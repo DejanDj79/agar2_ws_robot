@@ -1,6 +1,6 @@
 import os
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler, ExecuteProcess
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration, PythonExpression, PathJoinSubstitution
@@ -72,6 +72,19 @@ def generate_launch_description():
     output='screen'
   )
 
+
+  load_joint_state_broadcaster = ExecuteProcess(
+      cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+            'joint_state_broadcaster'],
+      output='screen'
+  )
+
+  load_diff_drive_base_controller = ExecuteProcess(
+      cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+            'diff_drive_base_controller'],
+      output='screen'
+  )
+
   ld = LaunchDescription()
   ld.add_action(declare_simulator_cmd)
   ld.add_action(declare_use_sim_time_cmd)
@@ -81,5 +94,9 @@ def generate_launch_description():
   ld.add_action(start_gazebo_server_cmd)
   ld.add_action(start_gazebo_client_cmd)
   ld.add_action(spawn_entity_node)
-  ld.add_action(robot_steering_node)
+  # ld.add_action(robot_steering_node)
+
+  ld.add_action(load_joint_state_broadcaster)
+  ld.add_action(load_diff_drive_base_controller)
+
   return ld
