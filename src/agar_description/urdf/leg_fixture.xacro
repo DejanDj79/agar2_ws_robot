@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<robot name="agar" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="leg_fixture" params="name type xyz rpy ixyz irpy ixx ixy ixz iyy iyz izz jxyz jrpy">
+        <link name="${name}">
+            <visual>
+                <origin xyz="${xyz}" rpy="${rpy}" />
+                <geometry>
+                    <mesh filename="file://$(find agar_description)/meshes/leg_fixture_${type}.stl" />
+                </geometry>
+                <material name="grey" />
+            </visual>
+            <inertial>
+                <origin xyz="${ixyz}" rpy="${irpy}" />
+                <mass value="3.43" />
+                <inertia ixx="${ixx}" ixy="${ixy}" ixz="${ixz}" iyy="${iyy}" iyz="${iyz}" izz="${izz}" />
+            </inertial>
+            <collision>
+                <origin xyz="${xyz}" rpy="${rpy}" />
+                <geometry>
+                    <mesh filename="file://$(find agar_description)/meshes/leg_fixture_${type}.stl" />
+                </geometry>
+            </collision>
+        </link>
+        <joint name="${name}_joint" type="fixed">
+            <origin xyz="${jxyz}" rpy="${jrpy}" />
+            <parent link="base_link" />
+            <child link="${name}" />
+        </joint>
+        <gazebo reference="${name}">
+            <material>Gazebo/Grey</material>
+        </gazebo>
+    </xacro:macro>
+</robot>   
