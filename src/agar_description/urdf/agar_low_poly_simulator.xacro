@@ -22,7 +22,9 @@
     <xacro:include filename="$(find agar_description)/urdf/leg_low_poly.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/wheel_low_poly.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/ros2_control.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/stand.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/gps_imu.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/lidar.xacro" />
     
     <!-- AgAR frame -->
     <link name="base_footprint">
@@ -122,81 +124,5 @@
         ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 0.18999 -0.0002" jrpy="0 0 0" />
     <xacro:wheel_low_poly name="${rear_left_wheel}" type="a" xyz="0 0 0" rpy="${pi/2} 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 -0.18999 -0.0002" jrpy="0 0 ${pi}" />
-
-
-     <link name="my_link">
-        <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <box size="0.1 0.1 0.1" />
-            </geometry>
-            <material name="black" />
-        </visual>
-        <inertial>
-            <origin xyz="0 0 0.1" rpy="0 0 0"/>
-            <mass value="1"/>
-            <inertia ixx="100"  ixy="0"  ixz="0" iyy="100" iyz="0" izz="100" />
-        </inertial>
-        <collision>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
-            <geometry>
-                <cylinder radius="1" length="0.5"/>
-            </geometry>
-        </collision>
-    </link>
-    <joint name="my_link_joint" type="fixed">
-        <origin xyz="0.7 0 0.176" rpy="0 0 0" />
-        <parent link="base_link"/>
-        <child link="my_link" />
-    </joint>
-    <gazebo reference="my_link">
-        <material>Gazebo/Black</material>
-    </gazebo>
-
-
-
-    <!-- <ros2_control name="GazeboSystem" type="system">
-        <hardware>
-            <plugin>gazebo_ros2_control/GazeboSystem</plugin>
-        </hardware>
-        <joint name="front_left_wheel_joint">
-            <command_interface name="velocity">
-                <param name="min">-1</param>
-                <param name="max">1</param>
-            </command_interface>
-            <state_interface name="position"/>
-            <state_interface name="velocity"/>
-        </joint>
-        <joint name="rear_left_wheel_joint">
-            <command_interface name="velocity">
-                <param name="min">-1</param>
-                <param name="max">1</param>
-            </command_interface>
-            <state_interface name="position"/>
-            <state_interface name="velocity"/>
-        </joint>
-        <joint name="front_right_wheel_joint">
-            <command_interface name="velocity">
-                <param name="min">-1</param>
-                <param name="max">1</param>
-            </command_interface>
-            <state_interface name="position"/>
-            <state_interface name="velocity"/>
-        </joint>
-        <joint name="rear_right_wheel_joint">
-            <command_interface name="velocity">
-                <param name="min">-1</param>
-                <param name="max">1</param>
-            </command_interface>
-            <state_interface name="position"/>
-            <state_interface name="velocity"/>
-        </joint>
-    </ros2_control>
-
-    <gazebo>
-        <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
-        <parameters>$(find agar_gazebo)/config/diff_drive_controller.yaml</parameters>
-        </plugin>
-    </gazebo> -->
 
 </robot>

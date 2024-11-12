@@ -6,8 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /RobotModel1
-        - /Odometry1
         - /Odometry1/Shape1
       Splitter Ratio: 0.5
     Tree Height: 719
@@ -28,7 +26,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: PointCloud2
 Visualization Manager:
   Class: ""
   Displays:
@@ -75,9 +73,9 @@ Visualization Manager:
           Value: true
         imu_link:
           Value: true
-        map:
+        left_stand:
           Value: true
-        my_link:
+        map:
           Value: true
         odom:
           Value: true
@@ -94,6 +92,12 @@ Visualization Manager:
         rear_right_leg_fixture:
           Value: true
         rear_right_wheel:
+          Value: true
+        right_stand:
+          Value: true
+        top_stand:
+          Value: true
+        velodyne:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -117,7 +121,7 @@ Visualization Manager:
                   {}
                 imu_link:
                   {}
-                my_link:
+                left_stand:
                   {}
                 raster:
                   {}
@@ -129,6 +133,12 @@ Visualization Manager:
                   rear_right_leg:
                     rear_right_wheel:
                       {}
+                right_stand:
+                  {}
+                top_stand:
+                  {}
+                velodyne:
+                  {}
       Update Interval: 0
       Value: true
     - Alpha: 0.699999988079071
@@ -197,7 +207,7 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        my_link:
+        left_stand:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -233,6 +243,21 @@ Visualization Manager:
           Show Trail: false
           Value: true
         rear_right_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        right_stand:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        top_stand:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        velodyne:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -284,6 +309,40 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /odometry/filtered
       Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: ring
+      Class: rviz_default_plugins/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 7
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.009999999776482582
+      Style: Points
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /velodyne_points
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -330,25 +389,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 20.696704864501953
+      Distance: 5.655266284942627
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.2608282566070557
-        Y: -5.879868030548096
-        Z: -2.9989986419677734
+        X: -0.36536115407943726
+        Y: -1.8006749153137207
+        Z: -0.2558087706565857
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.44539785385131836
+      Pitch: 0.3903977572917938
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.9503971338272095
+      Yaw: 1.4953968524932861
     Saved: ~
 Window Geometry:
   Displays:
