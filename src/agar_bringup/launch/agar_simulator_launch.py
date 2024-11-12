@@ -7,17 +7,11 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
-    config = os.path.join(
-      get_package_share_directory('agar_bringup'),
-      'config',
-      'agar_simulator.yaml'
-    )
-    
-    rviz_launch = IncludeLaunchDescription(
-      PythonLaunchDescriptionSource([os.path.join(
-         get_package_share_directory('agar_visualization'), 'launch'),
-         '/agar_visualization_launch.py'])
-      )
+    # config = os.path.join(
+    #   get_package_share_directory('agar_bringup'),
+    #   'config',
+    #   'agar_simulator.yaml'
+    # )
     
     gazebo_launch = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
@@ -30,6 +24,24 @@ def generate_launch_description():
          get_package_share_directory('agar_description'), 'launch'),
          '/agar_description_launch.py'])
       )
+    
+    rviz_launch = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('agar_visualization'), 'launch'),
+         '/agar_visualization_launch.py'])
+      )
+    
+    localization_launch = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('agar_localization'), 'launch'),
+         '/agar_localization_launch.py'])
+      )
+    
+    robot_steering_node = Node(
+      package='rqt_robot_steering', 
+      executable='rqt_robot_steering',
+      output='screen'
+    )
 
     return LaunchDescription([
         # Node(
@@ -39,9 +51,11 @@ def generate_launch_description():
         #     name='test_node',
         #     parameters=[config]
         # ),
-        # rviz_launch,
         description_launch,
+        localization_launch,
         gazebo_launch,
+        rviz_launch,
+        robot_steering_node,
 
         # Node(
         #     package='agar_bringup',

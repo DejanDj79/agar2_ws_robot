@@ -15,10 +15,7 @@ def generate_launch_description():
  
   world_file_name = 'agar_empty.world'
   world_path = os.path.join(pkg_agar_gazebo, 'worlds', world_file_name)
-   
-  # Set the path to the SDF model files.
-  # gazebo_models_path = os.path.join(pkg_agar_gazebo, 'models')
-  # os.environ["GAZEBO_MODEL_PATH"] = gazebo_models_path
+
  
   headless = LaunchConfiguration('headless')
   use_sim_time = LaunchConfiguration('use_sim_time')
@@ -63,15 +60,9 @@ def generate_launch_description():
     package='gazebo_ros', 
     executable='spawn_entity.py',
     arguments=['-topic', 'robot_description', '-entity', 'AgAR'],
+    parameters=[{"use_sime_time": use_sim_time}],
     output='screen'
   )
-
-  robot_steering_node = Node(
-    package='rqt_robot_steering', 
-    executable='rqt_robot_steering',
-    output='screen'
-  )
-
 
   load_joint_state_broadcaster = ExecuteProcess(
       cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
@@ -83,6 +74,12 @@ def generate_launch_description():
       cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
             'diff_drive_base_controller'],
       output='screen'
+  )
+
+  transform_node = Node(
+      package="tf2_ros",
+      executable="static_transform_publisher",
+      arguments = ["--x", "0", "--y", "0", "--z", "0", "--yaw", "0", "--pitch", "0", "--roll", "0", "--frame-id", "map", "--child-frame-id", "odom"]
   )
 
   ld = LaunchDescription()
@@ -98,5 +95,7 @@ def generate_launch_description():
 
   ld.add_action(load_joint_state_broadcaster)
   ld.add_action(load_diff_drive_base_controller)
+
+  # ld.add_action(transform_node)
 
   return ld

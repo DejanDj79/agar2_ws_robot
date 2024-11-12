@@ -3,6 +3,7 @@ from glob import glob
 from setuptools import find_packages, setup
 
 package_name = 'agar_gazebo'
+submodules = 'agar_common'
 
 setup(
     name=package_name,
