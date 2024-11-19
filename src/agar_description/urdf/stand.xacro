@@ -1,60 +1,5 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
-    <link name="left_stand">
-        <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <box size="0.05 0.01 0.4" />
-            </geometry>
-            <material name="black" />
-        </visual>
-        <xacro:box_inertia m="1" l="0.05" w="0.01" h="0.4" xyz="0 0 0" rpy="0 0 0" />
-        <!-- <inertial>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <mass value="1" />
-            <inertia ixx="${ixx}" ixy="${ixy}" ixz="${ixz}" iyy="${iyy}" iyz="${iyz}" izz="${izz}" />
-        </inertial> -->
-        <collision>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <box size="0.05 0.01 0.4" />
-            </geometry>
-        </collision>
-    </link>
-    <joint name="left_stand_joint" type="fixed">
-        <origin xyz="0 0.3 0.38" rpy="0 0 0" />
-        <parent link="base_link" />
-        <child link="left_stand" />
-    </joint>
-    <gazebo reference="left_stand">
-        <material>Gazebo/Grey</material>
-    </gazebo>
-
-    <link name="right_stand">
-        <visual>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <box size="0.05 0.01 0.4" />
-            </geometry>
-            <material name="black" />
-        </visual>
-        <xacro:box_inertia m="1" l="0.05" w="0.01" h="0.4" xyz="0 0 0" rpy="0 0 0" />
-        <collision>
-            <origin xyz="0 0 0" rpy="0 0 0" />
-            <geometry>
-                <box size="0.05 0.01 0.4" />
-            </geometry>
-        </collision>
-    </link>
-    <joint name="right_stand_joint" type="fixed">
-        <origin xyz="0 -0.3 0.38" rpy="0 0 0" />
-        <parent link="base_link" />
-        <child link="right_stand" />
-    </joint>
-    <gazebo reference="right_stand">
-        <material>Gazebo/Grey</material>
-    </gazebo>
-
     <link name="top_stand">
         <visual>
             <origin xyz="0 0 0" rpy="0 0 0" />
@@ -80,4 +25,61 @@
         <material>Gazebo/Grey</material>
     </gazebo>
 
+
+    <link name="left_stand">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="0.05 0.01 0.4" />
+            </geometry>
+            <material name="black" />
+        </visual>
+        <xacro:box_inertia m="1" l="0.05" w="0.01" h="0.4" xyz="0 0 0" rpy="0 0 0" />
+        <!-- <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <mass value="1" />
+            <inertia ixx="${ixx}" ixy="${ixy}" ixz="${ixz}" iyy="${iyy}" iyz="${iyz}" izz="${izz}" />
+        </inertial> -->
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="0.05 0.01 0.4" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="left_stand_joint" type="fixed">
+        <origin xyz="0 0.3 -0.20" rpy="0 0 0" />
+        <parent link="top_stand" />
+        <child link="left_stand" />
+    </joint>
+    <gazebo reference="left_stand">
+        <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <link name="right_stand">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="0.05 0.01 0.4" />
+            </geometry>
+            <material name="black" />
+        </visual>
+        <xacro:box_inertia m="1" l="0.05" w="0.01" h="0.4" xyz="0 0 0" rpy="0 0 0" />
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <box size="0.05 0.01 0.4" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="right_stand_joint" type="fixed">
+        <origin xyz="0 -0.3 -0.20" rpy="0 0 0" />
+        <parent link="top_stand" />
+        <child link="right_stand" />
+    </joint>
+    <gazebo reference="right_stand">
+        <material>Gazebo/Grey</material>
+    </gazebo>
+
+    
 </robot>

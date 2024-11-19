@@ -13,7 +13,7 @@ def generate_launch_description():
   pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')   
   pkg_agar_gazebo = FindPackageShare(package='agar_gazebo').find('agar_gazebo')
  
-  world_file_name = 'agar_empty.world'
+  world_file_name = 'agar_cones.world'
   world_path = os.path.join(pkg_agar_gazebo, 'worlds', world_file_name)
 
  
@@ -23,7 +23,7 @@ def generate_launch_description():
   
   declare_simulator_cmd = DeclareLaunchArgument(
     name='headless',
-    default_value='False',
+    default_value='True',
     description='Whether to execute gzclient')
      
   declare_use_sim_time_cmd = DeclareLaunchArgument(

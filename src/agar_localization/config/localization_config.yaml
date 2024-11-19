@@ -1,7 +1,7 @@
 ### navsat transform ###
 navsat_transform:
   ros__parameters:
-    frequency: 30.0
+    frequency: 20.0
     delay: 0.0 # Seconds to wait before calculating the transform from GPS coordinates to your robot’s world frame.
 
     zero_altitude: false
@@ -17,7 +17,7 @@ navsat_transform:
 ekf_filter_node:
     ros__parameters:
         use_sim_time: true
-        frequency: 30.0
+        frequency: 20.0
         sensor_timeout: 0.1
         two_d_mode: true
         transform_time_offset: 0.0
@@ -29,10 +29,10 @@ ekf_filter_node:
         publish_acceleration: false
         reset_on_time_jump: true
         
-        map_frame: map                   # Defaults to "map" if unspecified
+        # map_frame: map                   # Defaults to "map" if unspecified
         odom_frame: odom                 # Defaults to "odom" if unspecified
         base_link_frame: base_footprint  # Defaults to "base_link" if unspecified
-        world_frame: map                # Defaults to the value of odom_frame if unspecified
+        world_frame: odom                # Defaults to the value of odom_frame if unspecified
 
 
 

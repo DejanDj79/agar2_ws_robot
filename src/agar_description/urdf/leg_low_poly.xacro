@@ -27,7 +27,7 @@
             <child link="${name}" />
         </joint>
         <gazebo reference="${name}">
-            <material>Gazebo/Grey</material>
+            <material>Gazebo/DarkGrey</material>
         </gazebo>
     </xacro:macro>
 </robot>   
