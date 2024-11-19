@@ -54,7 +54,7 @@ def generate_launch_description():
             'scan_time': 0.2,
             'range_min': 0.45,
             'range_max': 30.0,
-            'use_sime_time': True,
+            'use_sime_time': False,
         }],
     )
     
