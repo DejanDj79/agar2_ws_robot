@@ -72,6 +72,6 @@ def generate_launch_description():
   ld.add_action(map_to_odom)
   ld.add_action(odom_to_basefootprint)
 
-  # ld.add_action(pointcloud_to_laserscan)
+  ld.add_action(pointcloud_to_laserscan)
 
   return ld
