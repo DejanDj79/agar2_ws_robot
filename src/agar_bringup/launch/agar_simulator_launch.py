@@ -7,12 +7,6 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
-    # config = os.path.join(
-    #   get_package_share_directory('agar_bringup'),
-    #   'config',
-    #   'agar_simulator.yaml'
-    # )
-    
     gazebo_launch = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('agar_gazebo'), 'launch'),
@@ -44,13 +38,6 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        # Node(
-        #     package='agar_bringup',
-        #     namespace='/',
-        #     executable='test_node',
-        #     name='test_node',
-        #     parameters=[config]
-        # ),
         description_launch,
         localization_launch,
         gazebo_launch,

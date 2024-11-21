@@ -5,11 +5,11 @@ from launch_ros.actions import Node
  
 def generate_launch_description():
     
-    # transform_node = Node(
-    #     package="tf2_ros",
-    #     executable="static_transform_publisher",
-    #     arguments = ["--x", "0", "--y", "0", "--z", "0", "--yaw", "0", "--pitch", "0", "--roll", "0", "--frame-id", "map", "--child-frame-id", "odom"]
-    # )
+    use_sim_time_config = os.path.join(
+        get_package_share_directory('agar_bringup'),
+        'config',
+        'sim_time.yaml'
+    )
 
     mapviz_config = os.path.join(
       get_package_share_directory('agar_visualization'),
@@ -22,6 +22,7 @@ def generate_launch_description():
         executable="mapviz",
         name="mapviz",
         parameters = [
+            use_sim_time_config,
             {"config": mapviz_config}
         ]
     )
@@ -31,6 +32,7 @@ def generate_launch_description():
         executable="initialize_origin.py",
         name="initialize_origin",
         parameters = [
+            use_sim_time_config,
             {"local_xy_frame" : "map"},
             {"local_xy_origin" : "auto"},
             {"local_xy_navsatfix_topic" : "/gps/fix"},
@@ -39,7 +41,6 @@ def generate_launch_description():
 
 
     ld = LaunchDescription()
-    # ld.add_action(transform_node)
     ld.add_action(mapviz_node)
     ld.add_action(swri_transform_node)
 

@@ -1,3 +1,5 @@
+import os
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, SetEnvironmentVariable
 from launch.substitutions import LaunchConfiguration
@@ -6,14 +8,15 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    use_sim_time = LaunchConfiguration('use_sim_time')
+    use_sim_time_config = os.path.join(
+        get_package_share_directory('agar_bringup'),
+        'config',
+        'sim_time.yaml'
+    )
+
     qos = LaunchConfiguration('qos')
     localization = LaunchConfiguration('localization')
 
-    declare_use_sim_time = DeclareLaunchArgument(
-        'use_sim_time', default_value='true',
-        description='Use simulation (Gazebo) clock if true')
-    
     declare_qos = DeclareLaunchArgument(
         'qos', default_value='2',
         description='QoS used for input sensor topics')
@@ -24,10 +27,9 @@ def generate_launch_description():
     
     parameters={
         'frame_id': 'base_footprint',
-        'use_sim_time': use_sim_time,
-        'subscribe_depth': False,
-        'subscribe_rgb': False,
-        'subscribe_scan': True,
+        'subscribe_depth': True,
+        'subscribe_rgb': True,
+        'subscribe_scan': False,
         'subscribe_scan_cloud': False,
         'use_action_for_goal': True,
         'qos_scan': qos,
@@ -85,30 +87,29 @@ def generate_launch_description():
     rtabmap_slam =  Node(
         condition=UnlessCondition(localization),
         package='rtabmap_slam', executable='rtabmap', output='screen',
-        parameters=[parameters],
+        parameters=[use_sim_time_config, parameters],
         remappings=remappings,
         arguments=['-d'])
     
     rtabmap_slam_mem = Node(
         condition=IfCondition(localization),
         package='rtabmap_slam', executable='rtabmap', output='screen',
-        parameters=[parameters,
+        parameters=[use_sim_time_config, parameters,
             {'Mem/IncrementalMemory':'False',
             'Mem/InitWMWithAllNodes':'True'}],
         remappings=remappings)
 
     rtabmap_viz = Node(
         package='rtabmap_viz', executable='rtabmap_viz', output='screen',
-        parameters=[parameters],
+        parameters=[use_sim_time_config, parameters],
         remappings=remappings)
 
     ld = LaunchDescription()
-    ld.add_action(declare_use_sim_time)
     ld.add_action(declare_qos)
     ld.add_action(declare_localization)
 
     ld.add_action(rtabmap_slam)
     # ld.add_action(rtabmap_slam_mem)
-    ld.add_action(rtabmap_viz)
+    # ld.add_action(rtabmap_viz)
     
     return ld

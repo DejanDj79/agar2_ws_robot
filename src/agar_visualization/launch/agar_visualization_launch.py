@@ -10,11 +10,11 @@ from launch_ros.actions import Node
 def generate_launch_description():
     rviz_config = os.path.join(get_package_share_directory('agar_visualization'), 'config', 'agar_simulator.rviz')
 
-    use_sim_time = LaunchConfiguration('use_sim_time')
-    declare_use_sim_time_cmd = DeclareLaunchArgument(
-        name='use_sim_time',
-        default_value='True',
-        description='Use simulation (Gazebo) clock if true')
+    use_sim_time_config = os.path.join(
+        get_package_share_directory('agar_bringup'),
+        'config',
+        'sim_time.yaml'
+    )
     
     start_rviz = Node(
         package='rviz2',
@@ -22,11 +22,10 @@ def generate_launch_description():
         executable='rviz2',
         name='rviz2',
         arguments=['-d' + rviz_config],
-        parameters=[{'use_sim_time': use_sim_time}]
+        parameters=[use_sim_time_config]
     )
 
     ld = LaunchDescription()
-    ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(start_rviz)
 
     return ld

@@ -1,14 +1,21 @@
 import os
+from ament_index_python.packages import get_package_share_directory
+
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler, ExecuteProcess
-from launch.conditions import IfCondition, UnlessCondition
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, ExecuteProcess
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command, LaunchConfiguration, PythonExpression, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-from launch.event_handlers import OnProcessExit
  
 def generate_launch_description():
+
+  use_sim_time_config = os.path.join(
+    get_package_share_directory('agar_bringup'),
+    'config',
+    'sim_time.yaml'
+  )
  
   pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')   
   pkg_agar_gazebo = FindPackageShare(package='agar_gazebo').find('agar_gazebo')
@@ -21,19 +28,13 @@ def generate_launch_description():
 
  
   headless = LaunchConfiguration('headless')
-  use_sim_time = LaunchConfiguration('use_sim_time')
   use_simulator = LaunchConfiguration('use_simulator')
   
   declare_simulator_cmd = DeclareLaunchArgument(
     name='headless',
-    default_value='False',
+    default_value='True',
     description='Whether to execute gzclient')
      
-  declare_use_sim_time_cmd = DeclareLaunchArgument(
-    name='use_sim_time',
-    default_value='True',
-    description='Use simulation (Gazebo) clock if true')
- 
   declare_use_simulator_cmd = DeclareLaunchArgument(
     name='use_simulator',
     default_value='True',
@@ -63,7 +64,7 @@ def generate_launch_description():
     package='gazebo_ros', 
     executable='spawn_entity.py',
     arguments=['-topic', 'robot_description', '-entity', 'AgAR'],
-    parameters=[{"use_sime_time": use_sim_time}],
+    parameters=[use_sim_time_config],
     output='screen'
   )
 
@@ -79,15 +80,14 @@ def generate_launch_description():
       output='screen'
   )
 
-  transform_node = Node(
-      package="tf2_ros",
-      executable="static_transform_publisher",
-      arguments = ["--x", "0", "--y", "0", "--z", "0", "--yaw", "0", "--pitch", "0", "--roll", "0", "--frame-id", "map", "--child-frame-id", "odom"]
-  )
+  # transform_node = Node(
+  #     package="tf2_ros",
+  #     executable="static_transform_publisher",
+  #     arguments = ["--x", "0", "--y", "0", "--z", "0", "--yaw", "0", "--pitch", "0", "--roll", "0", "--frame-id", "map", "--child-frame-id", "odom"]
+  # )
 
   ld = LaunchDescription()
   ld.add_action(declare_simulator_cmd)
-  ld.add_action(declare_use_sim_time_cmd)
   ld.add_action(declare_use_simulator_cmd)
   ld.add_action(declare_world_cmd)
  

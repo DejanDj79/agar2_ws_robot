@@ -18,9 +18,9 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time')
     declare_use_sim_time_cmd = DeclareLaunchArgument(
-    name='use_sim_time',
-    default_value='True',
-    description='Use simulation (Gazebo) clock if true')
+      name='use_sim_time',
+      default_value='True',
+      description='Use simulation (Gazebo) clock if true')
 
     # slam_toolbox = Node(
     #     name='slamtoolbox',

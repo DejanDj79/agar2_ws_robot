@@ -1,7 +1,15 @@
+import os
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
 
 def generate_launch_description():
+    use_sim_time_config = os.path.join(
+        get_package_share_directory('agar_bringup'),
+        'config',
+        'sim_time.yaml'
+    )
+    
     velodyne_to_laser = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
@@ -27,9 +35,8 @@ def generate_launch_description():
             'range_min': 0.45,
             'range_max': 30.0,
             'use_inf': True,
-            'inf_epsilon': 1.0,
-            'use_sime_time': False
-        }],
+            'inf_epsilon': 1.0
+        }, use_sim_time_config],
     )
 
     # camera_to_laser = Node(
