@@ -50,6 +50,7 @@ def generate_launch_description():
                        'planner_server',
                        'behavior_server',
                        'bt_navigator',
+                       'collision_monitor',
                        'waypoint_follower',
                        'velocity_smoother']
 
@@ -124,7 +125,7 @@ def generate_launch_description():
                 respawn_delay=2.0,
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings + [('diff_drive_base_controller/cmd_vel_unstamped', 'cmd_vel_nav')]),
+                remappings=remappings + [('cmd_vel_to_col', 'cmd_vel_nav')]),
             Node(
                 package='nav2_smoother',
                 executable='smoother_server',
@@ -185,7 +186,7 @@ def generate_launch_description():
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings +
-                        [('diff_drive_base_controller/cmd_vel_unstamped', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'diff_drive_base_controller/cmd_vel_unstamped')]),
+                        [('cmd_vel_to_col', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel_to_col')]),
             Node(
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
@@ -195,6 +196,13 @@ def generate_launch_description():
                 parameters=[{'use_sim_time': use_sim_time},
                             {'autostart': autostart},
                             {'node_names': lifecycle_nodes}]),
+
+            Node(
+                package='nav2_collision_monitor',
+                executable='collision_monitor',
+                output='screen',
+                emulate_tty=True,
+                parameters=[configured_params]) 
         ]
     )
 
@@ -207,7 +215,7 @@ def generate_launch_description():
                 plugin='nav2_controller::ControllerServer',
                 name='controller_server',
                 parameters=[configured_params],
-                remappings=remappings + [('diff_drive_base_controller/cmd_vel_unstamped', 'cmd_vel_nav')]),
+                remappings=remappings + [('cmd_vel_to_col', 'cmd_vel_nav')]),
             ComposableNode(
                 package='nav2_smoother',
                 plugin='nav2_smoother::SmootherServer',
@@ -244,7 +252,7 @@ def generate_launch_description():
                 name='velocity_smoother',
                 parameters=[configured_params],
                 remappings=remappings +
-                           [('diff_drive_base_controller/cmd_vel_unstamped', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'diff_drive_base_controller/cmd_vel_unstamped')]),
+                           [('cmd_vel_to_col', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel_to_col')]),
             ComposableNode(
                 package='nav2_lifecycle_manager',
                 plugin='nav2_lifecycle_manager::LifecycleManager',
