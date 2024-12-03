@@ -22,7 +22,8 @@ def generate_launch_description():
  
   # world_file_name = 'agar_empty.world'
   # world_file_name = 'agar_cones.world'
-  world_file_name = 'agar_walls.world'
+  # world_file_name = 'agar_walls.world'
+  world_file_name = 'agar_vineyard.world'
   # world_file_name = 'agar_village.world'
   world_path = os.path.join(pkg_agar_gazebo, 'worlds', world_file_name)
 
