@@ -20,7 +20,7 @@ def generate_launch_description():
   pkg_gazebo_ros = FindPackageShare(package='gazebo_ros').find('gazebo_ros')   
   pkg_agar_gazebo = FindPackageShare(package='agar_gazebo').find('agar_gazebo')
  
-  world_file_name = 'agar_empty.world'
+  # world_file_name = 'agar_empty.world'
   # world_file_name = 'agar_cones.world'
   # # world_file_name = 'agar_walls.world'
   world_file_name = 'agar_vineyard.world'
