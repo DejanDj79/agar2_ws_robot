@@ -118,23 +118,23 @@
         ixx="1.1302317084114302" ixy="0" ixz="0" iyy="3.845526063904824" iyz="0" izz="3.271057725788208" jxyz="0.18 -0.075 -0.31" jrpy="0 ${pi/3} 0" />
    
     <!-- AgAR Wheels -->
-    <!-- <xacro:wheel_low_poly name="${front_right_wheel}" type="a" xyz="0 0 0" rpy="${pi/2} 0 0" ixyz="0 0 0" irpy="0 0 0" 
+    <xacro:wheel_low_poly name="${front_right_wheel}" type="a" xyz="0 0 0" rpy="${pi/2} 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 -0.18999 -0.0002" jrpy="0 0 0" />
     <xacro:wheel_low_poly name="${rear_right_wheel}" type="a" xyz="0 0 0" rpy="${pi/2} 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 0.18999 -0.0002" jrpy="0 0 ${pi}" />
     <xacro:wheel_low_poly name="${front_left_wheel}" type="a" xyz="0 0 0" rpy="${pi/2} 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 0.18999 -0.0002" jrpy="0 0 0" />
     <xacro:wheel_low_poly name="${rear_left_wheel}" type="a" xyz="0 0 0" rpy="${pi/2} 0 0" ixyz="0 0 0" irpy="0 0 0" 
-        ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 -0.18999 -0.0002" jrpy="0 0 ${pi}" /> -->
+        ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 -0.18999 -0.0002" jrpy="0 0 ${pi}" />
 
-    <xacro:wheel name="${front_right_wheel}" type="a" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
+    <!-- <xacro:wheel name="${front_right_wheel}" type="a" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 -0.18999 -0.0002" jrpy="0 -${pi/3} 0" />
     <xacro:wheel name="${rear_right_wheel}" type="a" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 0.18999 -0.0002" jrpy="0 ${pi/3} ${pi}" />
     <xacro:wheel name="${front_left_wheel}" type="b" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.4193309158223555" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.4193309158223555" jxyz="0.341 0.18999 -0.0002" jrpy="0 -${pi/3} 0" />
     <xacro:wheel name="${rear_left_wheel}" type="b" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
-        ixx="0.4193309158223555" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.4193309158223555" jxyz="0.341 -0.18999 -0.000" jrpy="0 ${pi/3} ${pi}" />
+        ixx="0.4193309158223555" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.4193309158223555" jxyz="0.341 -0.18999 -0.000" jrpy="0 ${pi/3} ${pi}" /> -->
                                     
 
 </robot>
