@@ -38,14 +38,9 @@ def generate_launch_description():
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
 
-    lifecycle_nodes = ['controller_server',
-                    #    'smoother_server',
+    lifecycle_nodes = [
+                       'controller_server',
                        'planner_server',
-                       'behavior_server',
-                       'bt_navigator',
-                       'collision_monitor',
-                       'waypoint_follower',
-                    #    'velocity_smoother',
                        ]
 
     remappings = [('/tf', 'tf'),
@@ -125,36 +120,36 @@ def generate_launch_description():
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
-            Node(
-                package='nav2_behaviors',
-                executable='behavior_server',
-                name='behavior_server',
-                output='screen',
-                respawn=use_respawn,
-                respawn_delay=2.0,
-                parameters=[configured_params],
-                arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings + [('cmd_vel_teleop', 'cmd_vel_nav'), ('cmd_vel', 'diff_drive_base_controller/cmd_vel_unstamped')]),
-            Node(
-                package='nav2_bt_navigator',
-                executable='bt_navigator',
-                name='bt_navigator',
-                output='screen',
-                respawn=use_respawn,
-                respawn_delay=2.0,
-                parameters=[configured_params],
-                arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings),
-            Node(
-                package='nav2_waypoint_follower',
-                executable='waypoint_follower',
-                name='waypoint_follower',
-                output='screen',
-                respawn=use_respawn,
-                respawn_delay=2.0,
-                parameters=[configured_params],
-                arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings),
+            # Node(
+            #     package='nav2_behaviors',
+            #     executable='behavior_server',
+            #     name='behavior_server',
+            #     output='screen',
+            #     respawn=use_respawn,
+            #     respawn_delay=2.0,
+            #     parameters=[configured_params],
+            #     arguments=['--ros-args', '--log-level', log_level],
+            #     remappings=remappings + [('cmd_vel_teleop', 'cmd_vel_nav'), ('cmd_vel', 'diff_drive_base_controller/cmd_vel_unstamped')]),
+            # Node(
+            #     package='nav2_bt_navigator',
+            #     executable='bt_navigator',
+            #     name='bt_navigator',
+            #     output='screen',
+            #     respawn=use_respawn,
+            #     respawn_delay=2.0,
+            #     parameters=[configured_params],
+            #     arguments=['--ros-args', '--log-level', log_level],
+            #     remappings=remappings),
+            # Node(
+            #     package='nav2_waypoint_follower',
+            #     executable='waypoint_follower',
+            #     name='waypoint_follower',
+            #     output='screen',
+            #     respawn=use_respawn,
+            #     respawn_delay=2.0,
+            #     parameters=[configured_params],
+            #     arguments=['--ros-args', '--log-level', log_level],
+            #     remappings=remappings),
             # Node(
             #     package='nav2_velocity_smoother',
             #     executable='velocity_smoother',
@@ -175,14 +170,14 @@ def generate_launch_description():
                 parameters=[{'use_sim_time': use_sim_time},
                             {'autostart': autostart},
                             {'node_names': lifecycle_nodes}]),
-            Node(
-                package='nav2_collision_monitor',
-                executable='collision_monitor',
-                output='screen',
-                emulate_tty=True,
-                parameters=[configured_params],
-                remappings=remappings + [('cmd_vel_raw', 'cmd_vel_nav'), ('cmd_vel', 'diff_drive_base_controller/cmd_vel_unstamped')]
-                ),
+            # Node(
+            #     package='nav2_collision_monitor',
+            #     executable='collision_monitor',
+            #     output='screen',
+            #     emulate_tty=True,
+            #     parameters=[configured_params],
+            #     remappings=remappings + [('cmd_vel_raw', 'cmd_vel_nav'), ('cmd_vel', 'diff_drive_base_controller/cmd_vel_unstamped')]
+            #     ),
         ]
     )
 

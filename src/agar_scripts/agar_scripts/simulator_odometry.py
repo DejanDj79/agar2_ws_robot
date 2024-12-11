@@ -28,7 +28,51 @@ class SimulatorOdometry(Node):
         self.position = [0.0, 0.0]
         self.orientation = [0.0, 0.0, 0.0, 1.0]
 
-        self.odom_pub = self.create_publisher(Odometry, 'odometry/agar_odom', 10)
+        plugins: ["obstacle_layer", "inflation_layer"] #"obstacle_layer", "voxel_layer", 
+      # voxel_layer:
+      #   plugin: "nav2_costmap_2d::VoxelLayer"
+      #   enabled: True
+      #   publish_voxel_map: True
+      #   origin_z: 0.0
+      #   z_resolution: 0.05
+      #   z_voxels: 16
+      #   max_obstacle_height: 3.0
+      #   mark_threshold: 0
+      #   observation_sources: lidar_point_cloud #scan
+      #   lidar_point_cloud:
+      #     topic: /velodyne_points
+      #     data_type: "PointCloud2"
+      #     max_obstacle_height: 3.0
+      #     min_obstacle_height: 0.15
+      #     obstacle_max_range: 2.5
+      #     obstacle_min_range: 0.7
+      #     raytrace_max_range: 2.5
+      #     raytrace_min_range: 0.7
+      #     clearing: False
+      #     marking: False
+      # inflation_layer:
+      #   plugin: "nav2_costmap_2d::InflationLayer"
+      #   cost_scaling_factor: 7.0 #3.0
+      #   inflation_radius: 0.85 #0.55
+      # static_layer:
+      #   plugin: "nav2_costmap_2d::StaticLayer"
+      #   map_subscribe_transient_local: True
+      # obstacle_layer:
+      #   plugin: "nav2_costmap_2d::ObstacleLayer"
+      #   enabled: True
+      #   observation_sources: lidar_point_cloud #scan
+      #   lidar_point_cloud:
+      #     topic: /velodyne_points
+      #     data_type: "PointCloud2"
+      #     max_obstacle_height: 3.0
+      #     min_obstacle_height: 0.15
+      #     obstacle_max_range: 1.5
+      #     obstacle_min_range: 0.7
+      #     raytrace_max_range: 1.5
+      #     raytrace_min_range: 0.7
+      #     clearing: False
+      #     marking: True
+      # always_send_full_costmap: True
 
         self.gps_subscriber = self.create_subscription(
             NavSatFix,
