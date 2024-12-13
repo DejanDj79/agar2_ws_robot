@@ -7,9 +7,10 @@ from rclpy.node import Node
 from tf2_ros import TransformException 
 from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener 
-from tf_transformations import euler_from_quaternion, quaternion_from_euler, quaternion_multiply
+from tf_transformations import euler_from_quaternion, quaternion_from_euler
 
 from geometry_msgs.msg import TransformStamped, Twist
+from agar_msgs.msg import CollisionZones
 
 from random import randrange
 from enum import Enum
@@ -47,23 +48,48 @@ class WaypointFollower(Node):
 
         self.cmd_vel_pub = self.create_publisher(Twist, 'diff_drive_base_controller/cmd_vel_unstamped', 10)
 
+        self.collision_zones_sub = self.create_subscription(
+            CollisionZones, 'collision_zones',
+            self.collision_zones_callback, 10)
+
         self.source_frame = 'odom'
         self.target_frame = 'base_footprint'
 
         # self.pos_x = self.pos_y = self.yaw = 0
         self.robot_position = RobotPosition()
         self.waypoint       = RobotPosition()
-        self.waypoint.x     = float(randrange(20))
-        self.waypoint.y     = float(randrange(20))
+        self.waypoint.x     = 100.0 #float(randrange(20))
+        self.waypoint.y     = 0.0 #float(randrange(20))
 
         self.tf_static_broadcaster = StaticTransformBroadcaster(self)
 
         self.waypoint_index = 1
         self.publish_waypoint()
 
+        self.is_slow    = False
+
         self.current_action = robot_action.FOLLOW_PATH
 
         self.backup_distance = 0.0
+
+    #endregion
+
+    #region subscribers actions
+    def collision_zones_callback(self, msg):
+
+        if self.is_slow == False and msg.front_slow == True:
+            self.get_logger().warn("Collision ahead. Entering slow speed mode.")
+        elif self.is_slow == True and msg.front_slow == False:
+            self.get_logger().warn("Exiting slow speed mode.")
+
+        self.is_slow = msg.front_slow
+
+        if self.current_action == robot_action.FOLLOW_PATH and msg.front_stop == True:
+            self.get_logger().warn("Collision ahead. Activating stop and backup.")
+            trans = self.tf_buffer.lookup_transform('base_footprint', f'waypoint_{self.waypoint_index}', Time())
+            distance_in_m = sqrt(trans.transform.translation.x ** 2 + trans.transform.translation.y ** 2)
+            self.backup_distance = distance_in_m + 1.0
+            self.current_action = robot_action.BACKUP
 
     #endregion
 
@@ -84,7 +110,7 @@ class WaypointFollower(Node):
             distance_in_m = sqrt(trans.transform.translation.x ** 2 + trans.transform.translation.y ** 2)
             angle = atan2(trans.transform.translation.y, trans.transform.translation.x)
             angle_deg = degrees(angle)
-            self.get_logger().info(f'Distance: {round(distance_in_m, 2)}, angle waypoint: {round(angle, 2)}, {round(angle_deg, 2)}')
+            # self.get_logger().info(f'Distance: {round(distance_in_m, 2)}, angle waypoint: {round(angle, 2)}, {round(angle_deg, 2)}')
 
             if abs(angle_deg) > 30: speed_z = 1.0
             elif abs(angle_deg) > 10 and abs(angle_deg) <= 30: speed_z = 0.5
@@ -93,14 +119,18 @@ class WaypointFollower(Node):
             else: speed_z = 0.0
 
             if distance_in_m < 0.1:
-                self.backup_distance = distance_in_m + 0.5
-                self.current_action = robot_action.BACKUP
+                # self.backup_distance = distance_in_m + 0.5
+                self.current_action = robot_action.STOP
             
-            speed_x = 1.0
+            if self.is_slow:
+                speed_x = 0.3
+            else:
+                speed_x = 1.0
+
             if speed_z > 1: speed_z = 1.0
             if angle_deg < 0: speed_z *= -1.0
 
-            self.get_logger().info(f'Speed x: {speed_x}, z: {speed_z}')
+            # self.get_logger().info(f'Speed x: {speed_x}, z: {speed_z}')
 
             msg = Twist()
             # msg.header.stamp = self.get_clock().now().to_msg()
@@ -108,7 +138,7 @@ class WaypointFollower(Node):
             msg.angular.z = speed_z
             self.cmd_vel_pub.publish(msg)
         except TransformException as ex:
-            self.get_logger().error(
+            self.get_logger().warn(
                 f'Could not transform base_footprint to waypoint_01: {ex}')
         
 
@@ -118,14 +148,10 @@ class WaypointFollower(Node):
             distance_in_m = sqrt(trans.transform.translation.x ** 2 + trans.transform.translation.y ** 2)
             angle = atan2(trans.transform.translation.y, trans.transform.translation.x)
             angle_deg = degrees(angle)
-            self.get_logger().info(f'Distance: {round(distance_in_m, 2)}, angle waypoint: {round(angle, 2)}, {round(angle_deg, 2)}')
+            # self.get_logger().info(f'Distance: {round(distance_in_m, 2)}, angle waypoint: {round(angle, 2)}, {round(angle_deg, 2)}')
             
             if distance_in_m > self.backup_distance:
-                self.waypoint_index += 1
-                self.waypoint.x = float(randrange(20))
-                self.waypoint.y = float(randrange(20))
-                self.publish_waypoint()
-
+                self.get_logger().warn("Backup completed. Perform path following.")
                 self.backup_distance = 0
                 self.current_action = robot_action.FOLLOW_PATH
 
@@ -135,7 +161,7 @@ class WaypointFollower(Node):
             self.cmd_vel_pub.publish(msg)
 
         except TransformException as ex:
-            self.get_logger().error(
+            self.get_logger().warn(
                 f'Could not transform base_footprint to waypoint_{self.waypoint_index}: {ex}')
 
 
@@ -156,7 +182,7 @@ class WaypointFollower(Node):
             self.robot_position.deg = degrees(self.robot_position.z)
             
         except TransformException as ex:
-            self.get_logger().error(
+            self.get_logger().warn(
                 f'Could not transform {self.source_frame} to {self.target_frame}: {ex}')
             
     def publish_waypoint(self):

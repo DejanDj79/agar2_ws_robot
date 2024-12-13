@@ -1,16 +1,22 @@
 import rclpy
-import math 
-
+from rclpy.time import Time
 from rclpy.node import Node
 
+from nav_msgs.msg import OccupancyGrid
 from nav2_msgs.srv import GetCostmap
+from geometry_msgs.msg import Point32, Polygon, PolygonStamped
+from agar_msgs.msg import CollisionZones
 
 from nav2_simple_commander.costmap_2d import PyCostmap2D
 from nav2_simple_commander.line_iterator import LineIterator
-
 from nav2_simple_commander.robot_navigator import BasicNavigator
-from nav_msgs.msg import OccupancyGrid
-from geometry_msgs.msg import Point32, Polygon, PolygonStamped
+
+from tf2_ros.buffer import Buffer
+from tf2_ros.transform_listener import TransformListener 
+from tf2_ros import TransformException
+from tf_transformations import euler_from_quaternion
+
+from math import cos, sin, sqrt
 
 NO_INFORMATION = 255
 LETHAL_OBSTACLE = 254
@@ -24,19 +30,44 @@ class CollisionChecker(Node):
         super().__init__('collision_checker')
         self.get_logger().info('Initialization completed')
 
-        # self.timer                  = self.create_timer(0.05, self.run)
+        self.timer                  = self.create_timer(0.05, self.run)
         self.nav                    = BasicNavigator()
         self.costmap                = None
         self.footprint              = None
         self.costmap_subscriber     = self.create_subscription(
             OccupancyGrid, 'global_costmap/costmap',
             self.costmap_subscriber_callback, 10)
-        self.footprint_subscriber   = self.create_subscription(
-            PolygonStamped, 'global_costmap/published_footprint',
-            self.footprint_subscriber_callback, 10)
+        # self.footprint_subscriber   = self.create_subscription(
+        #     PolygonStamped, 'global_costmap/published_footprint',
+        #     self.footprint_subscriber_callback, 10)
     
-        self.front_poly_pub = self.create_publisher(PolygonStamped, 'front_footprint', 10)
-        self.rear_poly_pub = self.create_publisher(PolygonStamped, 'rear_footprint', 10)
+        self.robot_height           = 2.0
+        self.robot_width            = 1.8
+        self.source_frame           = 'odom'
+        self.target_frame           = 'base_footprint'
+
+        self.distance = sqrt(pow(self.robot_height / 2, 2) + pow(self.robot_width / 2, 2))
+
+        self.footprint_poly_pub     = self.create_publisher(PolygonStamped, 'footprint', 10)
+        self.front_stop_poly_pub    = self.create_publisher(PolygonStamped, 'front_stop_footprint', 10)
+        self.front_slow_poly_pub    = self.create_publisher(PolygonStamped, 'front_slow_footprint', 10)
+        self.rear_stop_poly_pub     = self.create_publisher(PolygonStamped, 'rear_stop_footprint', 10)
+        self.rear_slow_poly_pub     = self.create_publisher(PolygonStamped, 'rear_slow_footprint', 10)
+        # self.left_stop_poly_pub     = self.create_publisher(PolygonStamped, 'left_stop_footprint', 10)
+        # self.left_slow_poly_pub     = self.create_publisher(PolygonStamped, 'left_slow_footprint', 10)
+        # self.right_stop_poly_pub    = self.create_publisher(PolygonStamped, 'right_stop_footprint', 10)
+        # self.right_slow_poly_pub    = self.create_publisher(PolygonStamped, 'right_slow_footprint', 10)
+
+        self.collision_zones_pub    = self.create_publisher(CollisionZones, 'collision_zones', 10)
+
+        self.front_stop_poly        = None
+        self.front_slow_poly        = None
+        self.rear_stop_poly         = None
+        self.rear_slow_poly         = None
+
+        self.tf_buffer = Buffer()
+        self.tf_listener = TransformListener(self.tf_buffer, self)
+
     #endregion
 
     #region Process Data
@@ -44,63 +75,171 @@ class CollisionChecker(Node):
         self.costmap = PyCostmap2D(msg)
         # self.nav.clearGlobalCostmap()
 
-    def footprint_subscriber_callback(self, msg):
-        polygon = msg.polygon
-        self.footprint = polygon
+    # def footprint_subscriber_callback(self, msg):
+    #     polygon = msg.polygon
+    #     self.footprint = polygon
 
-        point_A = (polygon.points[0].x, polygon.points[0].y)
-        point_B = (polygon.points[1].x, polygon.points[1].y)
-        point_C = (polygon.points[2].x, polygon.points[2].y)
-        point_D = (polygon.points[3].x, polygon.points[3].y)
+    #     point_A = (polygon.points[0].x, polygon.points[0].y)
+    #     point_B = (polygon.points[1].x, polygon.points[1].y)
+    #     point_C = (polygon.points[2].x, polygon.points[2].y)
+    #     point_D = (polygon.points[3].x, polygon.points[3].y)
 
-        
-        front_poly = self.generate_polygon(point_D, point_A, point_C, point_B, 1.0)
-        self.front_poly_pub.publish(front_poly)
+    #     (self.front_stop_poly, self.front_slow_poly) = self.generate_zones(point_D, point_A, point_C, point_B, 0.25, 0.75)
+    #     self.front_stop_poly_pub.publish(self.front_stop_poly)
+    #     self.front_slow_poly_pub.publish(self.front_slow_poly)
 
-        rear_poly = self.generate_polygon(point_A, point_D, point_B, point_C, 1.0)
-        self.rear_poly_pub.publish(rear_poly)
-        # self.get_logger().info(f'{slow_polygon}')
-
-        
-        
-        # slowdown_polygon = polygon
+    #     (self.rear_stop_poly, self.rear_slow_poly) = self.generate_zones(point_A, point_D, point_B, point_C, 0.25, 0.75)
+    #     self.rear_stop_poly_pub.publish(self.rear_stop_poly)
+    #     self.rear_slow_poly_pub.publish(self.rear_slow_poly)
 
     def run(self):
+        self.generate_footprint()
         if self.costmap is None or self.footprint is None:
             self.get_logger().warn('OccupancyGrid or Footprint not yet received.')
             return
         try:
-            val = self.footprintCost(self.footprint)
-            if val != 0.0:
-                self.get_logger().info(f'{val}')
+            val_f_stop = self.footprintCost(self.front_stop_poly.polygon)
+            val_f_slow = self.footprintCost(self.front_slow_poly.polygon)
+            val_r_stop = self.footprintCost(self.rear_stop_poly.polygon)
+            val_r_slow = self.footprintCost(self.rear_slow_poly.polygon)
+            
+            # if val_f_stop != 0.0 or val_f_slow != 0.0 or val_r_stop != 0.0 or val_r_slow != 0.0:
+            #     self.get_logger().info(f'Front stop: {val_f_stop}, slow: {val_f_slow}')
+            #     self.get_logger().info(f'Rear stop: {val_r_stop}, slow: {val_r_slow}')
+
+            collision_zones = CollisionZones()
+            collision_zones.front_stop = val_f_stop != 0
+            collision_zones.front_slow = val_f_slow != 0
+            collision_zones.rear_stop = val_r_stop != 0
+            collision_zones.rear_slow = val_r_slow != 0
+            self.collision_zones_pub.publish(collision_zones)
+
         except Exception as ex:
             self.get_logger().error(
                 f'Exception: {ex}')
     #endregion
             
     #region Utils
-    def move_point(self, A, B, d): 
+    def generate_footprint(self):
+        """
+        Generate and publish robot footprint with stop and slow zones.
+        """
+
+        try:
+            trans = self.tf_buffer.lookup_transform(self.source_frame, self.target_frame, Time())
+                
+            pos_x = trans.transform.translation.x
+            pos_y = trans.transform.translation.y
+
+            orientation_list = [trans.transform.rotation.x, trans.transform.rotation.y, trans.transform.rotation.z, trans.transform.rotation.w]
+            (roll, pitch, pos_z) = euler_from_quaternion(orientation_list)
+
+            ax = pos_x + self.distance * cos(pos_z + 0.67474429)
+            ay = pos_y + self.distance * sin(pos_z + 0.67474429)
+
+            bx = pos_x + self.distance * cos(pos_z + 5.60844102)
+            by = pos_y + self.distance * sin(pos_z + 5.60844102)
+
+            cx = pos_x + self.distance * cos(pos_z + 3.81633694)
+            cy = pos_y + self.distance * sin(pos_z + 3.81633694)
+
+            dx = pos_x + self.distance * cos(pos_z + 2.46684836)
+            dy = pos_y + self.distance * sin(pos_z + 2.46684836)
+
+            point_A = (ax, ay)
+            point_B = (bx, by)
+            point_C = (cx, cy)
+            point_D = (dx, dy)
+
+            footprint = self.generate_polygon(point_D, point_A, point_C, point_B)
+            self.footprint = footprint.polygon
+            self.footprint_poly_pub.publish(footprint)
+
+            (self.front_stop_poly, self.front_slow_poly) = self.generate_zones(point_D, point_A, point_C, point_B, 0.25, 0.75)
+            self.front_stop_poly_pub.publish(self.front_stop_poly)
+            self.front_slow_poly_pub.publish(self.front_slow_poly)
+
+            (self.rear_stop_poly, self.rear_slow_poly) = self.generate_zones(point_A, point_D, point_B, point_C, 0.25, 0.75)
+            self.rear_stop_poly_pub.publish(self.rear_stop_poly)
+            self.rear_slow_poly_pub.publish(self.rear_slow_poly)
+        except TransformException as ex:
+            self.get_logger().warn(
+                f'Could not transform {self.source_frame} to {self.target_frame}: {ex}')
+
+
+    def move_point(self, A, B, d):
+        """
+        Move point on line (A, B) by distance
+
+        Args:
+            A (float): Back point.
+            B (float): Front point.
+            d (float): Distance for to move point from point B.
+
+        Returns:
+            tuple of points: x, y (Moved point).
+            x (float): point x position.
+            y (float): point t position.
+        """
         vector_AB = (B[0] - A[0], B[1] - A[1]) 
-        length_AB = math.sqrt(vector_AB[0]**2 + vector_AB[1]**2) 
+        length_AB = sqrt(vector_AB[0]**2 + vector_AB[1]**2) 
         unit_vector = (vector_AB[0] / length_AB, vector_AB[1] / length_AB) 
         return (B[0] + d * unit_vector[0], B[1] + d * unit_vector[1])
-    
-    def generate_polygon(self, point_1_back, point_1_front, point_2_back, point_2_front, distance):
-        point_A1 = self.move_point(point_1_back, point_1_front, distance)
-        point_B1 = self.move_point(point_2_back, point_2_front, distance)
 
+    """
+            D---------------A
+            |               |
+            |   FOOTPRINT   |
+            |               |
+            C---------------B
+    """
+    def generate_zones(self, point_1_back, point_1_front, point_2_back, point_2_front, dis_stop, dis_slow):
+        """
+        Generate stop and slow robot footprint
+
+        Args:
+            point_1_back (float): The rear left point.
+            point_1_front (float): The front left point.
+            point_2_back (float): The rear right point.
+            point_2_front (float): The rear right point.
+            dis_stop (float): Distance for stop polygon.
+            dis_slow (float): Distance for slow polygon.
+
+        Returns:
+            tuple of polygons: polygon_stop, polygon_slow (Generated stop and slow footprint)
+        """
+        point_A1 = self.move_point(point_1_back, point_1_front, dis_stop)
+        point_B1 = self.move_point(point_2_back, point_2_front, dis_stop)
+
+        point_A2 = self.move_point(point_1_back, point_1_front, dis_slow)
+        point_B2 = self.move_point(point_2_back, point_2_front, dis_slow)
+
+        stop_poly = self.generate_polygon(point_1_front, point_A1, point_2_front, point_B1)
+        slow_poly = self.generate_polygon(point_A1, point_A2, point_B1, point_B2)
+
+        return (stop_poly, slow_poly)
+
+        
+    def generate_polygon(self, point_1_back, point_1_front, point_2_back, point_2_front):
+        """
+        Generate Polygon Stamped
+
+        Args:
+            point_1_back (float): The rear left point.
+            point_1_front (float): The front left point.
+            point_2_back (float): The rear right point.
+            point_2_front (float): The rear right point.
+
+        Returns:
+            polygon (Generated polygon stamped)
+        """
         polygon = PolygonStamped()
         polygon.header.stamp = self.get_clock().now().to_msg()
         polygon.header.frame_id = 'map'
         footprint = Polygon()
         point = Point32()
-        point.x = point_A1[0]
-        point.y = point_A1[1]
-        point.z = 0.0
-        footprint.points.append(point)
-        point = Point32()
-        point.x = point_B1[0]
-        point.y = point_B1[1]
+        point.x = point_1_front[0]
+        point.y = point_1_front[1]
         point.z = 0.0
         footprint.points.append(point)
         point = Point32()
@@ -109,14 +248,18 @@ class CollisionChecker(Node):
         point.z = 0.0
         footprint.points.append(point)
         point = Point32()
-        point.x = point_1_front[0]
-        point.y = point_1_front[1]
+        point.x = point_2_back[0]
+        point.y = point_2_back[1]
+        point.z = 0.0
+        footprint.points.append(point)
+        point = Point32()
+        point.x = point_1_back[0]
+        point.y = point_1_back[1]
         point.z = 0.0
         footprint.points.append(point)
         polygon.polygon = footprint
         return polygon
     #endregion
-
 
     #region Collision Checker
     def worldToMapValidated(self, wx: float, wy: float):
