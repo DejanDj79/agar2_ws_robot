@@ -41,8 +41,10 @@ ekf_filter_node:
         imu0_config: [false, false, false,      # X,Y,Z
                       false, false, true,      # roll, pitch, yaw
                       false, false, false,      # X˙, Y˙, Z˙
-                      false, false, true,      # roll˙, pitch˙, yaw˙
-                      false, false, true]      # X˙˙, Y˙˙, Z˙˙
+                      false, false, false,      # roll˙, pitch˙, yaw˙
+                      false, false, false]      # X˙˙, Y˙˙, Z˙˙
+                      # false, false, true,      # roll˙, pitch˙, yaw˙
+                      # false, false, true]      # X˙˙, Y˙˙, Z˙˙
 
         imu0_differential: false
         imu0_nodelay: false
@@ -61,8 +63,19 @@ ekf_filter_node:
         odom0_nodelay: false
         odom0_relative: false
         odom0_queue_size: 10
-        
 
+        # odom1: /odometry/agar_odom
+        # odom1_config: [true,  true, false,
+        #             false, false, false,
+        #             false, false, false,
+        #             false, false, false,
+        #             false, false, false]
+
+        # odom1_differential: false
+        # odom1_nodelay: false
+        # odom1_relative: false
+        # odom1_queue_size: 10
+        
 
         use_control: false
         stamped_control: false

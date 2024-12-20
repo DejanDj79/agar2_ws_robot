@@ -28,51 +28,7 @@ class SimulatorOdometry(Node):
         self.position = [0.0, 0.0]
         self.orientation = [0.0, 0.0, 0.0, 1.0]
 
-        plugins: ["obstacle_layer", "inflation_layer"] #"obstacle_layer", "voxel_layer", 
-      # voxel_layer:
-      #   plugin: "nav2_costmap_2d::VoxelLayer"
-      #   enabled: True
-      #   publish_voxel_map: True
-      #   origin_z: 0.0
-      #   z_resolution: 0.05
-      #   z_voxels: 16
-      #   max_obstacle_height: 3.0
-      #   mark_threshold: 0
-      #   observation_sources: lidar_point_cloud #scan
-      #   lidar_point_cloud:
-      #     topic: /velodyne_points
-      #     data_type: "PointCloud2"
-      #     max_obstacle_height: 3.0
-      #     min_obstacle_height: 0.15
-      #     obstacle_max_range: 2.5
-      #     obstacle_min_range: 0.7
-      #     raytrace_max_range: 2.5
-      #     raytrace_min_range: 0.7
-      #     clearing: False
-      #     marking: False
-      # inflation_layer:
-      #   plugin: "nav2_costmap_2d::InflationLayer"
-      #   cost_scaling_factor: 7.0 #3.0
-      #   inflation_radius: 0.85 #0.55
-      # static_layer:
-      #   plugin: "nav2_costmap_2d::StaticLayer"
-      #   map_subscribe_transient_local: True
-      # obstacle_layer:
-      #   plugin: "nav2_costmap_2d::ObstacleLayer"
-      #   enabled: True
-      #   observation_sources: lidar_point_cloud #scan
-      #   lidar_point_cloud:
-      #     topic: /velodyne_points
-      #     data_type: "PointCloud2"
-      #     max_obstacle_height: 3.0
-      #     min_obstacle_height: 0.15
-      #     obstacle_max_range: 1.5
-      #     obstacle_min_range: 0.7
-      #     raytrace_max_range: 1.5
-      #     raytrace_min_range: 0.7
-      #     clearing: False
-      #     marking: True
-      # always_send_full_costmap: True
+        self.odom_pub = self.create_publisher(Odometry, 'odometry/agar_odom', 10)
 
         self.gps_subscriber = self.create_subscription(
             NavSatFix,
@@ -80,11 +36,11 @@ class SimulatorOdometry(Node):
             self.gps_subscriber_callback,
             10)
         
-        self.imu_subscriber = self.create_subscription(
-            Imu,
-            'imu/data',
-            self.imu_subscriber_callback,
-            10)
+        # self.imu_subscriber = self.create_subscription(
+        #     Imu,
+        #     'imu/data',
+        #     self.imu_subscriber_callback,
+        #     10)
         
     def gps_subscriber_callback(self, msg):
         lat = msg.latitude
@@ -100,19 +56,19 @@ class SimulatorOdometry(Node):
     def publish_transform(self):
         # self.get_logger().info('pos x: {0}, pos y: {1}'.format(self.position[0], self.position[1]))
         # self.get_logger().info('x: {0}, y: {1}, z: {2}, w: {3}'.format(self.orientation[0], self.orientation[1], self.orientation[2], self.orientation[3]))
-        self.tf_broadcaster.sendTransform(self.set_transform('odom', 'base_footprint', self.position, self.orientation))
-        self.tf_broadcaster.sendTransform(self.set_transform('map', 'odom', [0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
+        # self.tf_broadcaster.sendTransform(self.set_transform('map', 'odom', [0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
+        # self.tf_broadcaster.sendTransform(self.set_transform('odom', 'base_footprint', self.position, self.orientation))
 
         odom = Odometry()
         odom.header.stamp = self.get_clock().now().to_msg()
-        odom.header.frame_id = "odom"
+        odom.header.frame_id = "map"
         odom.child_frame_id = "base_footprint"
         odom.pose.pose.position.x = self.position[0]
         odom.pose.pose.position.y = self.position[1]
-        odom.pose.pose.orientation.x = self.orientation[0]
-        odom.pose.pose.orientation.y = self.orientation[1]
-        odom.pose.pose.orientation.z = self.orientation[2]
-        odom.pose.pose.orientation.w = self.orientation[3]
+        # odom.pose.pose.orientation.x = self.orientation[0]
+        # odom.pose.pose.orientation.y = self.orientation[1]
+        # odom.pose.pose.orientation.z = self.orientation[2]
+        # odom.pose.pose.orientation.w = self.orientation[3]
         self.odom_pub.publish(odom)
 
     def set_transform(self, frame_id, child_frame_id, position, orientation):
