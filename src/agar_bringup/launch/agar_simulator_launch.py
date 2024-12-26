@@ -37,12 +37,19 @@ def generate_launch_description():
       output='screen'
     )
 
+    # waypoint_follower = Node(
+    #   package='agar_scripts', 
+    #   executable='waypoint_follower',
+    #   output='screen'
+    # )
+
     return LaunchDescription([
         description_launch,
         localization_launch,
         gazebo_launch,
         rviz_launch,
         robot_steering_node,
+        # waypoint_follower,
 
         # Node(
         #     package='agar_bringup',

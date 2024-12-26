@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Lidar1/LaserScan1
         - /DepthCamera1/DepthCamera1/Topic1
+        - /Path1
         - /Footprints1
       Splitter Ratio: 0.5076141953468323
     Tree Height: 754
@@ -589,6 +590,34 @@ Visualization Manager:
     - Alpha: 1
       Buffer Length: 1
       Class: rviz_default_plugins/Path
+      Color: 192; 191; 188
+      Enabled: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Billboards
+      Line Width: 0.029999999329447746
+      Name: Path
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /angle_path
+      Value: true
+    - Alpha: 0.5
+      Buffer Length: 1
+      Class: rviz_default_plugins/Path
       Color: 25; 255; 0
       Enabled: true
       Head Diameter: 0.30000001192092896
@@ -613,34 +642,6 @@ Visualization Manager:
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /plan
-      Value: true
-    - Alpha: 1
-      Buffer Length: 1
-      Class: rviz_default_plugins/Path
-      Color: 129; 61; 156
-      Enabled: true
-      Head Diameter: 0.30000001192092896
-      Head Length: 0.20000000298023224
-      Length: 0.30000001192092896
-      Line Style: Lines
-      Line Width: 0.029999999329447746
-      Name: Path
-      Offset:
-        X: 0
-        Y: 0
-        Z: 0
-      Pose Color: 255; 85; 255
-      Pose Style: None
-      Radius: 0.029999999329447746
-      Shaft Diameter: 0.10000000149011612
-      Shaft Length: 0.10000000149011612
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        Filter size: 10
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /angle_path
       Value: true
     - Alpha: 1
       Class: rviz_default_plugins/Polygon
@@ -823,26 +824,26 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Class: rviz_default_plugins/Orbit
-      Distance: 17.606380462646484
+      Class: rviz_default_plugins/ThirdPersonFollower
+      Distance: 19.511638641357422
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.013624932616949081
-        Y: 1.502776026725769
-        Z: -0.6783755421638489
-      Focal Shape Fixed Size: true
+        X: -0.08571386337280273
+        Y: -7.4315690994262695
+        Z: 6.67572021484375e-06
+      Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.38539689779281616
-      Target Frame: <Fixed Frame>
-      Value: Orbit (rviz)
-      Yaw: 5.15582275390625
+      Pitch: 0.5553984045982361
+      Target Frame: base_footprint
+      Value: ThirdPersonFollower (rviz_default_plugins)
+      Yaw: 4.728570938110352
     Saved: ~
 Window Geometry:
   DepthCamera:
