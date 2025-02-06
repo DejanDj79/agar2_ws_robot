@@ -23,6 +23,7 @@ setup(
             'simulator_odometry = agar_scripts.simulator_odometry:main',
             'waypoint_follower = agar_scripts.waypoint_follower:main',
             'collision_checker = agar_scripts.collision_checker:main',
+            'toknav_gps = agar_scripts.toknav:main',
         ],
     },
 )

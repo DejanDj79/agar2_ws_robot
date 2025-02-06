@@ -64,8 +64,8 @@ class WaypointFollower(Node):
         self.waypoints_path_pub = self.create_publisher(Path, "/plan", 10)
         self.angle_path_pub     = self.create_publisher(Path, "/angle_path", 10)
 
-        self.collision_zones_sub    = self.create_subscription(CollisionZones, 'collision_zones', self.collision_zones_callback, 10)
-        self.navigation_active_sub  = self.create_subscription(Bool, 'navigation_active', self.navigation_active_callback, 10)
+        self.collision_zones_sub    = self.create_subscription(CollisionZones, '/collision_zones', self.collision_zones_callback, 10)
+        self.navigation_active_sub  = self.create_subscription(Bool, '/navigation_active', self.navigation_active_callback, 10)
         self.load_waypoints_sub     = self.create_subscription(String, '/load_waypoints', self.load_waypoints_callback, 10)
 
         self.source_frame = 'odom'

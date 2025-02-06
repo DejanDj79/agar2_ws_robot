@@ -6,7 +6,11 @@ from tf_transformations import quaternion_from_euler
 
 import socket
 import time
-import sys 
+import sys
+
+from std_msgs.msg import Int16, Bool
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import NavSatFix, Imu
 
 class ToknavGpsDriver(Node):
 
@@ -30,6 +34,13 @@ class ToknavGpsDriver(Node):
         self.connection_status = 'not connected'
 
         self.prev_status = None
+
+        self.gps_pub = self.create_publisher(NavSatFix, "/gps/fix", 10)
+        self.imu_pub = self.create_publisher(Imu, "/imu/data", 10)
+
+        self.brake_pub = self.create_publisher(Int16, "/brake_status", 10)
+        self.nav_active_pub = self.create_publisher(Bool, "/navigation_active", 10)
+        self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
 
         # self.brake_pub = rospy.Publisher("/brake_status", Int16, queue_size=1)
         # self.gps_pub = rospy.Publisher('/gps/fix', NavSatFix, queue_size = 1)
@@ -89,16 +100,16 @@ class ToknavGpsDriver(Node):
 
             if data_01 == '' or data_02 == '':
                 print('Lost connection. Trying to reconnect...')
-                self.publish_odometry((0, 0), quaternion_from_euler(0, 0, 0))
+                # self.publish_odometry((0, 0), quaternion_from_euler(0, 0, 0))
                 self.connect_to_device()
             else:
-                self.parse_data(data_01, data_02)
+                # self.parse_data(data_01, data_02)
                 self.connection_status = 'receiving GPS messages'
         except socket.timeout as t:
             self.connection_status = 'no GPS messages received'
-            self.publish_odometry((0, 0), quaternion_from_euler(0, 0, 0))
+            # self.publish_odometry((0, 0), quaternion_from_euler(0, 0, 0))
         except socket.error:
-            self.publish_odometry((0, 0), quaternion_from_euler(0, 0, 0))
+            # self.publish_odometry((0, 0), quaternion_from_euler(0, 0, 0))
             pass
 
 
