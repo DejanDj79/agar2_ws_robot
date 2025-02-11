@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <link name="gps_link" />
+    <joint name="gps_link_joint" type="fixed">
+        <origin xyz="0.0 0 0.4" rpy="0 0 0" />
+        <parent link="base_link" />
+        <child link="gps_link" />
+    </joint>                         
+
+    <link name="imu_link" />
+    <joint name="imu_joint" type="fixed">
+        <origin xyz="0.0 0 0.4" rpy="0 0 0" />
+        <parent link="base_link" />
+        <child link="imu_link" />
+    </joint>
+</robot>

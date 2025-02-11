@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<robot name="agar"
+    xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="wheel_low_poly_fix" params="name type xyz rpy ixyz irpy ixx ixy ixz iyy iyz izz jxyz jrpy">
+        <link name="${name}_wheel">
+            <visual>
+                <origin xyz="${xyz}" rpy="${rpy}" />
+                <geometry>
+                    <cylinder length="0.2" radius="0.3"/>
+                </geometry>
+                <material name="black" />
+            </visual>
+            <inertial>
+                <origin xyz="${ixyz}" rpy="${irpy}" />
+                <mass value="12" />
+                <inertia ixx="${ixx}" ixy="${ixy}" ixz="${ixz}" iyy="${iyy}" iyz="${iyz}" izz="${izz}" />
+            </inertial>
+            <collision>
+                <origin xyz="${xyz}" rpy="${rpy}" />
+                <geometry>
+                    <cylinder length="0.2" radius="0.3"/>
+                </geometry>
+            </collision>
+        </link>
+
+        <joint name="${name}_wheel_joint" type="fixed">
+            <origin xyz="${jxyz}" rpy="${jrpy}" />
+            <parent link="${name}_leg"/>
+            <child link="${name}_wheel" />
+        </joint>
+        <!-- <joint name="${name}_wheel_joint" type="fixed">
+                <origin xyz="${jxyz}" rpy="${jrpy}" />
+                <parent link="${name}_leg"/>
+            <child link="${name}_wheel" />
+            <axis xyz="0 1 0" />
+        </joint> -->
+        <gazebo reference="${name}_wheel">
+            <material>Gazebo/Black</material>
+            <!-- <mu1 value="0.1"/>
+            <mu2 value="0.1"/> -->
+            <!-- <kp value="10000000.0" />
+            <kd value="1.0" />
+            <fdir1 value="1 0 0"/> -->
+        </gazebo>
+    </xacro:macro>
+</robot>   

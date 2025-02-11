@@ -21,11 +21,11 @@ def generate_launch_description():
         executable="navsat_transform_node",
         name="navsat_transform",
         output="screen",
-        parameters=[robot_localization_file_path, use_sim_time_config],
-        # remappings=[
-        #     ("gps/fix", "/ublox_gps_node/fix"),     # IN
-        #     ("odometry/gps", "odometry/gps"),       # OUT
-        # ],
+        parameters=[robot_localization_file_path], #, use_sim_time_config
+        remappings=[
+            ("gps/fix", "gps/fix"),                # IN
+            ("odometry/gps", "odometry/gps"),       # OUT
+        ],
     )
 
   start_robot_localization_cmd = Node(
@@ -33,7 +33,7 @@ def generate_launch_description():
     executable='ekf_node',
     name='ekf_filter_node',
     output='screen',
-    parameters=[robot_localization_file_path, use_sim_time_config],
+    parameters=[robot_localization_file_path], #, use_sim_time_config
     # remappings=[
     #       ("odometry/filtered", "odometry/local_odom"),
     #   ],    
@@ -68,6 +68,6 @@ def generate_launch_description():
   ld.add_action(map_to_odom)
   # ld.add_action(odom_to_basefootprint)
 
-  ld.add_action(pointcloud_to_laserscan)
+  # ld.add_action(pointcloud_to_laserscan)
 
   return ld

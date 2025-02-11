@@ -16,7 +16,7 @@ def generate_launch_description():
     description_launch = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('agar_description'), 'launch'),
-         '/agar_description_launch.py'])
+         '/agar_description_simulator_launch.py'])
       )
     
     rviz_launch = IncludeLaunchDescription(
@@ -28,7 +28,7 @@ def generate_launch_description():
     localization_launch = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('agar_localization'), 'launch'),
-         '/agar_localization_launch.py'])
+         '/agar_localization_simulator_launch.py'])
       )
     
     robot_steering_node = Node(
@@ -45,7 +45,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         description_launch,
-        localization_launch,
+        # localization_launch,
         gazebo_launch,
         rviz_launch,
         robot_steering_node,

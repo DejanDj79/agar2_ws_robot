@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="agar" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <xacro:arg name="robot_namespace" default="/"/>
+
+    <xacro:property name="front_right_leg_fixture" value="front_right_leg_fixture" />
+    <xacro:property name="rear_right_leg_fixture" value="rear_right_leg_fixture" />
+    <xacro:property name="front_left_leg_fixture" value="front_left_leg_fixture" />
+    <xacro:property name="rear_left_leg_fixture" value="rear_left_leg_fixture" />
+    <xacro:property name="front_right_leg" value="front_right_leg" />
+    <xacro:property name="rear_right_leg" value="rear_right_leg" />
+    <xacro:property name="front_left_leg" value="front_left_leg" />
+    <xacro:property name="rear_left_leg" value="rear_left_leg" />
+    <xacro:property name="front_right_wheel" value="front_right" />
+    <xacro:property name="rear_right_wheel" value="rear_right" />
+    <xacro:property name="front_left_wheel" value="front_left" />
+    <xacro:property name="rear_left_wheel" value="rear_left" />
+
+    <xacro:include filename="$(find agar_description)/urdf/inertia.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/materials.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/leg_fixture.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/leg_low_poly.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/wheel_low_poly_fix.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/stand.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/gps_imu_fix.xacro" />
+    <!-- <xacro:include filename="$(find agar_description)/urdf/lidar.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/camera.xacro" /> -->
+    
+    <!-- AgAR frame -->
+    <link name="base_footprint">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 1.67" />
+            <geometry>
+                <box size="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+    </link>
+
+    <link name="base_link">
+        <visual>
+            <origin xyz="0 0 -0.176" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="file://$(find agar_description)/meshes/chassis.stl" />
+            </geometry>
+            <material name="light_grey" />
+        </visual>
+        <xacro:box_inertia m="600" l="0.3" w="1.9" h="0.61" xyz="0 0 0" rpy="0 0 0" />
+         <!-- <inertial>
+            <mass value="600.0" />
+            <origin xyz="0 0 -0.352" />
+            <inertia ixx="22.512101178550736" ixy="0" ixz="0" iyy="64.07999579429635" iyz="0" izz="80.11209645786295" />
+        </inertial> -->
+        <collision>
+            <origin xyz="0 0 -0.176" rpy="0 0 0 " />
+            <geometry>
+                <mesh filename="file://$(find agar_description)/meshes/chassis.stl" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="base_footprint_joint" type="fixed">
+        <origin xyz="0 0 0.97943" rpy="0 0 0" />
+        <parent link="base_footprint"/>
+        <child link="base_link" />
+    </joint>
+    <gazebo reference="base_link">
+        <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <link name="raster">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="file://$(find agar_description)/meshes/raster.stl" />
+            </geometry>
+            <material name="grey" />
+        </visual>
+        <inertial>
+            <origin xyz="0 0 0.01" rpy="0 0 0" />
+            <mass value="16.76" />
+            <inertia ixx="0.5031142899449066" ixy="0" ixz="0" iyy="2.7377808234150605" iyz="0" izz="3.240266613388063" />
+        </inertial>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <mesh filename="file://$(find agar_description)/meshes/raster.stl" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="raster_joint" type="fixed">
+        <origin xyz="0 0 0.176" rpy="0 0 0" />
+        <parent link="base_link" />
+        <child link="raster" />
+    </joint>
+    <gazebo reference="raster">
+        <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <!-- AgAR Legs fixtures -->
+    <xacro:leg_fixture name="${front_right_leg_fixture}" type="a" xyz="0 0 0" rpy="0 0 0" ixyz="0.03 -0.06 0.13" irpy="0 0 0" 
+        ixx="0.05459239453300868" ixy="0" ixz="0" iyy="0.05970593665262832" iyz="0" izz="0.01507425976279013" jxyz="0.07 -0.307 -0.076" jrpy="0 0 0" />
+    <xacro:leg_fixture name="${rear_right_leg_fixture}" type="b" xyz="0 0 0" rpy="0 0 0" ixyz="0.03 0.06 0.13" irpy="0 0 0" 
+        ixx="0.05459239565745024" ixy="0" ixz="0" iyy="0.05970593665262832" iyz="0" izz="0.015074260887231683" jxyz="-0.07 -0.307 -0.076" jrpy="0 0 ${pi}" />
+    <xacro:leg_fixture name="${front_left_leg_fixture}" type="b" xyz="0 0 0" rpy="0 0 0" ixyz="0.03 -0.06 0.13" irpy="0 0 0" 
+        ixx="0.05459239565745024" ixy="0" ixz="0" iyy="0.05970593665262832" iyz="0" izz="0.015074260887231683" jxyz="0.07 0.307 -0.076" jrpy="0 0 0" />
+    <xacro:leg_fixture name="${rear_left_leg_fixture}" type="a" xyz="0 0 0" rpy="0 0 0" ixyz="0.03 0.06 0.13" irpy="0 0 0" 
+        ixx="0.05459239453300868" ixy="0" ixz="0" iyy="0.05970593665262832" iyz="0" izz="0.01507425976279013" jxyz="-0.07 0.307 -0.076" jrpy="0 0 ${pi}" />
+
+    <!-- AgAR Legs -->
+    <xacro:leg_low_poly name="${front_right_leg}" type="a" xyz="0 0 0" rpy="0 0 ${pi}" ixyz="-0.58 0.02 0.08" irpy="0 0 0" 
+        ixx="1.1302317084114302" ixy="0" ixz="0" iyy="3.845526063904824" iyz="0" izz="3.271057725788208" jxyz="0.18 -0.075 -0.31" jrpy="0 ${pi/3} 0" />
+    <xacro:leg_low_poly name="${rear_right_leg}" type="a" xyz="0 0 0" rpy="0 0 -${pi}" ixyz="-0.58 0.02 0.08" irpy="0 0 0" 
+        ixx="1.1302317084114302" ixy="0" ixz="0" iyy="3.845526063904824" iyz="0" izz="3.271057725788208" jxyz="0.18 0.075 -0.31" jrpy="0 ${pi/3} 0" />
+    <xacro:leg_low_poly name="${front_left_leg}" type="a" xyz="0 0 0" rpy="0 0 ${pi}" ixyz="-0.58 0.02 0.08" irpy="0 0 0" 
+        ixx="1.1302317084114302" ixy="0" ixz="0" iyy="3.845526063904824" iyz="0" izz="3.271057725788208" jxyz="0.18 0.075 -0.31" jrpy="0 ${pi/3} 0" />
+    <xacro:leg_low_poly name="${rear_left_leg}" type="a" xyz="0 0 0" rpy="0 0 -${pi}" ixyz="-0.58 0.02 0.08" irpy="0 0 0" 
+        ixx="1.1302317084114302" ixy="0" ixz="0" iyy="3.845526063904824" iyz="0" izz="3.271057725788208" jxyz="0.18 -0.075 -0.31" jrpy="0 ${pi/3} 0" />
+   
+    <!-- AgAR Wheels -->
+    <xacro:wheel_low_poly_fix name="${front_right_wheel}" type="a" xyz="0 0 0" rpy="${pi/2} 0 0" ixyz="0 0 0" irpy="0 0 0" 
+        ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 -0.18999 -0.0002" jrpy="0 0 0" />
+    <xacro:wheel_low_poly_fix name="${rear_right_wheel}" type="a" xyz="0 0 0" rpy="${pi/2} 0 0" ixyz="0 0 0" irpy="0 0 0" 
+        ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 0.18999 -0.0002" jrpy="0 0 ${pi}" />
+    <xacro:wheel_low_poly_fix name="${front_left_wheel}" type="a" xyz="0 0 0" rpy="${pi/2} 0 0" ixyz="0 0 0" irpy="0 0 0" 
+        ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 0.18999 -0.0002" jrpy="0 0 0" />
+    <xacro:wheel_low_poly_fix name="${rear_left_wheel}" type="a" xyz="0 0 0" rpy="${pi/2} 0 0" ixyz="0 0 0" irpy="0 0 0" 
+        ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 -0.18999 -0.0002" jrpy="0 0 ${pi}" />
+
+    <!-- <xacro:wheel name="${front_right_wheel}" type="a" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
+        ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 -0.18999 -0.0002" jrpy="0 -${pi/3} 0" />
+    <xacro:wheel name="${rear_right_wheel}" type="a" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
+        ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 0.18999 -0.0002" jrpy="0 ${pi/3} ${pi}" />
+    <xacro:wheel name="${front_left_wheel}" type="b" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
+        ixx="0.4193309158223555" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.4193309158223555" jxyz="0.341 0.18999 -0.0002" jrpy="0 -${pi/3} 0" />
+    <xacro:wheel name="${rear_left_wheel}" type="b" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
+        ixx="0.4193309158223555" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.4193309158223555" jxyz="0.341 -0.18999 -0.000" jrpy="0 ${pi/3} ${pi}" /> -->
+                                    
+
+</robot>

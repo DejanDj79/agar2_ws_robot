@@ -8,9 +8,19 @@ import socket
 import time
 import sys
 
+from math import atan2, pi
+
 from std_msgs.msg import Int16, Bool
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Quaternion
 from sensor_msgs.msg import NavSatFix, Imu
+from nav_msgs.msg import Odometry
+
+from agar_common.agar_common_library import gpgga
+from agar_common.agar_common_library import alvinxy
+
+from rcl_interfaces.srv import GetParameters
+
+from geometry_msgs.msg import TransformStamped
 
 class ToknavGpsDriver(Node):
 
@@ -42,12 +52,34 @@ class ToknavGpsDriver(Node):
         self.nav_active_pub = self.create_publisher(Bool, "/navigation_active", 10)
         self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
 
+        self.navigation_active = False
+
+        self.navigation_active_sub  = self.create_subscription(Bool, '/navigation_active', self.navigation_active_callback, 10)
+
         # self.brake_pub = rospy.Publisher("/brake_status", Int16, queue_size=1)
         # self.gps_pub = rospy.Publisher('/gps/fix', NavSatFix, queue_size = 1)
         # self.odom_pub = rospy.Publisher("odometry/agar_odom", Odometry, queue_size=10)
         # self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
         # self.nav_active_pub = rospy.Publisher('/navigation_active', Bool, queue_size=1)
         # self.notifications_pub = rospy.Publisher("/agar_notifications", String, queue_size=1)
+
+
+        # self.cli = self.create_client(GetParameters, '/navsat_transform/get_parameters')
+        # while not self.cli.wait_for_service(timeout_sec=1.0):
+        #     self.get_logger().info('service not available, waiting again...')
+        # self.req = GetParameters.Request()
+
+        # self.req.names = ['datum']
+        # self.future = self.cli.call_async(self.req)
+        # rclpy.spin_until_future_complete(self, self.future)
+        # res = self.future.result()
+        # self.datum_latitude     = res.values[0].double_array_value[0]
+        # self.datum_longitude    = res.values[0].double_array_value[1]
+        self.datum_latitude         = 43.330890405343304
+        self.datum_longitude        = 21.893977363705066
+
+
+        # self.tf_broadcaster = TransformBroadcaster(self)
 
         self.connect_to_device() 
 
@@ -98,12 +130,21 @@ class ToknavGpsDriver(Node):
                 (data_01, addr) = self.socket.recvfrom(1024)
             (data_02, addr) = self.socket.recvfrom(1024)
 
+            # self.get_logger().info('Data 01: {0}'.format(data_01))
+            # self.get_logger().info('Data 01: {0}'.format(data_02))
+
+            data_01 = b'$GNGGA,130355.50,4319.86211564,N,02153.46818735,E,4,12,1.4,196.7865,M,45.0941,M,1.5,0*62\r\n'
+            data_02 = b'$GNGGAH,130355.50,4319.86146616,N,02153.46712102,E,4,09,2.5,198.0816,M,45.0941,M,1.5,0*2F\r\n'
+
+            # self.get_logger().info('Data 01: {0}'.format(data_01))
+            # self.get_logger().info('Data 01: {0}'.format(data_02))
+
             if data_01 == '' or data_02 == '':
                 print('Lost connection. Trying to reconnect...')
                 # self.publish_odometry((0, 0), quaternion_from_euler(0, 0, 0))
                 self.connect_to_device()
             else:
-                # self.parse_data(data_01, data_02)
+                self.parse_data(data_01, data_02)
                 self.connection_status = 'receiving GPS messages'
         except socket.timeout as t:
             self.connection_status = 'no GPS messages received'
@@ -112,8 +153,137 @@ class ToknavGpsDriver(Node):
             # self.publish_odometry((0, 0), quaternion_from_euler(0, 0, 0))
             pass
 
+    def parse_data(self, data_01, data_02):
+
+        gps_data_1 = gpgga.arr2data(data_02)
+        gps_data_2 = gpgga.arr2data(data_01)
+
+        # self.get_logger().info('GPS Data 1: lat: {0}, lng: {1}'.format(gps_data_1.latitude, gps_data_1.longitude))
+        # self.get_logger().info('GPS Data 2: lat: {0}, lng: {1}'.format(gps_data_2.latitude, gps_data_2.longitude))
+
+        gps_status = self.get_gps_status(gps_data_1.gps_status, gps_data_2.gps_status)
+        # self.get_logger().info('gps_status: {0}'.format(gps_status))
+
+        if gps_status != self.prev_status:
+            status_name = self.get_gps_name(gps_status)
+            # self.send_notifications('Current GPS Status: {0}'.format(status_name))
+            self.get_logger().info('Current GPS Status: {0}'.format(status_name))
+            self.prev_status = gps_status
+
+        # if self.navigation_active and gps_status != 4:
+        #     self.brake_robot()
+        #     self.publish_odometry((0, 0), tf.transformations.quaternion_from_euler(0, 0, 0))
+        #     return
+        
+        self.publish_data(gps_data_1, gps_data_2, gps_status)
 
 
+    
+    def publish_data(self, gps_data_1, gps_data_2, gps_status):
+        
+        position_1 = alvinxy.ll2xy(gps_data_1.latitude, gps_data_1.longitude, self.datum_latitude, self.datum_longitude)
+        position_2 = alvinxy.ll2xy(gps_data_2.latitude, gps_data_2.longitude, self.datum_latitude, self.datum_longitude)
+
+        mid_x = (position_1[0] + position_2[0]) / 2
+        mid_y = (position_1[1] + position_2[1]) / 2
+
+        (mid_lat, mid_lng) = alvinxy.xy2ll(mid_x, mid_y, self.datum_latitude, self.datum_longitude)
+        mid_alt = int((gps_data_1.altitude + gps_data_2.altitude) / 2)
+
+        position = (mid_x, mid_y)
+
+        # self.get_logger().info('Mid position: x: {0}, y: {1}'.format(mid_x, mid_y))
+        gps_fix = alvinxy.xy2ll(position[0], position[1], self.datum_latitude, self.datum_longitude)
+        # self.get_logger().info('GPS Fix: lat: {0}, lng: {1}'.format(gps_fix[0], gps_fix[1]))
+
+
+        heading = atan2(position_2[1] - position_1[1], position_2[0] - position_1[0]) + (pi / 2)
+
+        gps_fix_msg = NavSatFix()
+        gps_fix_msg.header.stamp        = self.get_clock().now().to_msg()
+        gps_fix_msg.header.frame_id     = "gps_link"
+        gps_fix_msg.latitude            = gps_fix[0]
+        gps_fix_msg.longitude           = gps_fix[1]
+        gps_fix_msg.altitude            = float(mid_alt)
+        gps_fix_msg.status.status       = 0
+        gps_fix_msg.status.service      = 1
+        # gps_fix_msg.position_covariance = [0.1, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.1]
+        gps_fix_msg.position_covariance_type = 2
+        self.gps_pub.publish(gps_fix_msg)
+
+        # self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'gps_link', [0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
+
+        orientation = quaternion_from_euler(0, 0, heading)
+        # self.get_logger().info('Orientation: {0}'.format(orientation))
+
+        imu_msg = Imu()
+        imu_msg.header.stamp        = self.get_clock().now().to_msg()
+        imu_msg.header.frame_id     = "imu"
+        imu_msg.orientation.x         = orientation[0]
+        imu_msg.orientation.y         = orientation[1]
+        imu_msg.orientation.z         = orientation[2]
+        imu_msg.orientation.w         = orientation[3]
+
+        # imu_msg.orientation_covariance  = [0.1, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.1]
+        # imu_msg.angular_velocity_covariance  = [0.1, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.1]
+        # imu_msg.angular_velocity_covariance  = [0.1, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.1]
+
+        self.imu_pub.publish(imu_msg)
+
+        # self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'imu', [0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
+
+
+    def get_gps_name(self, gps_status):
+        if gps_status == 1:
+            return 'Single point positioning'
+        elif gps_status == 2:
+            return 'SBAS differential positioning'
+        elif gps_status == 4:
+            return 'RTK fixed solution'
+        elif gps_status == 5:
+            return 'RTK floating point'
+        elif gps_status == 6:
+            return 'Inertial navigation positioning'
+        else:
+            return 'No positioning'
+
+    def get_gps_status(self, status_1, status_2):
+        if status_1 == status_2:
+            return status_1
+        elif status_1 == 4 or status_2 == 4:
+            return 4
+        elif status_1 == 0 or status_2 == 0:
+            return 0
+        elif status_1 == 1 or status_2 == 1:
+            return 1
+        elif status_1 == 2 or status_2 == 2:
+            return 2
+        elif status_1 == 5 or status_2 == 5:
+            return 5
+        elif status_1 == 6 or status_2 == 6:
+            return 6
+        return 0
+    
+    def navigation_active_callback(self, msg):
+        self.navigation_active  = msg.data
+
+
+    # def set_transform(self, frame_id, child_frame_id, position, orientation):
+    #     t = TransformStamped()
+    #     t.header.stamp = self.get_clock().now().to_msg()
+    #     t.header.frame_id = frame_id
+    #     t.child_frame_id = child_frame_id
+
+    #     t.transform.translation.x = position[0]
+    #     t.transform.translation.y = position[1]
+    #     t.transform.translation.z = 0.0
+
+    #     t.transform.rotation.x = orientation[0]
+    #     t.transform.rotation.y = orientation[1]
+    #     t.transform.rotation.z = orientation[2]
+    #     t.transform.rotation.w = orientation[3]
+
+    #     return t
 
 def main(args=None):
     rclpy.init(args=args)
