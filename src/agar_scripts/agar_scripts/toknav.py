@@ -22,6 +22,8 @@ from rcl_interfaces.srv import GetParameters
 
 from geometry_msgs.msg import TransformStamped
 
+import random
+
 class ToknavGpsDriver(Node):
 
     def __init__(self):
@@ -51,6 +53,7 @@ class ToknavGpsDriver(Node):
         self.brake_pub = self.create_publisher(Int16, "/brake_status", 10)
         self.nav_active_pub = self.create_publisher(Bool, "/navigation_active", 10)
         self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
+        # self.odom_pub = self.create_publisher(Odometry, "/odometry/agar", 10)
 
         self.navigation_active = False
 
@@ -79,7 +82,7 @@ class ToknavGpsDriver(Node):
         self.datum_longitude        = 21.893977363705066
 
 
-        # self.tf_broadcaster = TransformBroadcaster(self)
+        self.tf_broadcaster = TransformBroadcaster(self)
 
         self.connect_to_device() 
 
@@ -125,6 +128,9 @@ class ToknavGpsDriver(Node):
 
     def read_gps(self):
         try:
+            self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'gps_link', [0.0, 0.0, 0.5], [0.0, 0.0, 0.0, 1.0]))
+            self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'imu', [0.0, 0.0, 0.4], [0.0, 0.0, 0.0, 1.0]))
+
             (data_01, addr) = self.socket.recvfrom(1024)
             if '$GNGGAH' in data_01.decode():
                 (data_01, addr) = self.socket.recvfrom(1024)
@@ -177,8 +183,6 @@ class ToknavGpsDriver(Node):
         
         self.publish_data(gps_data_1, gps_data_2, gps_status)
 
-
-    
     def publish_data(self, gps_data_1, gps_data_2, gps_status):
         
         position_1 = alvinxy.ll2xy(gps_data_1.latitude, gps_data_1.longitude, self.datum_latitude, self.datum_longitude)
@@ -211,8 +215,9 @@ class ToknavGpsDriver(Node):
         gps_fix_msg.position_covariance_type = 2
         self.gps_pub.publish(gps_fix_msg)
 
-        # self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'gps_link', [0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
+        # self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'gps_link', [0.0, 0.0, 0.5], [0.0, 0.0, 0.0, 1.0]))
 
+        # heading = random.randrange(0, 100) / 100
         orientation = quaternion_from_euler(0, 0, heading)
         # self.get_logger().info('Orientation: {0}'.format(orientation))
 
@@ -223,13 +228,30 @@ class ToknavGpsDriver(Node):
         imu_msg.orientation.y         = orientation[1]
         imu_msg.orientation.z         = orientation[2]
         imu_msg.orientation.w         = orientation[3]
-
         # imu_msg.orientation_covariance  = [0.1, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.1]
         # imu_msg.angular_velocity_covariance  = [0.1, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.1]
         # imu_msg.angular_velocity_covariance  = [0.1, 0.0, 0.0, 0.0, 0.1, 0.0, 0.0, 0.0, 0.1]
-
         self.imu_pub.publish(imu_msg)
 
+        # self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'imu', [0.0, 0.0, 0.4], [0.0, 0.0, 0.0, 1.0]))
+
+
+        # odom_msg = Odometry()
+        # odom_msg.header.stamp = self.get_clock().now().to_msg()
+        # odom_msg.header.frame_id = "odom"
+        # odom_msg.child_frame_id = "base_footprint"
+        # odom_msg.pose.pose.position.x = position[0]
+        # odom_msg.pose.pose.position.y = position[1]
+        # odom_msg.pose.pose.position.z = 0.0
+        # odom_msg.pose.pose.orientation.x = orientation[0]
+        # odom_msg.pose.pose.orientation.y = orientation[1]
+        # odom_msg.pose.pose.orientation.z = orientation[2]
+        # odom_msg.pose.pose.orientation.w = orientation[3]
+        # self.odom_pub.publish(odom_msg)
+        
+        # self.tf_broadcaster.sendTransform(self.set_transform('odom', 'base_footprint', [position[0], position[1]], orientation))
+
+        # self.tf_broadcaster.sendTransform(self.set_transform('map', 'odom', [0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
         # self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'imu', [0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
 
 
@@ -268,22 +290,22 @@ class ToknavGpsDriver(Node):
         self.navigation_active  = msg.data
 
 
-    # def set_transform(self, frame_id, child_frame_id, position, orientation):
-    #     t = TransformStamped()
-    #     t.header.stamp = self.get_clock().now().to_msg()
-    #     t.header.frame_id = frame_id
-    #     t.child_frame_id = child_frame_id
+    def set_transform(self, frame_id, child_frame_id, position, orientation):
+        t = TransformStamped()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = frame_id
+        t.child_frame_id = child_frame_id
 
-    #     t.transform.translation.x = position[0]
-    #     t.transform.translation.y = position[1]
-    #     t.transform.translation.z = 0.0
+        t.transform.translation.x = position[0]
+        t.transform.translation.y = position[1]
+        t.transform.translation.z = position[2]
 
-    #     t.transform.rotation.x = orientation[0]
-    #     t.transform.rotation.y = orientation[1]
-    #     t.transform.rotation.z = orientation[2]
-    #     t.transform.rotation.w = orientation[3]
+        t.transform.rotation.x = orientation[0]
+        t.transform.rotation.y = orientation[1]
+        t.transform.rotation.z = orientation[2]
+        t.transform.rotation.w = orientation[3]
 
-    #     return t
+        return t
 
 def main(args=None):
     rclpy.init(args=args)

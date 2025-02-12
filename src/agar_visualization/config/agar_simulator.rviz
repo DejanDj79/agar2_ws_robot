@@ -4,10 +4,9 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /Odometry1
         - /Lidar1/LaserScan1
         - /DepthCamera1/DepthCamera1/Topic1
-        - /Path1
-        - /Footprints1
       Splitter Ratio: 0.5076141953468323
     Tree Height: 727
   - Class: rviz_common/Selection
@@ -93,16 +92,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        depth_camera:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        depth_camera_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         front_left_leg:
           Alpha: 1
           Show Axes: false
@@ -133,14 +122,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        gps_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        imu_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         left_stand:
           Alpha: 1
           Show Axes: false
@@ -191,21 +172,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        velodyne:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        velodyne_base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        velodyne_stand:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Mass Properties:
         Inertia: false
         Mass: false
@@ -230,7 +196,7 @@ Visualization Manager:
           Color: 204; 51; 204
           Scale: 1
           Value: true
-        Value: true
+        Value: false
       Enabled: true
       Keep: 100
       Name: Odometry
@@ -781,25 +747,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/ThirdPersonFollower
-      Distance: 19.511638641357422
+      Distance: 6.175012111663818
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.08571386337280273
-        Y: -7.4315690994262695
-        Z: 6.67572021484375e-06
+        X: 0.22503089904785156
+        Y: -1.13877534866333
+        Z: 6.198883056640625e-06
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.5553984045982361
+      Pitch: 1.0053980350494385
       Target Frame: base_footprint
       Value: ThirdPersonFollower (rviz_default_plugins)
-      Yaw: 4.728570938110352
+      Yaw: 4.918575286865234
     Saved: ~
 Window Geometry:
   DepthCamera:

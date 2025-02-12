@@ -24,7 +24,7 @@ ekf_filter_node:
         transform_timeout: 0.0
         print_diagnostics: true
         debug: false
-        debug_out_file: /home/nikolica/workspace/logs/
+        debug_out_file: /home/nikolica/workspace/logs/ekf_debug.txt
         publish_tf: true
         publish_acceleration: false
         reset_on_time_jump: true
@@ -35,9 +35,8 @@ ekf_filter_node:
         world_frame: odom                # Defaults to the value of odom_frame if unspecified
 
 
-
-        # Configuration IMU
-        imu0: /imu/data #/zed/zed_node/imu/data
+        # Configuration IMU #/zed/zed_node/imu/data
+        imu0: /imu/data
         imu0_config: [false, false, false,      # X,Y,Z
                       false, false, true,      # roll, pitch, yaw
                       false, false, false,      # X˙, Y˙, Z˙
@@ -49,7 +48,7 @@ ekf_filter_node:
         imu0_differential: false
         imu0_nodelay: false
         imu0_relative: false
-        imu0_queue_size: 10
+        imu0_queue_size: 20
 
         # Configuration odom
         odom0: /odometry/gps
@@ -62,20 +61,7 @@ ekf_filter_node:
         odom0_differential: false
         odom0_nodelay: false
         odom0_relative: false
-        odom0_queue_size: 10
-
-        # odom1: /odometry/agar_odom
-        # odom1_config: [true,  true, false,
-        #             false, false, false,
-        #             false, false, false,
-        #             false, false, false,
-        #             false, false, false]
-
-        # odom1_differential: false
-        # odom1_nodelay: false
-        # odom1_relative: false
-        # odom1_queue_size: 10
-        
+        odom0_queue_size: 20
 
         use_control: false
         stamped_control: false

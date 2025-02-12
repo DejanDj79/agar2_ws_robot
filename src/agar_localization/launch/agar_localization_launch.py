@@ -16,10 +16,11 @@ def generate_launch_description():
         name="navsat_transform",
         output="screen",
         parameters=[robot_localization_file_path], #, use_sim_time_config
-        remappings=[
-            ("gps/fix", "gps/fix"),                # IN
-            ("odometry/gps", "odometry/gps"),       # OUT
-        ],
+        # remappings=[
+        #     ("imu/data", "imu/data"),
+        #     ("gps/fix", "gps/fix"),                # IN
+        #     ("odometry/gps", "odometry/gps"),       # OUT
+        # ],
     )
 
   start_robot_localization_cmd = Node(
@@ -29,7 +30,7 @@ def generate_launch_description():
     output='screen',
     parameters=[robot_localization_file_path], #, use_sim_time_config
     # remappings=[
-    #       ("odometry/filtered", "odometry/local_odom"),
+    #       ("imu/data", "imu/data"),
     #   ],    
     )
   
