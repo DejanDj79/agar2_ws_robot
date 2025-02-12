@@ -10,12 +10,6 @@ def generate_launch_description():
   pkg_localization = FindPackageShare(package='agar_localization').find('agar_localization')
   robot_localization_file_path = os.path.join(pkg_localization, 'config', 'localization_config.yaml') 
   
-  use_sim_time_config = os.path.join(
-      get_package_share_directory('agar_bringup'),
-      'config',
-      'sim_time.yaml'
-  )
-  
   gnss_fix_to_odometry_node = Node(
         package="robot_localization",
         executable="navsat_transform_node",
@@ -55,9 +49,9 @@ def generate_launch_description():
   #     arguments=['0', '0', '0', '0', '0', '0', '1', 'odom', 'base_footprint'],
   # )
   
-  pointcloud_to_laserscan = IncludeLaunchDescription(
-    PythonLaunchDescriptionSource(os.path.join(pkg_localization, 'launch', 'agar_laserscan_launch.py')),
-  )
+  # pointcloud_to_laserscan = IncludeLaunchDescription(
+  #   PythonLaunchDescriptionSource(os.path.join(pkg_localization, 'launch', 'agar_laserscan_launch.py')),
+  # )
 
 
   ld = LaunchDescription()

@@ -57,12 +57,5 @@ def generate_launch_description():
         # mapviz_launch,
         # robot_steering_node,
         # waypoint_follower,
-
-        # Node(
-        #     package='agar_bringup',
-        #     namespace='/',
-        #     executable='agar_rosbag',
-        #     name='agar_rosbag'
-        # ),
     ])
     

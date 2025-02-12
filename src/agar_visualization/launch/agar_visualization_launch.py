@@ -10,19 +10,12 @@ from launch_ros.actions import Node
 def generate_launch_description():
     rviz_config = os.path.join(get_package_share_directory('agar_visualization'), 'config', 'agar_simulator.rviz')
 
-    use_sim_time_config = os.path.join(
-        get_package_share_directory('agar_bringup'),
-        'config',
-        'sim_time.yaml'
-    )
-    
     start_rviz = Node(
         package='rviz2',
         namespace='/',
         executable='rviz2',
         name='rviz2',
-        arguments=['-d' + rviz_config],
-        parameters=[use_sim_time_config]
+        arguments=['-d' + rviz_config]
     )
 
     ld = LaunchDescription()
