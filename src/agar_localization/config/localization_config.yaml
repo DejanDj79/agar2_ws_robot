@@ -11,7 +11,8 @@ navsat_transform:
     publish_filtered_gps: false
 
     wait_for_datum: true
-    datum: [43.330890405343304, 21.893977363705066, 0.0] #  latitude, longitude, heading (in radians)
+    # datum: [43.330890405343304, 21.893977363705066, 0.0] #  latitude, longitude, heading (in radians)
+    datum: [43.33112072916667, 21.890989195166668, 0.0]
 
 ### ekf config file ###
 ekf_filter_node:
@@ -49,6 +50,7 @@ ekf_filter_node:
         imu0_nodelay: false
         imu0_relative: false
         imu0_queue_size: 20
+
 
         # Configuration odom
         odom0: /odometry/gps

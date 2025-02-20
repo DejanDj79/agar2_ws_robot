@@ -9,9 +9,9 @@ show_status_bar: true
 show_capture_tools: true
 window_width: 1864
 window_height: 1016
-view_scale: 0.0573085248
-offset_x: -10.8318834
-offset_y: 3.2213881
+view_scale: 0.024304416
+offset_x: 0.42053929
+offset_y: -2.16739488
 use_latest_transforms: true
 background: "#a0a0a4"
 image_transport: raw
@@ -29,9 +29,37 @@ displays:
     name: new display
     config:
       visible: true
-      collapsed: false
+      collapsed: true
       topic: /gps/fix
       color: "#00ff00"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
+  - type: mapviz_plugins/navsat
+    name: new display
+    config:
+      visible: true
+      collapsed: true
+      topic: /gps/fix/left
+      color: "#f9f06b"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2
+  - type: mapviz_plugins/navsat
+    name: new display
+    config:
+      visible: true
+      collapsed: true
+      topic: /gps/fix/right
+      color: "#f9f06b"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
@@ -44,18 +72,30 @@ displays:
     config:
       visible: true
       collapsed: false
-      topic: /odometry/agar
+      topic: /odometry/filtered
       color: "#c80003"
       draw_style: arrows
-      position_tolerance: 0.01
+      position_tolerance: 0
       buffer_size: 0
       show_laps: false
       show_covariance: false
       show_all_covariances: false
       static_arrow_sizes: false
-      arrow_size: 52
+      arrow_size: 6
       show_timestamps: 0
       qos_depth: 10
       qos_history: 1
       qos_reliability: 1
       qos_durability: 2
+  - type: mapviz_plugins/tf_frame
+    name: new display
+    config:
+      visible: true
+      collapsed: true
+      frame: base_footprint
+      color: "#00ff00"
+      draw_style: lines
+      position_tolerance: 0
+      buffer_size: 0
+      static_arrow_sizes: false
+      arrow_size: 25

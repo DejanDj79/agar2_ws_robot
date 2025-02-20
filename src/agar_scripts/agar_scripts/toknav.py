@@ -54,6 +54,7 @@ class ToknavGpsDriver(Node):
         self.nav_active_pub = self.create_publisher(Bool, "/navigation_active", 10)
         self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
         # self.odom_pub = self.create_publisher(Odometry, "/odometry/agar", 10)
+        self.odom_pub = self.create_publisher(Odometry, "/odometry/filtered", 10)
 
         self.navigation_active = False
 
@@ -78,9 +79,10 @@ class ToknavGpsDriver(Node):
         # res = self.future.result()
         # self.datum_latitude     = res.values[0].double_array_value[0]
         # self.datum_longitude    = res.values[0].double_array_value[1]
-        self.datum_latitude         = 43.330890405343304
-        self.datum_longitude        = 21.893977363705066
-
+        # self.datum_latitude         = 43.330890405343304
+        # self.datum_longitude        = 21.893977363705066
+        self.datum_latitude         = 43.33100874425
+        self.datum_longitude        = 21.89109394616667
 
         self.tf_broadcaster = TransformBroadcaster(self)
 
@@ -131,16 +133,21 @@ class ToknavGpsDriver(Node):
             self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'gps_link', [0.0, 0.0, 0.5], [0.0, 0.0, 0.0, 1.0]))
             self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'imu', [0.0, 0.0, 0.4], [0.0, 0.0, 0.0, 1.0]))
 
-            (data_01, addr) = self.socket.recvfrom(1024)
-            if '$GNGGAH' in data_01.decode():
-                (data_01, addr) = self.socket.recvfrom(1024)
+            # (data_01, addr) = self.socket.recvfrom(1024)
+            # if '$GNGGAH' in data_01.decode():
+            #     (data_01, addr) = self.socket.recvfrom(1024)
+            # (data_02, addr) = self.socket.recvfrom(1024)
+
             (data_02, addr) = self.socket.recvfrom(1024)
+            if '$GNGGAH' in data_02.decode():
+                (data_02, addr) = self.socket.recvfrom(1024)
+            (data_01, addr) = self.socket.recvfrom(1024)
 
             # self.get_logger().info('Data 01: {0}'.format(data_01))
             # self.get_logger().info('Data 01: {0}'.format(data_02))
 
-            data_01 = b'$GNGGA,130355.50,4319.86211564,N,02153.46818735,E,4,12,1.4,196.7865,M,45.0941,M,1.5,0*62\r\n'
-            data_02 = b'$GNGGAH,130355.50,4319.86146616,N,02153.46712102,E,4,09,2.5,198.0816,M,45.0941,M,1.5,0*2F\r\n'
+            # data_01 = b'$GNGGA,130355.50,4319.86211564,N,02153.46818735,E,4,12,1.4,196.7865,M,45.0941,M,1.5,0*62\r\n'
+            # data_02 = b'$GNGGAH,130355.50,4319.86146616,N,02153.46712102,E,4,09,2.5,198.0816,M,45.0941,M,1.5,0*2F\r\n'
 
             # self.get_logger().info('Data 01: {0}'.format(data_01))
             # self.get_logger().info('Data 01: {0}'.format(data_02))
@@ -203,6 +210,8 @@ class ToknavGpsDriver(Node):
 
         heading = atan2(position_2[1] - position_1[1], position_2[0] - position_1[0]) + (pi / 2)
 
+        # cov = random.randrange(0, 1) / 100
+
         gps_fix_msg = NavSatFix()
         gps_fix_msg.header.stamp        = self.get_clock().now().to_msg()
         gps_fix_msg.header.frame_id     = "gps_link"
@@ -236,22 +245,21 @@ class ToknavGpsDriver(Node):
         # self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'imu', [0.0, 0.0, 0.4], [0.0, 0.0, 0.0, 1.0]))
 
 
-        # odom_msg = Odometry()
-        # odom_msg.header.stamp = self.get_clock().now().to_msg()
-        # odom_msg.header.frame_id = "odom"
-        # odom_msg.child_frame_id = "base_footprint"
-        # odom_msg.pose.pose.position.x = position[0]
-        # odom_msg.pose.pose.position.y = position[1]
-        # odom_msg.pose.pose.position.z = 0.0
-        # odom_msg.pose.pose.orientation.x = orientation[0]
-        # odom_msg.pose.pose.orientation.y = orientation[1]
-        # odom_msg.pose.pose.orientation.z = orientation[2]
-        # odom_msg.pose.pose.orientation.w = orientation[3]
-        # self.odom_pub.publish(odom_msg)
+        odom_msg = Odometry()
+        odom_msg.header.stamp = self.get_clock().now().to_msg()
+        odom_msg.header.frame_id = "odom"
+        odom_msg.child_frame_id = "base_footprint"
+        odom_msg.pose.pose.position.x = position[0]
+        odom_msg.pose.pose.position.y = position[1]
+        odom_msg.pose.pose.position.z = 0.0
+        odom_msg.pose.pose.orientation.x = orientation[0]
+        odom_msg.pose.pose.orientation.y = orientation[1]
+        odom_msg.pose.pose.orientation.z = orientation[2]
+        odom_msg.pose.pose.orientation.w = orientation[3]
+        self.odom_pub.publish(odom_msg)
         
-        # self.tf_broadcaster.sendTransform(self.set_transform('odom', 'base_footprint', [position[0], position[1]], orientation))
-
-        # self.tf_broadcaster.sendTransform(self.set_transform('map', 'odom', [0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
+        self.tf_broadcaster.sendTransform(self.set_transform('odom', 'base_footprint', [position[0], position[1], 0.0], orientation))
+        self.tf_broadcaster.sendTransform(self.set_transform('map', 'odom', [0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
         # self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'imu', [0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
 
 
