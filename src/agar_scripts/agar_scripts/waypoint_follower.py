@@ -60,9 +60,10 @@ class WaypointFollower(Node):
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.tf_broadcaster = TransformBroadcaster(self)
 
-        self.cmd_vel_pub = self.create_publisher(Twist, 'diff_drive_base_controller/cmd_vel_unstamped', 10)
-        self.waypoints_path_pub = self.create_publisher(Path, "/plan", 10)
-        self.angle_path_pub     = self.create_publisher(Path, "/angle_path", 10)
+        # self.cmd_vel_pub = self.create_publisher(Twist, 'diff_drive_base_controller/cmd_vel_unstamped', 10)
+        self.cmd_vel_pub            = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.waypoints_path_pub     = self.create_publisher(Path, "/plan", 10)
+        self.angle_path_pub         = self.create_publisher(Path, "/angle_path", 10)
 
         self.collision_zones_sub    = self.create_subscription(CollisionZones, '/collision_zones', self.collision_zones_callback, 10)
         self.navigation_active_sub  = self.create_subscription(Bool, '/navigation_active', self.navigation_active_callback, 10)
