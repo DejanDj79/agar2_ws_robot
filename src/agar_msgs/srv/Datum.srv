@@ -1,0 +1,3 @@
+geographic_msgs/GeoPose datum
+---
+bool success

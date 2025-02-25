@@ -17,7 +17,8 @@ from std_msgs.msg import Bool, String, Int16
 from geometry_msgs.msg import Twist, PoseStamped
 from nav_msgs.msg import Path 
 from agar_msgs.msg import CollisionZones
-from rcl_interfaces.srv import GetParameters
+# from rcl_interfaces.srv import GetParameters
+from agar_msgs.srv import Datum
 
 from agar_common.agar_common_library import agar_navigation
 from agar_common.agar_common_library.alvinxy import ll2xy
@@ -49,9 +50,15 @@ class WaypointFollower(Node):
     def __init__(self):
         super().__init__('waypoint_follower')
 
+        from rcl_interfaces.msg import ParameterDescriptor
+        my_parameter_descriptor = ParameterDescriptor(description='This parameter is mine!')
+        self.declare_parameter('my_parameter', 'world', my_parameter_descriptor)
+
         self.simulator_mode = True
 
         self.get_logger().info('Initialization completed')
+
+        self.datum_service = self.create_service(Datum, 'waypoint_datum', self.set_datum_callback)
 
         timer_period        = 0.05  # seconds
         self.timer          = self.create_timer(timer_period, self.run)
@@ -103,17 +110,14 @@ class WaypointFollower(Node):
         self.path = Path()
         self.path.header.frame_id = 'map'
 
-        self.cli = self.create_client(GetParameters, '/navsat_transform/get_parameters')
-        while not self.cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service not available, waiting again...')
-        self.req = GetParameters.Request()
+        self.datum_latitude         = 0.0
+        self.datum_longitude        = 0.0
 
-        self.req.names = ['datum']
-        self.future = self.cli.call_async(self.req)
-        rclpy.spin_until_future_complete(self, self.future)
-        res = self.future.result()
-        self.datum_latitude     = res.values[0].double_array_value[0]
-        self.datum_longitude    = res.values[0].double_array_value[1]
+        # self.cli = self.create_client(Datum, '/datum_get')
+        # while not self.cli.wait_for_service(timeout_sec=1.0):
+        #     self.get_logger().info('service not available, waiting again...')
+        # self.req = Datum.Request()
+        # self.get_datum()
     #endregion
 
     #region Load waypoints
@@ -141,6 +145,8 @@ class WaypointFollower(Node):
             self.get_logger().error(ex)
 
     def generate_waypoint_list(self):
+        self.get_logger().info(f'Datum: {self.datum_latitude}, {self.datum_longitude}')
+
         pose = PoseStamped()
         pose.pose.position.x = self.robot_position.x
         pose.pose.position.y = self.robot_position.y
@@ -153,6 +159,7 @@ class WaypointFollower(Node):
         while i < len(self.waypoints_csv):
             curr_wp = self.waypoints_csv[i]
 
+            self.get_logger().info(f'Waypoint: {curr_wp.latitude}, {curr_wp.longitude}')
             (pos_x, pos_y) = ll2xy(curr_wp.latitude, curr_wp.longitude, self.datum_latitude, self.datum_longitude)
 
             pose = PoseStamped()
@@ -244,12 +251,8 @@ class WaypointFollower(Node):
                 # pose = PoseStamped()
                 # pose.pose.position.x = wp3[0]
                 # pose.pose.position.y = wp3[1]
-                # self.path.poses.append(pose)
-
-                # wp = agar_navigation.waypoint(i, wp3[0], wp3[1], wp4[0], wp4[1], True, curr_wp.reverse_turn, curr_wp.tank, 
-                #     curr_wp.speed, curr_wp.agar_action, curr_wp.combo_value, curr_wp.combo_text, curr_wp.param_1, 
-                #     curr_wp.param_2, curr_wp.param_3, curr_wp.param_4, curr_wp.visited)
-                # self.waypoints.append(wp)
+                # self.path.poses.append(pos
+        
 
                 # pose = PoseStamped()
                 # pose.pose.position.x = wp4[0]
@@ -301,6 +304,18 @@ class WaypointFollower(Node):
             self.load_waypoints_from_file()
         else:
             self.get_logger().warn(f'The path {self.waypoints_path}{self.waypoint_file_name} does not exists')
+
+    def set_datum_callback(self, request, response):
+        response.success = False
+        try:
+            self.datum_latitude     = request.datum.position.latitude
+            self.datum_longitude    = request.datum.position.longitude
+            self.get_logger().info(f'Datum received: {self.datum_latitude}, {self.datum_longitude}')
+        except Exception as ex:
+            self.get_logger().error(f'Exception: {ex}')
+
+        response.success = True
+        return response
     #endregion
 
     #region Publisher
@@ -334,6 +349,7 @@ class WaypointFollower(Node):
 
     #region Path following
     def run(self):
+        # self.get_logger().info(f'Datum: {self.datum_latitude}, {self.datum_longitude}')
         self.get_robot_position()
         if self.navigation_active:
             start_point     = (self.current_waypoint.start_x, self.current_waypoint.start_y)
@@ -389,8 +405,8 @@ class WaypointFollower(Node):
                 angle_deg = angle_long_deg
                 self.publish_pose_path(point_long)
 
-            # self.get_logger().info(f'Robot ({round(self.robot_position.x, 2)}, {round(self.robot_position.y, 2)}, {round(self.robot_position.z, 2)}, {round(degrees(self.robot_position.z), 2)})')            
-            # self.get_logger().info(f'angle: {round(angle_deg, 2)}, distance: {round(distance_in_m, 2)}, waypoint: {round(self.waypoint_index, 2)}, ({round(self.current_waypoint.end_x, 2)}, {round(self.current_waypoint.end_y, 2)})')
+            self.get_logger().info(f'Robot ({round(self.robot_position.x, 2)}, {round(self.robot_position.y, 2)}, {round(self.robot_position.z, 2)}, {round(degrees(self.robot_position.z), 2)})')            
+            self.get_logger().info(f'angle: {round(angle_deg, 2)}, distance: {round(distance_in_m, 2)}, waypoint: {round(self.waypoint_index, 2)}, ({round(self.current_waypoint.end_x, 2)}, {round(self.current_waypoint.end_y, 2)})')
 
             if self.simulator_mode:
                 if abs(angle_deg) > 30: speed_z = 1.0
@@ -527,10 +543,28 @@ class WaypointFollower(Node):
                 f'Could not transform {self.source_frame} to {self.target_frame}: {ex}')
     #endregion
 
+    #region Other
+    def get_datum(self):
+        self.get_logger().info('Getting datum')
+        try:
+            # res = self.cli.call(self.req)
+            # self.get_logger().info(f'Datum: {res}')
+
+            self.future = self.cli.call_async(self.req)
+            rclpy.spin_until_future_complete(self, self.future)
+            res = self.future.result()
+            self.datum_latitude     = res.datum.position.latitude
+            self.datum_longitude    = res.datum.position.longitude
+            self.get_logger().info(f'Datum: {self.datum_latitude}, {self.datum_longitude}')
+        except Exception as exc:
+            self.get_logger().info('Service call failed %r' % exc)
+    #endregion
+
 #region Main
-def main(args=None):
-    rclpy.init(args=args)
+def main():
+    rclpy.init()
     waypoint_follower = WaypointFollower()
+
     rclpy.spin(waypoint_follower)
     waypoint_follower.destroy_node()
     rclpy.shutdown()

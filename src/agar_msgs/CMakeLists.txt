@@ -7,6 +7,7 @@ endif()
 
 
 # find dependencies
+find_package(geographic_msgs REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 # uncomment the following section in order to fill in
@@ -15,7 +16,8 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/CollisionZones.msg"
-  #DEPENDENCIES geometry_msgs # Add packages that above messages depend on, in this case geometry_msgs for Sphere.msg
+  "srv/Datum.srv"
+  DEPENDENCIES geographic_msgs #geometry_msgs # Add packages that above messages depend on, in this case geometry_msgs for Sphere.msg
 )
 
 if(BUILD_TESTING)
