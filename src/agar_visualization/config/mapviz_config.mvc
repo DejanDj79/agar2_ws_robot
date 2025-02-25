@@ -9,9 +9,9 @@ show_status_bar: true
 show_capture_tools: true
 window_width: 1864
 window_height: 1016
-view_scale: 0.024304416
-offset_x: 0.42053929
-offset_y: -2.16739488
+view_scale: 0.331012785
+offset_x: 154.828537
+offset_y: 12.0599413
 use_latest_transforms: true
 background: "#a0a0a4"
 image_transport: raw
@@ -20,11 +20,23 @@ displays:
     name: new display
     config:
       visible: true
-      collapsed: true
+      collapsed: false
       custom_sources:
         []
       bing_api_key: Av63clFa5mA5qnuu8Y4wl-7kohbJ-AJH0SMLmyvvUJcuTqtS9J6bvAduxh_8dO0S
       source: Bing Maps (terrain)
+  - type: mapviz_plugins/robot_image
+    name: new display
+    config:
+      visible: true
+      collapsed: true
+      frame: base_footprint
+      image: /home/nikolica/Downloads/agar_top.png
+      width: 2
+      height: 1.3200000000000001
+      offset_x: 0
+      offset_y: 0
+      ratio: original
   - type: mapviz_plugins/navsat
     name: new display
     config:
@@ -71,11 +83,11 @@ displays:
     name: new display
     config:
       visible: true
-      collapsed: false
+      collapsed: true
       topic: /odometry/filtered
       color: "#c80003"
       draw_style: arrows
-      position_tolerance: 0
+      position_tolerance: 0.69999999999999996
       buffer_size: 0
       show_laps: false
       show_covariance: false
@@ -93,9 +105,20 @@ displays:
       visible: true
       collapsed: true
       frame: base_footprint
-      color: "#00ff00"
+      color: "#99c1f1"
       draw_style: lines
       position_tolerance: 0
       buffer_size: 0
       static_arrow_sizes: false
       arrow_size: 25
+  - type: mapviz_plugins/path
+    name: new display
+    config:
+      visible: true
+      collapsed: true
+      topic: /plan
+      color: "#dc8add"
+      qos_depth: 10
+      qos_history: 1
+      qos_reliability: 1
+      qos_durability: 2

@@ -31,6 +31,12 @@ def generate_launch_description():
          '/agar_localization_simulator_launch.py'])
       )
     
+    mapviz_launch = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('agar_visualization'), 'launch'),
+         '/agar_mapviz_launch.py'])
+      )
+    
     robot_steering_node = Node(
       package='rqt_robot_steering', 
       executable='rqt_robot_steering',
@@ -48,6 +54,7 @@ def generate_launch_description():
         # localization_launch,
         gazebo_launch,
         rviz_launch,
+        mapviz_launch,
         robot_steering_node,
         # waypoint_follower,
 

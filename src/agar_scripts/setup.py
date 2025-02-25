@@ -24,7 +24,7 @@ setup(
             'waypoint_follower = agar_scripts.waypoint_follower:main',
             'collision_checker = agar_scripts.collision_checker:main',
             'toknav_gps = agar_scripts.toknav:main',
-            'toknav_odom = agar_scripts.toknav_odom:main',
+            'datum_correction = agar_scripts.datum_correction:main',
         ],
     },
 )

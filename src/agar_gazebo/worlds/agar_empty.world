@@ -4,8 +4,10 @@
     <spherical_coordinates>
       <surface_model>EARTH_WGS84</surface_model>
       <world_frame_orientation>ENU</world_frame_orientation>
-      <longitude_deg>21.893977363705066</longitude_deg>
-      <latitude_deg>43.330890405343304</latitude_deg>
+      <!-- <longitude_deg>21.893977363705066</longitude_deg>
+      <latitude_deg>43.330890405343304</latitude_deg> -->
+      <longitude_deg>21.890321557666667</longitude_deg>
+      <latitude_deg>43.33057862816666</latitude_deg>
       <elevation>236</elevation>
       <heading_deg>180</heading_deg>
     </spherical_coordinates>
@@ -19,3 +21,4 @@
     </include>
   </world>
 </sdf>
+

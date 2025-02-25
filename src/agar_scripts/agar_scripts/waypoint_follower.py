@@ -13,7 +13,7 @@ from tf2_ros.buffer import Buffer
 from tf2_ros.transform_listener import TransformListener 
 from tf_transformations import euler_from_quaternion
 
-from std_msgs.msg import Bool, String
+from std_msgs.msg import Bool, String, Int16
 from geometry_msgs.msg import Twist, PoseStamped
 from nav_msgs.msg import Path 
 from agar_msgs.msg import CollisionZones
@@ -49,6 +49,8 @@ class WaypointFollower(Node):
     def __init__(self):
         super().__init__('waypoint_follower')
 
+        self.simulator_mode = True
+
         self.get_logger().info('Initialization completed')
 
         timer_period        = 0.05  # seconds
@@ -60,22 +62,23 @@ class WaypointFollower(Node):
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.tf_broadcaster = TransformBroadcaster(self)
 
-        # self.cmd_vel_pub = self.create_publisher(Twist, 'diff_drive_base_controller/cmd_vel_unstamped', 10)
         self.cmd_vel_pub            = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.waypoints_path_pub     = self.create_publisher(Path, "/plan", 10)
-        self.angle_path_pub         = self.create_publisher(Path, "/angle_path", 10)
+        if self.simulator_mode:
+            self.cmd_vel_pub = self.create_publisher(Twist, 'diff_drive_base_controller/cmd_vel_unstamped', 10)
 
-        self.collision_zones_sub    = self.create_subscription(CollisionZones, '/collision_zones', self.collision_zones_callback, 10)
+        self.waypoints_path_pub     = self.create_publisher(Path, '/plan', 10)
+        self.angle_path_pub         = self.create_publisher(Path, '/angle_path', 10)
+        self.brake_robot_pub        = self.create_publisher(Int16, '/brake_status', 10)
+
         self.navigation_active_sub  = self.create_subscription(Bool, '/navigation_active', self.navigation_active_callback, 10)
+        self.collision_zones_sub    = self.create_subscription(CollisionZones, '/collision_zones', self.collision_zones_callback, 10)
         self.load_waypoints_sub     = self.create_subscription(String, '/load_waypoints', self.load_waypoints_callback, 10)
 
         self.source_frame = 'odom'
         self.target_frame = 'base_footprint'
 
         self.robot_position = RobotPosition()
-
         self.tf_static_broadcaster = StaticTransformBroadcaster(self)
-
 
         self.navigation_active      = False
         self.current_action         = robot_action.NO_ACTION
@@ -289,6 +292,7 @@ class WaypointFollower(Node):
         else:
             self.navigation_active  = False
             self.current_action     = robot_action.STOP
+            self.brake_robot()
 
     def load_waypoints_callback(self, msg):
         self.reset_waypoints()
@@ -316,6 +320,16 @@ class WaypointFollower(Node):
         msg_path.poses.append(pose)
 
         self.angle_path_pub.publish(msg_path) 
+    
+    def brake_robot(self):
+        cmd_vel = Twist()
+        cmd_vel.linear.x = 0.0
+        cmd_vel.linear.y = 0.0
+        self.cmd_vel_pub.publish(cmd_vel)
+
+        brake_msg = Int16()
+        brake_msg.data = 1
+        self.brake_robot_pub.publish(brake_msg)
     #endregion
 
     #region Path following
@@ -326,6 +340,8 @@ class WaypointFollower(Node):
             end_point       = (self.current_waypoint.end_x, self.current_waypoint.end_y)
             # angle_deg       = self.calculate_angle(end_point)
             distance_in_m   = sqrt(pow(self.robot_position.x - end_point[0], 2) + pow(self.robot_position.y - end_point[1], 2))
+
+            self.get_logger().info(f'Distance ({round(distance_in_m, 2)}, {round(self.goal_distance, 2)})')
 
             if distance_in_m < self.goal_distance:
                 self.goal_reached()
@@ -355,6 +371,7 @@ class WaypointFollower(Node):
             self.get_logger().info('All waypoints visited')
             self.current_action     = robot_action.STOP
             self.navigation_active  = False
+            self.brake_robot()
             
     def follow_path(self, start_point, end_point, distance_in_m):
         try:
@@ -375,11 +392,18 @@ class WaypointFollower(Node):
             # self.get_logger().info(f'Robot ({round(self.robot_position.x, 2)}, {round(self.robot_position.y, 2)}, {round(self.robot_position.z, 2)}, {round(degrees(self.robot_position.z), 2)})')            
             # self.get_logger().info(f'angle: {round(angle_deg, 2)}, distance: {round(distance_in_m, 2)}, waypoint: {round(self.waypoint_index, 2)}, ({round(self.current_waypoint.end_x, 2)}, {round(self.current_waypoint.end_y, 2)})')
 
-            if abs(angle_deg) > 30: speed_z = 1.0
-            elif abs(angle_deg) > 10 and abs(angle_deg) <= 30: speed_z = 0.5
-            elif abs(angle_deg) > 2 and abs(angle_deg) <= 10: speed_z = 0.25
-            elif abs(angle_deg) > 1 and abs(angle_deg) <= 2: speed_z = 0.1
-            else: speed_z = 0.0
+            if self.simulator_mode:
+                if abs(angle_deg) > 30: speed_z = 1.0
+                elif abs(angle_deg) > 10 and abs(angle_deg) <= 30: speed_z = 0.5
+                elif abs(angle_deg) > 2 and abs(angle_deg) <= 10: speed_z = 0.25
+                elif abs(angle_deg) > 1 and abs(angle_deg) <= 2: speed_z = 0.1
+                else: speed_z = 0.0
+            else:
+                if abs(angle_deg) > 10: speed_z = 1.0
+                elif abs(angle_deg) > 8 and abs(angle_deg) <= 10: speed_z = 0.5
+                elif abs(angle_deg) > 5 and abs(angle_deg) <= 8: speed_z = 0.2
+                elif abs(angle_deg) > 1 and abs(angle_deg) <= 5: speed_z = 0.1
+                else: speed_z = 0.0
 
             if self.is_slow:
                 speed_x = 0.3
