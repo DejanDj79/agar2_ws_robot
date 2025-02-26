@@ -8,6 +8,12 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 def generate_launch_description():
     
+    description_launch = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('agar_description'), 'launch'),
+         '/agar_description_launch.py'])
+      )
+    
     localization_launch = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('agar_localization'), 'launch'),
@@ -33,6 +39,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        description_launch,
         localization_launch,
         waypoint_follower,
         # toknav,
