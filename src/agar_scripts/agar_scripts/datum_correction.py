@@ -44,7 +44,8 @@ class DatumCorrection(Node):
 
     def gps_subscriber_callback(self, msg):
         status = msg.status.status
-        if status == NavSatStatus.STATUS_FIX and self.fix_received == False:
+        # if status == NavSatStatus.STATUS_FIX and self.fix_received == False:
+        if status == NavSatStatus.STATUS_GBAS_FIX and self.fix_received == False:
             lat = msg.latitude
             lng = msg.longitude
             alt = msg.altitude
