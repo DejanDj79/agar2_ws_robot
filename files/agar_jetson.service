@@ -1,0 +1,9 @@
+[Unit]
+Description=AgAR Jetson Service
+
+[Service]
+ExecStart=/home/nvidia/agar_jetson.sh
+
+[Install]
+WantedBy=multi-user.target
+
