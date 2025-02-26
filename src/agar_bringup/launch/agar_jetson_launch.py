@@ -40,7 +40,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         description_launch,
-        localization_launch,
+        # localization_launch,
         waypoint_follower,
         # toknav,
         datum_correction,

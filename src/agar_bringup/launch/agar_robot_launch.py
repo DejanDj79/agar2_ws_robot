@@ -1,0 +1,39 @@
+import os
+from ament_index_python.packages import get_package_share_directory
+
+from launch import LaunchDescription
+from launch_ros.actions import Node
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+
+def generate_launch_description():
+    rviz_launch = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('agar_visualization'), 'launch'),
+         '/agar_visualization_launch.py'])
+      )
+    
+    mapviz_launch = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('agar_visualization'), 'launch'),
+         '/agar_mapviz_launch.py'])
+      )
+    
+    robot_steering_node = Node(
+      package='rqt_robot_steering', 
+      executable='rqt_robot_steering',
+      output='screen'
+    )
+
+    # waypoint_follower = Node(
+    #   package='agar_scripts', 
+    #   executable='waypoint_follower',
+    #   output='screen'
+    # )
+
+    return LaunchDescription([
+        rviz_launch,
+        mapviz_launch,
+        # robot_steering_node,
+    ])
+    
