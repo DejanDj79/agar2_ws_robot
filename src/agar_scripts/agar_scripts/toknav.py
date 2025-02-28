@@ -592,6 +592,8 @@ class ToknavGpsDriver(Node):
             if not self.using_receiver_epe or isnan(self.alt_std_dev):
                 self.alt_std_dev = default_epe * 2
 
+            self.get_logger().info(f'Standard deviation: {self.lon_std_dev} - {self.lat_std_dev} - {self.alt_std_dev}')
+
             hdop = self.gga['hdop']
             gps_fix_msg.position_covariance[0] = (hdop * self.lon_std_dev) ** 2
             gps_fix_msg.position_covariance[4] = (hdop * self.lat_std_dev) ** 2
