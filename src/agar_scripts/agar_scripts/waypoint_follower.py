@@ -60,7 +60,7 @@ class WaypointFollower(Node):
 
         self.datum_service = self.create_service(Datum, 'waypoint_datum', self.set_datum_callback)
 
-        timer_period        = 0.05  # seconds
+        timer_period        = 1 / 20  # seconds
         self.timer          = self.create_timer(timer_period, self.run)
         self.timer_stop     = self.create_timer(1.0, self.stop_and_wait)
         self.timer_stop.cancel()

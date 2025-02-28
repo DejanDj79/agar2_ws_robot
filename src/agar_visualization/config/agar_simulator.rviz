@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /TF1
+        - /AgAR1
         - /Odometry1
         - /Lidar1/LaserScan1
         - /DepthCamera1/DepthCamera1/Topic1
@@ -59,19 +60,19 @@ Visualization Manager:
         base_footprint:
           Value: false
         base_link:
-          Value: false
+          Value: true
         front_left_leg:
           Value: false
         front_left_leg_fixture:
           Value: false
         front_left_wheel:
-          Value: false
+          Value: true
         front_right_leg:
           Value: false
         front_right_leg_fixture:
           Value: false
         front_right_wheel:
-          Value: false
+          Value: true
         gps_link:
           Value: true
         imu_link:
@@ -93,13 +94,13 @@ Visualization Manager:
         rear_left_leg_fixture:
           Value: false
         rear_left_wheel:
-          Value: false
+          Value: true
         rear_right_leg:
           Value: false
         rear_right_leg_fixture:
           Value: false
         rear_right_wheel:
-          Value: false
+          Value: true
         right_stand:
           Value: false
         top_stand:
@@ -175,7 +176,7 @@ Visualization Manager:
                             {}
       Update Interval: 0
       Value: true
-    - Alpha: 1
+    - Alpha: 0.800000011920929
       Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
       Description File: ""
@@ -339,7 +340,7 @@ Visualization Manager:
       Update Interval: 0
       Value: true
       Visual Enabled: true
-    - Angle Tolerance: 0.30000001192092896
+    - Angle Tolerance: 0.5
       Class: rviz_default_plugins/Odometry
       Covariance:
         Orientation:
@@ -359,7 +360,7 @@ Visualization Manager:
       Enabled: true
       Keep: 100
       Name: Odometry
-      Position Tolerance: 0.5
+      Position Tolerance: 1
       Shape:
         Alpha: 1
         Axes Length: 1
@@ -906,25 +907,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 1.3121458292007446
+      Distance: 3.5935139656066895
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.30756717920303345
-        Y: -0.45791253447532654
-        Z: 1.2612669467926025
-      Focal Shape Fixed Size: true
+        X: -0.11193932592868805
+        Y: -0.43458428978919983
+        Z: 0.8463531732559204
+      Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.20539848506450653
+      Pitch: 0.7397973537445068
       Target Frame: base_footprint
       Value: Orbit (rviz_default_plugins)
-      Yaw: 0.7985772490501404
+      Yaw: 3.1840693950653076
     Saved: ~
 Window Geometry:
   DepthCamera:
