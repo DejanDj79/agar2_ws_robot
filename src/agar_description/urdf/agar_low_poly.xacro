@@ -26,6 +26,8 @@
     <!-- <xacro:include filename="$(find agar_description)/urdf/gps_imu_fix.xacro" /> -->
     <!-- <xacro:include filename="$(find agar_description)/urdf/lidar.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/camera.xacro" /> -->
+
+    <xacro:include filename="$(find agar_description)/urdf/zed_descr.urdf.xacro" />
     
     <!-- AgAR frame -->
     <link name="base_footprint">

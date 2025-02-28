@@ -25,6 +25,8 @@ setup(
             'collision_checker = agar_scripts.collision_checker:main',
             'toknav_gps = agar_scripts.toknav:main',
             'datum_correction = agar_scripts.datum_correction:main',
+            'rosbag_transforms = agar_scripts.rosbag_transforms:main',
+            'fake_sensors = agar_scripts.fake_sensors:main',
         ],
     },
 )

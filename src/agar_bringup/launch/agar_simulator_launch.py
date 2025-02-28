@@ -51,11 +51,11 @@ def generate_launch_description():
 
     return LaunchDescription([
         description_launch,
-        # localization_launch,
+        localization_launch,
         gazebo_launch,
         rviz_launch,
         mapviz_launch,
-        robot_steering_node,
+        # robot_steering_node,
         # waypoint_follower,
 
         # Node(
