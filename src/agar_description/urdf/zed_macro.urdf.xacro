@@ -109,7 +109,7 @@
     </xacro:if>
 
     <!-- Camera mounting point (the threaded screw hole in the bottom) -->
-    <!-- <link name="${name}_camera_link" /> -->
+    <link name="${name}_camera_link" />
     <!-- <joint name="${name}_camera_link_joint" type="fixed">
       <parent link="top_stand" />
       <child link="${name}_camera_link" />
