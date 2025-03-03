@@ -40,7 +40,7 @@ class FakeSensors(Node):
             self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'gps_link', [0.0, 0.0, 0.5], [0.0, 0.0, 0.0, 1.0]))
             self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'imu', [0.0, 0.0, 0.4], [0.0, 0.0, 0.0, 1.0]))
 
-            self.tf_broadcaster.sendTransform(self.set_transform('top_stand', 'zedx_camera_link', [0.0, 0.0, -0.05], [0.0, 0.0, 0.0, 1.0]))
+            self.tf_broadcaster.sendTransform(self.set_transform('top_stand', 'zed_camera_link', [0.0, 0.0, -0.05], [0.0, 0.0, 0.0, 1.0]))
 
 
             gps_fix_msg = NavSatFix()
