@@ -53,10 +53,6 @@ class WaypointFollower(Node):
     def __init__(self):
         super().__init__('waypoint_follower')
 
-        from rcl_interfaces.msg import ParameterDescriptor
-        my_parameter_descriptor = ParameterDescriptor(description='This parameter is mine!')
-        self.declare_parameter('my_parameter', 'world', my_parameter_descriptor)
-
         self.simulator_mode = True
 
         self.get_logger().info('Initialization completed')
@@ -288,11 +284,9 @@ class WaypointFollower(Node):
         self.send_notifications(noty)
     
     def update_waypoints_to_file(self, wp_idx):
-        self.get_logger().info(f'Update waypoint {wp_idx}')
-
         visited = self.waypoints_csv[wp_idx].visited
         if visited != True:
-            self.get_logger().info(f'Update waypoint {wp_idx} to visited')
+            self.get_logger().info(f'Waypoint {wp_idx} Updated to visited')
             self.waypoints_csv[wp_idx].visited = True
 
             msg = Int16()
