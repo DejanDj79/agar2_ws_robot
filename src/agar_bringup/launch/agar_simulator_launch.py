@@ -54,7 +54,7 @@ def generate_launch_description():
         localization_launch,
         gazebo_launch,
         rviz_launch,
-        mapviz_launch,
+        # mapviz_launch,
         # robot_steering_node,
         # waypoint_follower,
 

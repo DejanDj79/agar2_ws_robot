@@ -27,6 +27,7 @@ setup(
             'datum_correction = agar_scripts.datum_correction:main',
             'rosbag_transforms = agar_scripts.rosbag_transforms:main',
             'fake_sensors = agar_scripts.fake_sensors:main',
+            'fake_sensors_file = agar_scripts.fake_sensors_file:main',
         ],
     },
 )

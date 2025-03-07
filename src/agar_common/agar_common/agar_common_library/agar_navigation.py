@@ -19,7 +19,7 @@ class waypoint_csv:
 
 class waypoint:
     def __init__(self, idx, start_x, start_y, end_x, end_y, reverse, reverse_turn, tank, speed, agar_action, combo_value, combo_text,
-                 param_1, param_2, param_3, param_4, visited):
+                 param_1, param_2, param_3, param_4, visited, generated_wp):
         self.idx                    = idx
         self.start_x                = start_x
         self.start_y                = start_y 
@@ -36,4 +36,5 @@ class waypoint:
         self.param_2                = param_2
         self.param_3                = param_3
         self.param_4                = param_4
-        self.visited                = visited     
+        self.visited                = visited
+        self.generated_wp           = generated_wp

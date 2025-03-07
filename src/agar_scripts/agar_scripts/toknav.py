@@ -652,7 +652,7 @@ class ToknavGpsDriver(Node):
             self.get_logger().error("Regex didn't match, sentence not valid NMEA? Sentence was: %s"
                         % repr(nmea_sentence))
             return False
-        fields = [field.strip(',') for field in nmea_sentence.split(',')]
+        fields = [field.strip(',') for field in nmea_sentence.replace('*', ',0*').split(',')]
 
         # Ignore the $ and talker ID portions (e.g. GP)
         sentence_type = fields[0][3:]
