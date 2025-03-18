@@ -1,0 +1,4 @@
+string filename
+LatLng[] positions
+---
+bool saved 

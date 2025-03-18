@@ -1,0 +1,14 @@
+int16 agar_action
+string combo_text
+int16 combo_value
+float32 latitude
+float32 longitude
+int16 param_1
+int16 param_2
+int16 param_3
+int16 param_4
+bool reverse
+bool reverse_turn
+float32 speed
+bool tank
+bool visited

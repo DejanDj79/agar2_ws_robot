@@ -16,7 +16,13 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/CollisionZones.msg"
+  "msg/AgarWaypoint.msg"
+  "msg/LatLng.msg"
   "srv/Datum.srv"
+  "srv/AgarWaypointFiles.srv"
+  "srv/AgarWaypoint.srv"
+  "srv/GetMissionEditor.srv"
+  "srv/SetMissionEditor.srv"
   DEPENDENCIES geographic_msgs #geometry_msgs # Add packages that above messages depend on, in this case geometry_msgs for Sphere.msg
 )
 

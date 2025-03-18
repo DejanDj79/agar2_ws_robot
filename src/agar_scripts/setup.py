@@ -28,6 +28,10 @@ setup(
             'rosbag_transforms = agar_scripts.rosbag_transforms:main',
             'fake_sensors = agar_scripts.fake_sensors:main',
             'fake_sensors_file = agar_scripts.fake_sensors_file:main',
+            'waypoint_files_service = agar_scripts.waypoint_files_service:main',
+            'waypoint_service = agar_scripts.waypoint_service:main',
+            'get_mission_editor_service = agar_scripts.get_mission_editor_service:main',
+            'set_mission_editor_service = agar_scripts.set_mission_editor_service:main',
         ],
     },
 )
