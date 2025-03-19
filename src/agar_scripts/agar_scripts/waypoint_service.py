@@ -5,7 +5,7 @@ import os
 import csv
 
 from rclpy.node import Node
-from agar_msgs.srv import AgarWaypoint
+from agar_msgs.srv import AgarWaypoints
 from agar_msgs.msg import AgarWaypoint as AgarWaypointMsg
 
 
@@ -13,7 +13,7 @@ class WaypointService(Node):
 
     def __init__(self):
         super().__init__('agar_waypoint_service')
-        self.srv = self.create_service(AgarWaypoint, 'agar_waypoint_service', self.waypoint_callback)
+        self.srv = self.create_service(AgarWaypoints, 'agar_waypoint_service', self.waypoint_callback)
 
     def waypoint_callback(self, request, response):
         
