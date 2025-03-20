@@ -7,9 +7,9 @@ enable_antialiasing: true
 show_displays: true
 show_status_bar: true
 show_capture_tools: true
-window_width: 1864
-window_height: 1016
-view_scale: 0.0447299443
+window_width: 1680
+window_height: 1013
+view_scale: 0.0914204791
 offset_x: 16.1872559
 offset_y: -4.56953907
 use_latest_transforms: true
@@ -29,11 +29,11 @@ displays:
     name: new display
     config:
       visible: true
-      collapsed: true
+      collapsed: false
       frame: base_footprint
-      image: /home/nikolica/Downloads/agar_top.png
-      width: 2
-      height: 1.3200000000000001
+      image: /home/nikolica/Pictures/agar_top.png
+      width: 2.5
+      height: 1.6499999999999999
       offset_x: 0
       offset_y: 0
       ratio: original

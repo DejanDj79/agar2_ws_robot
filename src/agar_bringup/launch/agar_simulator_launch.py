@@ -43,11 +43,41 @@ def generate_launch_description():
       output='screen'
     )
 
-    # waypoint_follower = Node(
-    #   package='agar_scripts', 
-    #   executable='waypoint_follower',
-    #   output='screen'
-    # )
+    waypoint_follower = Node(
+      package='agar_scripts', 
+      executable='waypoint_follower',
+      output='screen'
+    )
+
+    datum_correction = Node(
+      package='agar_scripts', 
+      executable='datum_correction',
+      output='screen'
+    )
+
+    waypoint_service = Node(
+      package='agar_scripts', 
+      executable='waypoint_service',
+      output='screen'
+    )
+
+    waypoint_files_service = Node(
+      package='agar_scripts', 
+      executable='waypoint_files_service',
+      output='screen'
+    )
+
+    get_mission_editor_service = Node(
+      package='agar_scripts', 
+      executable='get_mission_editor_service',
+      output='screen'
+    )
+
+    set_mission_editor_service = Node(
+      package='agar_scripts', 
+      executable='set_mission_editor_service',
+      output='screen'
+    )
 
     return LaunchDescription([
         description_launch,
@@ -56,7 +86,16 @@ def generate_launch_description():
         rviz_launch,
         # mapviz_launch,
         # robot_steering_node,
-        # waypoint_follower,
+
+        waypoint_follower,
+        datum_correction,
+
+        waypoint_service,
+        waypoint_files_service,
+        get_mission_editor_service,
+        set_mission_editor_service,
+
+
 
         # Node(
         #     package='agar_bringup',

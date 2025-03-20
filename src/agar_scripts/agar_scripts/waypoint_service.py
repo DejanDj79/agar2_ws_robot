@@ -16,7 +16,7 @@ class WaypointService(Node):
         self.srv = self.create_service(AgarWaypoints, 'agar_waypoint_service', self.waypoint_callback)
 
     def waypoint_callback(self, request, response):
-        
+
         try:
             csv_header = ['latitude', 'longitude', 'reverse', 'reverse_turn', 'tank', 'speed', 'agar_action', 'combo_value', 'combo_text', 'param_1', 'param_2', 'param_3', 'param_4', 'visited']
             waypoints_path = '/home/nikolica/ros_data/waypoints/'
@@ -24,12 +24,18 @@ class WaypointService(Node):
 
             waypoint_list = []
 
+            self.get_logger().info(f'waypoint_filename: {waypoints_path + waypoint_filename}')
+
             file_exists = False if waypoint_filename == 'None' else os.path.exists(waypoints_path + waypoint_filename)
+            self.get_logger().info(f'File exists: {file_exists}')
             if file_exists:
                 with open(waypoints_path + waypoint_filename, 'r') as file:
                     reader = csv.DictReader(file, delimiter = '|',
                         fieldnames=csv_header)
                     data = list(reader)
+
+                    self.get_logger().info(f'data: {len(data)}')
+
                     for wp in data:
                         waypoint = AgarWaypointMsg()
                         waypoint.latitude               = float(wp.get('latitude'))
