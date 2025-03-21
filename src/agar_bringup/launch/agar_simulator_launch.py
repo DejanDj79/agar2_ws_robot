@@ -78,6 +78,12 @@ def generate_launch_description():
       executable='set_mission_editor_service',
       output='screen'
     )
+     
+    position_data_service = Node(
+      package='agar_scripts', 
+      executable='position_data_service',
+      output='screen'
+    )
 
     return LaunchDescription([
         description_launch,
@@ -94,7 +100,7 @@ def generate_launch_description():
         waypoint_files_service,
         get_mission_editor_service,
         set_mission_editor_service,
-
+        position_data_service,
 
 
         # Node(
