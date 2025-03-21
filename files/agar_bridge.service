@@ -1,0 +1,8 @@
+[Unit]
+Description=AgAR Bridge Service
+
+[Service]
+ExecStart=/home/nikolica/agar_bridge.sh
+
+[Install]
+WantedBy=multi-user.target

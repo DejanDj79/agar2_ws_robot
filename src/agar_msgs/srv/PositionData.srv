@@ -1,0 +1,10 @@
+---
+float32     altitude
+int16       current_mission
+int16       current_waypoint
+int8        gps_status
+float32     heading
+float32     latitude
+float32     longitude
+string      mission
+bool        navigation_active

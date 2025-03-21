@@ -1,0 +1,63 @@
+ topics:
+ -
+     topic: /brake_status 
+     type: std_msgs/msg/Int16
+     queue_size: 1
+ -
+     topic: /navigation_active 
+     type: std_msgs/msg/Bool
+     queue_size: 1
+ -
+     topic: /cmd_vel
+     type: geometry_msgs/msg/Twist
+     queue_size: 1
+ -
+     topic: /agar_notifications
+     type: std_msgs/msg/String
+     queue_size: 1
+ -
+     topic: /extra_motor_status
+     type: std_msgs/msg/UInt64
+     queue_size: 1
+ -
+     topic: /activate_actuators_position
+     type: std_msgs/msg/Int32MultiArray
+     queue_size: 1
+ -
+     topic: /gps/fix
+     type: sensor_msgs/msg/NavSatFix
+     queue_size: 1
+ -
+     topic: /mission_loaded 
+     type: std_msgs/msg/Bool
+     queue_size: 1
+ -
+     topic: /reset_waypoints
+     type: std_msgs/msg/UInt64
+     queue_size: 1
+ -
+     topic: /visited_waypoint
+     type: std_msgs/msg/Int16
+     queue_size: 1
+ -
+     topic: /load_waypoints
+     type: std_msgs/msg/String
+     queue_size: 1 
+     
+ services_1_to_2:
+ -
+     service: /agar_waypoint_files
+     type: agar_msgs/srv/AgarWaypointFiles
+ -
+     service: /agar_waypoint_service
+     type: agar_msgs/srv/AgarWaypoints
+ -
+     service: /agar/get_mission_editor_service
+     type: agar_msgs/srv/GetMissionEditor
+ -
+     service: /agar/set_mission_editor_service
+     type: agar_msgs/srv/SetMissionEditor
+ -
+     service /position_data_service
+     type: agar_msgs/srv/PositionData
+

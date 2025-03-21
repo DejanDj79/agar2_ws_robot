@@ -1,5 +1,3 @@
-# from example_interfaces.srv import AddTwoInts
-
 import rclpy
 import os
 import csv

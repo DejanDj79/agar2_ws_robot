@@ -1,8 +1,4 @@
-# from example_interfaces.srv import AddTwoInts
-
 import rclpy
-import os
-import csv
 
 from rclpy.node import Node
 from agar_msgs.srv import SetMissionEditor

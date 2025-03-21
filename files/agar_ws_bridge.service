@@ -1,0 +1,8 @@
+[Unit]
+Description=AgAR WS Bridge Service
+
+[Service]
+ExecStart=/home/nikolica/agar_ws_bridge.sh
+
+[Install]
+WantedBy=multi-user.target

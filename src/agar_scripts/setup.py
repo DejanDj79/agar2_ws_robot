@@ -32,6 +32,7 @@ setup(
             'waypoint_service = agar_scripts.waypoint_service:main',
             'get_mission_editor_service = agar_scripts.get_mission_editor_service:main',
             'set_mission_editor_service = agar_scripts.set_mission_editor_service:main',
+            'position_data_service = agar_scripts.position_data_service:main',
         ],
     },
 )
