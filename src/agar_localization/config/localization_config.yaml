@@ -14,6 +14,7 @@ navsat_transform:
     # datum: [43.330890405343304, 21.893977363705066, 0.0] #  latitude, longitude, heading (in radians)
     # datum: [43.33112072916667, 21.890989195166668, 0.0]
     datum: [43.33057862816666, 21.890321557666667, 0.0]
+    # datum: [42.007604251632976, 21.489645546679498] # Kamnik
 
 ### ekf config file ###
 ekf_filter_node:

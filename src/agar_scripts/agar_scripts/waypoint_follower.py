@@ -81,6 +81,7 @@ class WaypointFollower(Node):
         self.actuators_position_pub     = self.create_publisher(Int32MultiArray, "/activate_actuators_position", 10)
         self.extra_motor_pub            = self.create_publisher(UInt64, "/extra_motor_status", 10)
         self.visited_waypoint_pub       = self.create_publisher(Int16, "/visited_waypoint", 10)
+        self.navigation_active_pub      = self.create_publisher(Bool, '/navigation_active', 10)
 
         self.navigation_active_sub      = self.create_subscription(Bool, '/navigation_active', self.navigation_active_callback, 10)
         self.collision_zones_sub        = self.create_subscription(CollisionZones, '/collision_zones', self.collision_zones_callback, 10)
@@ -168,6 +169,7 @@ class WaypointFollower(Node):
         start_x = self.robot_position.x
         start_y = self.robot_position.y
         total_distance = 0
+        number_of_visited = -1
         while i < len(self.waypoints_csv):
 
             curr_wp = self.waypoints_csv[i]
@@ -260,7 +262,8 @@ class WaypointFollower(Node):
 
                     start_x = wp2[0]
                     start_y = wp2[1]
-
+            else:
+                number_of_visited += 1
             i += 1
 
         # for temp in self.waypoints:
@@ -270,6 +273,13 @@ class WaypointFollower(Node):
         #     self.get_logger().info(f"{temp.latitude}, {temp.longitude}")
 
         self.get_logger().info(f'Total number of waypoints: {len(self.waypoints)}, total distance: {round(total_distance, 2)}')
+
+        if len(self.waypoints) > 2 and self.waypoints[1].tank:
+            self.goal_distance = 0.5
+
+        msg = Int16()
+        msg.data = number_of_visited
+        self.visited_waypoint_pub.publish(msg)
 
         if (len(self.waypoints) > 0):
             self.path.header.stamp = self.get_clock().now().to_msg()
@@ -424,6 +434,8 @@ class WaypointFollower(Node):
 
             if distance_in_m < self.goal_distance:
                 self.goal_reached()
+            elif self.current_action == robot_action.SPIN:
+                self.spin(end_point)
             elif self.current_action == robot_action.FOLLOW_PATH:
                 self.follow_path(start_point, end_point, distance_in_m)
             elif self.current_action == robot_action.BACKUP:
@@ -437,7 +449,6 @@ class WaypointFollower(Node):
         self.goal_distance = self.default_goal_distance
         if self.waypoint_index == len(self.waypoints) - 1:
             self.goal_distance = 0.3
-
 
         if self.waypoint_index < len(self.waypoints):
             self.get_logger().info(f'Moving to waypoint {self.waypoint_index}')
@@ -453,12 +464,21 @@ class WaypointFollower(Node):
             self.current_waypoint = self.waypoints[self.waypoint_index]
             reverse = False
             self.reverse = False
-            if self.waypoint_index < len(self.waypoints) - 1 and self.waypoints[self.waypoint_index + 1].reverse: reverse = True
-            if self.current_waypoint.reverse: 
-                reverse = True
-                # self.current_action = robot_action.REVERSE
-                self.reverse = True
-            if reverse: self.goal_distance = 0.3
+
+            if self.current_waypoint.tank:
+                msg = Twist()
+                msg.linear.x  = 0.0
+                msg.angular.z = 0.0
+                self.cmd_vel_pub.publish(msg)
+                self.goal_distance = 0.5
+                self.current_action = robot_action.SPIN
+            else:
+                if self.waypoint_index < len(self.waypoints) - 1 and self.waypoints[self.waypoint_index + 1].reverse: reverse = True
+                if self.current_waypoint.reverse: 
+                    reverse = True
+                    # self.current_action = robot_action.REVERSE
+                    self.reverse = True
+                if reverse: self.goal_distance = 0.3
         else:
             self.get_logger().info('********************************************************************')
             self.get_logger().info('All waypoint reached')
@@ -466,6 +486,9 @@ class WaypointFollower(Node):
             self.get_logger().info('********************************************************************')
             self.current_action     = robot_action.STOP
             self.navigation_active  = False
+            msg_nav_active = Bool()
+            msg_nav_active.data = False
+            self.navigation_active_pub.publish(msg_nav_active)
             self.brake_robot()
             self.send_notifications('All waypoint reached. End time: {0}'.format(datetime.now()))
             
@@ -528,6 +551,22 @@ class WaypointFollower(Node):
         except TransformException as ex:
             self.get_logger().warn(
                 f'Could not transform base_footprint to waypoint_01: {ex}')
+
+    def spin(self, end_point):
+        angle_waypoint = self.calculate_angle(end_point)
+        if abs(angle_waypoint) < 8:
+            if self.waypoint_index < len(self.waypoints) - 1 and self.waypoints[self.waypoint_index + 1].tank:
+                self.goal_distance = 0.5
+            else:
+                self.goal_distance = self.default_goal_distance
+            self.current_action = robot_action.FOLLOW_PATH
+        else:
+            speed_z = 1.0
+            if angle_waypoint < 0: speed_z *= -1.0
+            msg = Twist()
+            msg.linear.x = 0.0
+            msg.angular.z = speed_z
+            self.cmd_vel_pub.publish(msg)
 
     def backup(self):
         try:
