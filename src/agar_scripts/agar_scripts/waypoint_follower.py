@@ -21,7 +21,7 @@ from geometry_msgs.msg import Twist, PoseStamped
 from nav_msgs.msg import Path 
 from agar_msgs.msg import CollisionZones
 # from rcl_interfaces.srv import GetParameters
-from agar_msgs.srv import Datum
+from agar_msgs.srv import Datum, RobotSpeedSave
 
 from agar_common.agar_common_library import agar_navigation
 from agar_common.agar_common_library.alvinxy import ll2xy
@@ -120,11 +120,10 @@ class WaypointFollower(Node):
         self.datum_latitude         = 0.0
         self.datum_longitude        = 0.0
 
-        # self.cli = self.create_client(Datum, '/datum_get')
-        # while not self.cli.wait_for_service(timeout_sec=1.0):
-        #     self.get_logger().info('service not available, waiting again...')
-        # self.req = Datum.Request()
-        # self.get_datum()
+        self.cli_speed = self.create_client(RobotSpeedSave, '/robot_speed_save_server')
+        while not self.cli_speed.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('service not available, waiting again...')
+        self.req_speed = RobotSpeedSave.Request()
     #endregion
 
     #region Load waypoints
@@ -171,7 +170,6 @@ class WaypointFollower(Node):
         total_distance = 0
         number_of_visited = -1
         while i < len(self.waypoints_csv):
-
             curr_wp = self.waypoints_csv[i]
             visited = curr_wp.visited
 
@@ -198,70 +196,113 @@ class WaypointFollower(Node):
                 start_x = pos_x
                 start_y = pos_y
 
+                # if curr_wp.reverse_turn and i < len(self.waypoints_csv) - 2:
+                #     a_start_x = wp.start_x
+                #     a_start_y = wp.start_y
+                #     a_end_x = wp.end_x
+                #     a_end_y = wp.end_y
+                #     (b_start_x, b_start_y)  = ll2xy(self.waypoints_csv[i + 1].latitude, self.waypoints_csv[i + 1].longitude, self.datum_latitude, self.datum_longitude)
+                #     (b_end_x, b_end_y)      = ll2xy(self.waypoints_csv[i + 2].latitude, self.waypoints_csv[i + 2].longitude, self.datum_latitude, self.datum_longitude)
+
+                #     wp1 = self.move_point((a_start_x, a_start_y), (a_end_x, a_end_y), self.reverse_turn_distance) # + 1.0
+                #     wp2 = self.move_point((b_end_x, b_end_y), (b_start_x, b_start_y), self.reverse_turn_distance) # + 1.0
+
+                #     wp3 = self.move_point((wp1[0], wp1[1]), (wp2[0], wp2[1]), self.reverse_turn_distance)
+                #     wp4 = self.move_point((wp2[0], wp2[1]), (wp1[0], wp1[1]), self.reverse_turn_distance)
+
+                #     wp = agar_navigation.waypoint(i + 1, start_x, start_y, wp1[0], wp1[1], False, curr_wp.reverse_turn, curr_wp.tank, 
+                #         curr_wp.speed, curr_wp.agar_action, curr_wp.combo_value, curr_wp.combo_text, curr_wp.param_1, 
+                #         curr_wp.param_2, curr_wp.param_3, curr_wp.param_4, curr_wp.visited, True)
+                #     self.waypoints.append(wp)
+
+                #     total_distance += sqrt(pow(start_x - wp1[0], 2) + pow(start_y - wp1[1], 2))
+
+                #     pose = PoseStamped()
+                #     pose.pose.position.x = wp1[0]
+                #     pose.pose.position.y = wp1[1]
+                #     self.path.poses.append(pose)
+
+                #     wp = agar_navigation.waypoint(i + 1, wp1[0], wp1[1], wp3[0], wp3[1], False, curr_wp.reverse_turn, curr_wp.tank, 
+                #         curr_wp.speed, curr_wp.agar_action, curr_wp.combo_value, curr_wp.combo_text, curr_wp.param_1, 
+                #         curr_wp.param_2, curr_wp.param_3, curr_wp.param_4, curr_wp.visited, True)
+                #     self.waypoints.append(wp)
+
+                #     total_distance += sqrt(pow(wp1[0] - wp3[0], 2) + pow(wp1[1] - wp3[1], 2))
+
+                #     pose = PoseStamped()
+                #     pose.pose.position.x = wp3[0]
+                #     pose.pose.position.y = wp3[1]
+                #     self.path.poses.append(pose)
+
+                #     wp = agar_navigation.waypoint(i + 1, wp3[0], wp3[1], wp4[0], wp4[1], True, curr_wp.reverse_turn, curr_wp.tank, 
+                #         curr_wp.speed, curr_wp.agar_action, curr_wp.combo_value, curr_wp.combo_text, curr_wp.param_1, 
+                #         curr_wp.param_2, curr_wp.param_3, curr_wp.param_4, curr_wp.visited, True)
+                #     self.waypoints.append(wp)
+
+                #     total_distance += sqrt(pow(wp3[0] - wp4[0], 2) + pow(wp3[1] - wp4[1], 2))
+
+                #     pose = PoseStamped()
+                #     pose.pose.position.x = wp4[0]
+                #     pose.pose.position.y = wp4[1]
+                #     sel0  curr_wp.param_2, curr_wp.param_3, curr_wp.param_4, curr_wp.visited, True)
+                #     self.waypoints.append(wp)
+
+                #     total_distance += sqrt(pow(wp4[0] - wp2[0], 2) + pow(wp4[1] - wp2[1], 2))
+
+                #     pose = PoseStamped()
+                #     pose.pose.position.x = wp2[0]
+                #     pose.pose.position.y = wp2[1]
+                #     self.path.poses.append(pose)
+
+                #     start_x = wp2[0]
+                #     start_y = wp2[1]
                 if curr_wp.reverse_turn and i < len(self.waypoints_csv) - 2:
-                    a_start_x = wp.start_x
-                    a_start_y = wp.start_y
+                    # a_start_x = wp.start_x
+                    # a_start_y = wp.start_y
                     a_end_x = wp.end_x
                     a_end_y = wp.end_y
                     (b_start_x, b_start_y)  = ll2xy(self.waypoints_csv[i + 1].latitude, self.waypoints_csv[i + 1].longitude, self.datum_latitude, self.datum_longitude)
-                    (b_end_x, b_end_y)      = ll2xy(self.waypoints_csv[i + 2].latitude, self.waypoints_csv[i + 2].longitude, self.datum_latitude, self.datum_longitude)
+                    # (b_end_x, b_end_y)      = ll2xy(self.waypoints_csv[i + 2].latitude, self.waypoints_csv[i + 2].longitude, self.datum_latitude, self.datum_longitude)
 
-                    wp1 = self.move_point((a_start_x, a_start_y), (a_end_x, a_end_y), self.reverse_turn_distance) # + 1.0
-                    wp2 = self.move_point((b_end_x, b_end_y), (b_start_x, b_start_y), self.reverse_turn_distance) # + 1.0
+                    wp1 = self.move_point((a_end_x, a_end_y), (b_start_x, b_start_y), self.reverse_turn_distance)
+                    wp2 = self.move_point((b_start_x, b_start_y), (a_end_x, a_end_y), self.reverse_turn_distance)
 
-                    wp3 = self.move_point((wp1[0], wp1[1]), (wp2[0], wp2[1]), self.reverse_turn_distance)
-                    wp4 = self.move_point((wp2[0], wp2[1]), (wp1[0], wp1[1]), self.reverse_turn_distance)
+                    # wp = agar_navigation.waypoint(i + 1, start_x, start_y, a_end_x, a_end_y, False, curr_wp.reverse_turn, curr_wp.tank, 
+                    #     curr_wp.speed, curr_wp.agar_action, curr_wp.combo_value, curr_wp.combo_text, curr_wp.param_1, 
+                    #     curr_wp.param_2, curr_wp.param_3, curr_wp.param_4, curr_wp.visited, True)
+                    # self.waypoints.append(wp)
 
-                    wp = agar_navigation.waypoint(i + 1, start_x, start_y, wp1[0], wp1[1], False, curr_wp.reverse_turn, curr_wp.tank, 
-                        curr_wp.speed, curr_wp.agar_action, curr_wp.combo_value, curr_wp.combo_text, curr_wp.param_1, 
-                        curr_wp.param_2, curr_wp.param_3, curr_wp.param_4, curr_wp.visited, True)
-                    self.waypoints.append(wp)
-
-                    total_distance += sqrt(pow(start_x - wp1[0], 2) + pow(start_y - wp1[1], 2))
+                    # total_distance += sqrt(pow(start_x - a_end_x, 2) + pow(start_y - a_end_y, 2))
 
                     pose = PoseStamped()
                     pose.pose.position.x = wp1[0]
                     pose.pose.position.y = wp1[1]
                     self.path.poses.append(pose)
 
-                    wp = agar_navigation.waypoint(i + 1, wp1[0], wp1[1], wp3[0], wp3[1], False, curr_wp.reverse_turn, curr_wp.tank, 
+                    wp = agar_navigation.waypoint(i + 1, a_end_x, a_end_y, wp1[0], wp1[1], False, curr_wp.reverse_turn, curr_wp.tank, 
                         curr_wp.speed, curr_wp.agar_action, curr_wp.combo_value, curr_wp.combo_text, curr_wp.param_1, 
                         curr_wp.param_2, curr_wp.param_3, curr_wp.param_4, curr_wp.visited, True)
                     self.waypoints.append(wp)
 
-                    total_distance += sqrt(pow(wp1[0] - wp3[0], 2) + pow(wp1[1] - wp3[1], 2))
+                    total_distance += sqrt(pow(wp1[0] - a_end_x, 2) + pow(wp1[1] - a_end_y, 2))
 
-                    pose = PoseStamped()
-                    pose.pose.position.x = wp3[0]
-                    pose.pose.position.y = wp3[1]
-                    self.path.poses.append(pose)
-
-                    wp = agar_navigation.waypoint(i + 1, wp3[0], wp3[1], wp4[0], wp4[1], True, curr_wp.reverse_turn, curr_wp.tank, 
-                        curr_wp.speed, curr_wp.agar_action, curr_wp.combo_value, curr_wp.combo_text, curr_wp.param_1, 
-                        curr_wp.param_2, curr_wp.param_3, curr_wp.param_4, curr_wp.visited, True)
-                    self.waypoints.append(wp)
-
-                    total_distance += sqrt(pow(wp3[0] - wp4[0], 2) + pow(wp3[1] - wp4[1], 2))
-
-                    pose = PoseStamped()
-                    pose.pose.position.x = wp4[0]
-                    pose.pose.position.y = wp4[1]
-                    self.path.poses.append(pose)
-
-                    wp = agar_navigation.waypoint(i + 1, wp4[0], wp4[1], wp2[0], wp2[1], False, curr_wp.reverse_turn, curr_wp.tank, 
-                        curr_wp.speed, curr_wp.agar_action, curr_wp.combo_value, curr_wp.combo_text, curr_wp.param_1, 
-                        curr_wp.param_2, curr_wp.param_3, curr_wp.param_4, curr_wp.visited, True)
-                    self.waypoints.append(wp)
-
-                    total_distance += sqrt(pow(wp4[0] - wp2[0], 2) + pow(wp4[1] - wp2[1], 2))
 
                     pose = PoseStamped()
                     pose.pose.position.x = wp2[0]
                     pose.pose.position.y = wp2[1]
                     self.path.poses.append(pose)
 
-                    start_x = wp2[0]
-                    start_y = wp2[1]
+                    wp = agar_navigation.waypoint(i + 1, b_start_x, b_start_y, wp2[0], wp2[1], True, curr_wp.reverse_turn, curr_wp.tank, 
+                        curr_wp.speed, curr_wp.agar_action, curr_wp.combo_value, curr_wp.combo_text, curr_wp.param_1, 
+                        curr_wp.param_2, curr_wp.param_3, curr_wp.param_4, curr_wp.visited, True)
+                    self.waypoints.append(wp)
+
+                    total_distance += sqrt(pow(wp1[0] - b_start_x, 2) + pow(wp1[1] - b_start_y, 2))
+
+                   
+
+                    # start_x = wp2[0]
+                    # start_y = wp2[1]
             else:
                 number_of_visited += 1
             i += 1
@@ -273,6 +314,9 @@ class WaypointFollower(Node):
         #     self.get_logger().info(f"{temp.latitude}, {temp.longitude}")
 
         self.get_logger().info(f'Total number of waypoints: {len(self.waypoints)}, total distance: {round(total_distance, 2)}')
+
+        if len(self.waypoints) > 0:
+            self.set_robot_speed()
 
         if len(self.waypoints) > 2 and self.waypoints[1].tank:
             self.goal_distance = 0.5
@@ -465,12 +509,16 @@ class WaypointFollower(Node):
             reverse = False
             self.reverse = False
 
+            self.set_robot_speed()
+
+            if self.waypoint_index < len(self.waypoints) - 1 and self.waypoints[self.waypoint_index + 1].tank:
+                self.goal_distance = 0.5
+
             if self.current_waypoint.tank:
                 msg = Twist()
                 msg.linear.x  = 0.0
                 msg.angular.z = 0.0
                 self.cmd_vel_pub.publish(msg)
-                self.goal_distance = 0.5
                 self.current_action = robot_action.SPIN
             else:
                 if self.waypoint_index < len(self.waypoints) - 1 and self.waypoints[self.waypoint_index + 1].reverse: reverse = True
@@ -770,6 +818,17 @@ class WaypointFollower(Node):
     def reset_initial_data(self):
         self.waypoints                  = []
 
+    def set_robot_speed(self):
+        speed = int(self.waypoints[self.waypoint_index].speed * 100)
+        self.get_logger().info(f'Setting robot speed: {speed}')
+        try:
+            self.req_speed.speed = speed
+            self.req_speed.tenk_speed = 50
+            future = self.cli_speed.call_async(self.req_speed)
+            future.result()
+            self.get_logger().info('Service save speed call completed')
+        except Exception as exc:
+            self.get_logger().error('Service call failed %r' % exc)
     #endregion
 
 #region Main

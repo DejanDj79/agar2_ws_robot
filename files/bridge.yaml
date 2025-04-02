@@ -58,6 +58,12 @@
      service: /agar/set_mission_editor_service
      type: agar_msgs/srv/SetMissionEditor
  -
-     service /position_data_service
+     service: /position_data_service
      type: agar_msgs/srv/PositionData
+
+ services_2_to_1:
+ -
+     service: /robot_speed_save_server
+     type: agar_msgs/RobotSpeedSave
+
 

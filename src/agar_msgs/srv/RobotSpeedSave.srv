@@ -1,0 +1,4 @@
+int16 speed
+int16 tenk_speed
+---
+bool saved
