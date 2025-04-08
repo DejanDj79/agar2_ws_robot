@@ -68,7 +68,7 @@ class ToknavGpsDriver(Node):
 
         self.navigation_active = False
 
-        # self.navigation_active_sub  = self.create_subscription(Bool, '/navigation_active', self.navigation_active_callback, 10)
+        self.navigation_active_sub  = self.create_subscription(Bool, '/navigation_active', self.navigation_active_callback, 10)
 
         # self.brake_pub = rospy.Publisher("/brake_status", Int16, queue_size=1)
         # self.gps_pub = rospy.Publisher('/gps/fix', NavSatFix, queue_size = 1)
@@ -574,10 +574,13 @@ class ToknavGpsDriver(Node):
             if gps_fix_msg.status.status > 1: #0:
                 self.valid_fix = True
             else:
+                if self.navigation_active:
+                    nav_active = Bool()
+                    nav_active.data = False
+                    self.nav_active_pub.publish(nav_active)
+                    self.navigation_active = False
+                
                 self.valid_fix = False
-                nav_active = Bool()
-                nav_active.data = False
-                self.nav_active_pub.publish(nav_active)
                 
             gps_fix_msg.status.service = NavSatStatus.SERVICE_GPS
 
@@ -701,6 +704,9 @@ class ToknavGpsDriver(Node):
         t.transform.rotation.w = orientation[3]
 
         return t
+    
+    def navigation_active_callback(self, msg):
+        self.navigation_active = msg.data
     
 def main(args=None):
     rclpy.init(args=args)
