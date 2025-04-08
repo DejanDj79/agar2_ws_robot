@@ -17,7 +17,8 @@ class WaypointService(Node):
 
         try:
             csv_header = ['latitude', 'longitude', 'reverse', 'reverse_turn', 'tank', 'speed', 'agar_action', 'combo_value', 'combo_text', 'param_1', 'param_2', 'param_3', 'param_4', 'visited']
-            waypoints_path = '/home/nikolica/ros_data/waypoints/'
+            # waypoints_path = '/home/nikolica/ros_data/waypoints/'
+            waypoints_path = '/home/nvidia/ros_data/waypoints/'
             waypoint_filename = request.waypoint_file_name
 
             waypoint_list = []

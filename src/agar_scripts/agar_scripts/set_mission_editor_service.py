@@ -17,7 +17,8 @@ class MissionEditorSet(Node):
             name = request.filename
             positions = request.positions
 
-            waypoints_path = '/home/nikolica/ros_data/waypoints/'
+            # waypoints_path = '/home/nikolica/ros_data/waypoints/'
+            waypoints_path = '/home/nvidia/ros_data/waypoints/'
             mission_file = open(waypoints_path + name + '.csv', "w")
             mission_file_wp = open(waypoints_path + name + '.waypoints', "w")
 

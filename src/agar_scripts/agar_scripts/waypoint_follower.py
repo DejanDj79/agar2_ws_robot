@@ -112,7 +112,8 @@ class WaypointFollower(Node):
         self.addition_waypoints     = []
         self.waypoints_csv          = None
         self.waypoint_file_name     = None
-        self.waypoints_path         = '/home/nikolica/ros_data/waypoints/'
+        # self.waypoints_path         = '/home/nikolica/ros_data/waypoints/'
+        self.waypoints_path         = '/home/nvidia/ros_data/waypoints/'
 
         self.path = Path()
         self.path.header.frame_id = 'map'

@@ -552,13 +552,26 @@ class ToknavGpsDriver(Node):
                 gps_fix_msg.header.stamp = rclpy.time.Time(seconds=self.gga['utc_time'][0], nanoseconds=self.gga['utc_time'][1]).to_msg()
 
             fix_type = self.gga['fix_type']
+            fix_type_h = self.ggah['fix_type']
+
+
             if not (fix_type in self.gps_qualities):
                 fix_type = -1
+
+            if not (fix_type_h in self.gps_qualities):
+                fix_type_h = -1
+
             gps_qual = self.gps_qualities[fix_type]
+            gps_qual_h = self.gps_qualities[fix_type_h]
+
+            if gps_qual_h[1] < gps_qual[1]:
+                gps_qual = gps_qual_h
+
             default_epe = gps_qual[0]
             gps_fix_msg.status.status = gps_qual[1]
             gps_fix_msg.position_covariance_type = gps_qual[2]
-            if gps_fix_msg.status.status > 0:
+
+            if gps_fix_msg.status.status > 1: #0:
                 self.valid_fix = True
             else:
                 self.valid_fix = False
@@ -566,7 +579,6 @@ class ToknavGpsDriver(Node):
                 nav_active.data = False
                 self.nav_active_pub.publish(nav_active)
                 
-
             gps_fix_msg.status.service = NavSatStatus.SERVICE_GPS
 
             latitude = (self.gga['latitude'] + self.ggah['latitude']) / 2

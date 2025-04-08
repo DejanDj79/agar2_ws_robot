@@ -38,11 +38,47 @@ def generate_launch_description():
       output='screen'
     )
 
+    waypoint_service = Node(
+      package='agar_scripts', 
+      executable='waypoint_service',
+      output='screen'
+    )
+
+    waypoint_files_service = Node(
+      package='agar_scripts', 
+      executable='waypoint_files_service',
+      output='screen'
+    )
+
+    get_mission_editor_service = Node(
+      package='agar_scripts', 
+      executable='get_mission_editor_service',
+      output='screen'
+    )
+
+    set_mission_editor_service = Node(
+      package='agar_scripts', 
+      executable='set_mission_editor_service',
+      output='screen'
+    )
+     
+    position_data_service = Node(
+      package='agar_scripts', 
+      executable='position_data_service',
+      output='screen'
+    )
+
     return LaunchDescription([
         description_launch,
         localization_launch,
         toknav,
         waypoint_follower,
         datum_correction,
+
+        waypoint_service,
+        waypoint_files_service,
+        get_mission_editor_service,
+        set_mission_editor_service,
+        position_data_service,
     ])
     

@@ -18,7 +18,8 @@ class MissionEditorGet(Node):
         
         try:
             name = request.filename
-            waypoints_path = '/home/nikolica/ros_data/waypoints/'
+            # waypoints_path = '/home/nikolica/ros_data/waypoints/'
+            waypoints_path = '/home/nvidia/ros_data/waypoints/'
             mission_file = waypoints_path + name
 
             response_data = []

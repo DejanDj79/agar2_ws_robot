@@ -14,7 +14,8 @@ class WaypointFilesService(Node):
     def waypoint_files_callback(self, request, response):
         data = []
         try:
-            dir = '/home/nikolica/ros_data/waypoints/'
+            # dir = '/home/nikolica/ros_data/waypoints/'
+            dir = '/home/nvidia/ros_data/waypoints/'
             for f in os.listdir(dir):
                 if f.endswith(".csv"):
                     data.append(f)
