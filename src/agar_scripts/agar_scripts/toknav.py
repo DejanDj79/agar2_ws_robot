@@ -377,9 +377,9 @@ class ToknavGpsDriver(Node):
             for nmea_string in data_list:
                 parsed_sentence = self.parse_nmea_sentence(nmea_string)
                 if 'GGA'    in parsed_sentence:
-                    self.gga    = parsed_sentence['GGA']
+                    self.ggah    = parsed_sentence['GGA']
                 if 'GGAH'   in parsed_sentence:
-                    self.ggah   = parsed_sentence['GGAH']
+                    self.gga   = parsed_sentence['GGAH']
                 if 'GST'    in parsed_sentence:
                     data = parsed_sentence['GST']
                     # Use receiver-provided error estimate if available
@@ -604,7 +604,7 @@ class ToknavGpsDriver(Node):
             if not self.using_receiver_epe or isnan(self.alt_std_dev):
                 self.alt_std_dev = default_epe * 2
 
-            self.get_logger().info(f'Standard deviation: {self.lon_std_dev} - {self.lat_std_dev} - {self.alt_std_dev}')
+            # self.get_logger().info(f'Standard deviation: {self.lon_std_dev} - {self.lat_std_dev} - {self.alt_std_dev}')
 
             hdop = self.gga['hdop']
             gps_fix_msg.position_covariance[0] = (hdop * self.lon_std_dev) ** 2

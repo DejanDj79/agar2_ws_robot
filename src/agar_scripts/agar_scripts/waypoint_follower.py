@@ -53,11 +53,11 @@ class WaypointFollower(Node):
     def __init__(self):
         super().__init__('waypoint_follower')
 
-        self.simulator_mode = True
+        self.simulator_mode = False
 
         self.get_logger().info('Initialization completed')
 
-        self.datum_service = self.create_service(Datum, 'waypoint_datum', self.set_datum_callback)
+        # self.datum_service = self.create_service(Datum, 'waypoint_datum', self.set_datum_callback)
 
         timer_period        = 1 / 20  # seconds
         self.timer          = self.create_timer(timer_period, self.run)
@@ -98,7 +98,7 @@ class WaypointFollower(Node):
         self.current_action         = robot_action.NO_ACTION
         self.backup_distance        = 0.0
         self.is_slow                = False
-        self.default_goal_distance  = 2.2
+        self.default_goal_distance  = 3.2
         self.goal_distance          = self.default_goal_distance
         self.reverse                = False
         self.robot_direction        = robot_direction.FORWARD
@@ -118,8 +118,10 @@ class WaypointFollower(Node):
         self.path = Path()
         self.path.header.frame_id = 'map'
 
-        self.datum_latitude         = 0.0
-        self.datum_longitude        = 0.0
+        # self.datum_latitude         = 0.0
+        # self.datum_longitude        = 0.0
+        self.datum_latitude         = 43.33100874425
+        self.datum_longitude        = 21.89109394616667
 
         self.cli_speed = self.create_client(RobotSpeedSave, '/robot_speed_save_server')
         while not self.cli_speed.wait_for_service(timeout_sec=1.0):

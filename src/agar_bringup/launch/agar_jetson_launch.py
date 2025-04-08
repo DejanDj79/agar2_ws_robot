@@ -73,7 +73,7 @@ def generate_launch_description():
         localization_launch,
         toknav,
         waypoint_follower,
-        datum_correction,
+        # datum_correction,
 
         waypoint_service,
         waypoint_files_service,
