@@ -62,7 +62,7 @@ class ToknavGpsDriver(Node):
 
         self.brake_pub = self.create_publisher(Int16, "/brake_status", 10)
         self.nav_active_pub = self.create_publisher(Bool, "/navigation_active", 10)
-        self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
+        # self.cmd_vel_pub = self.create_publisher(Twist, "/cmd_vel", 10)
         # self.odom_pub = self.create_publisher(Odometry, "/odometry/agar", 10)
         self.odom_pub = self.create_publisher(Odometry, "/odometry/filtered", 10)
 
