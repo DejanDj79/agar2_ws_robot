@@ -770,8 +770,7 @@ class WaypointFollower(Node):
             (roll, pitch, self.robot_position.z) = euler_from_quaternion(orientation_list)
             self.robot_position.deg = degrees(self.robot_position.z)
         except TransformException as ex:
-            self.get_logger().warn(
-                f'Could not transform {self.source_frame} to {self.target_frame}: {ex}')
+            self.get_logger().warn(f'Could not transform {self.source_frame} to {self.target_frame}: {ex}')
     #endregion
 
     #region Other
