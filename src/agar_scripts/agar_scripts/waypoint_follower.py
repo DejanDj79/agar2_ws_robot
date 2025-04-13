@@ -64,6 +64,9 @@ class WaypointFollower(Node):
         self.timer_stop     = self.create_timer(1.0, self.stop_and_wait)
         self.timer_stop.cancel()
 
+        self.timer_stop_spin = self.create_timer(1.0, self.stop_and_wait_for_spin)
+        self.timer_stop_spin.cancel()
+
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
         self.tf_broadcaster = TransformBroadcaster(self)
@@ -522,7 +525,10 @@ class WaypointFollower(Node):
                 msg.linear.x  = 0.0
                 msg.angular.z = 0.0
                 self.cmd_vel_pub.publish(msg)
-                self.current_action = robot_action.SPIN
+                self.current_action = robot_action.STOP
+                self.timer_stop_spin.reset()
+                # self.delay_active = True
+                # self.current_action = robot_action.SPIN
             else:
                 if self.waypoint_index < len(self.waypoints) - 1 and self.waypoints[self.waypoint_index + 1].reverse: reverse = True
                 if self.current_waypoint.reverse: 
@@ -605,7 +611,7 @@ class WaypointFollower(Node):
 
     def spin(self, end_point):
         angle_waypoint = self.calculate_angle(end_point)
-        if abs(angle_waypoint) < 8:
+        if abs(angle_waypoint) < 10:
             if self.waypoint_index < len(self.waypoints) - 1 and self.waypoints[self.waypoint_index + 1].tank:
                 self.goal_distance = 0.5
             else:
@@ -645,6 +651,10 @@ class WaypointFollower(Node):
         self.timer_stop.cancel()
         self.get_logger().info(f'Changing direction to {self.robot_direction}')
         self.current_action = robot_action.FOLLOW_PATH
+
+    def stop_and_wait_for_spin(self):
+        self.timer_stop_spin.cancel()
+        self.current_action = robot_action.SPIN
 
     def perform_agar_action(self, agar_action, param_1, param_2, param_3, param_4):
         # rospy.loginfo('{0} {1} {2} {3} {4}'.format(agar_action, param_1, param_2, param_3, param_4))
@@ -825,7 +835,7 @@ class WaypointFollower(Node):
         self.get_logger().info(f'Setting robot speed: {speed}')
         try:
             self.req_speed.speed = speed
-            self.req_speed.tenk_speed = 50
+            self.req_speed.tenk_speed = 70
             future = self.cli_speed.call_async(self.req_speed)
             future.result()
             self.get_logger().info('Service save speed call completed')
