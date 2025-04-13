@@ -574,11 +574,11 @@ class ToknavGpsDriver(Node):
             if gps_fix_msg.status.status > 1: #0:
                 self.valid_fix = True
             else:
-                if self.navigation_active:
-                    nav_active = Bool()
-                    nav_active.data = False
-                    self.nav_active_pub.publish(nav_active)
-                    self.navigation_active = False
+                # if self.navigation_active:
+                #     nav_active = Bool()
+                #     nav_active.data = False
+                #     self.nav_active_pub.publish(nav_active)
+                #     self.navigation_active = False
                 
                 self.valid_fix = False
                 
