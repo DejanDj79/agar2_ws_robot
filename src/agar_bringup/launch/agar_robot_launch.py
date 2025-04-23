@@ -33,7 +33,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         rviz_launch,
-        mapviz_launch,
+        # mapviz_launch,
         # robot_steering_node,
     ])
     
