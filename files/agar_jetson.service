@@ -2,8 +2,12 @@
 Description=AgAR Jetson Service
 
 [Service]
-ExecStart=/home/nvidia/agar_jetson.sh
+Type=simple
+User=nvidia
+Environment="AMENT_PREFIX_PATH=/opt/ros/humble"
+Environment="ROS_DISTRO=humble"
+#Environment="HOME=nvidia"
+ExecStart=/usr/bin/bash /home/nvidia/agar_jetson.sh
 
 [Install]
 WantedBy=multi-user.target
-

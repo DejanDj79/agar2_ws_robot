@@ -64,7 +64,7 @@ class WaypointFollower(Node):
         self.timer_stop     = self.create_timer(1.0, self.stop_and_wait)
         self.timer_stop.cancel()
 
-        self.timer_stop_spin = self.create_timer(1.0, self.stop_and_wait_for_spin)
+        self.timer_stop_spin = self.create_timer(2.0, self.stop_and_wait_for_spin)
         self.timer_stop_spin.cancel()
 
         self.tf_buffer = Buffer()
@@ -123,8 +123,10 @@ class WaypointFollower(Node):
 
         # self.datum_latitude         = 0.0
         # self.datum_longitude        = 0.0
-        self.datum_latitude         = 43.33100874425
-        self.datum_longitude        = 21.89109394616667
+        # self.datum_latitude         = 43.33100874425
+        # self.datum_longitude        = 21.89109394616667
+        self.datum_latitude         = 42.00609939691667
+        self.datum_longitude        = 21.48982421066667
 
         self.cli_speed = self.create_client(RobotSpeedSave, '/robot_speed_save_server')
         while not self.cli_speed.wait_for_service(timeout_sec=1.0):
@@ -135,6 +137,7 @@ class WaypointFollower(Node):
     #region Load waypoints
     def reset_waypoints(self, csv_reset):
         self.current_action         = robot_action.NO_ACTION
+        self.robot_direction        = robot_direction.FORWARD
         self.navigation_active      = False
         self.goal_distance          = self.default_goal_distance
         self.path                   = Path()
@@ -325,7 +328,7 @@ class WaypointFollower(Node):
             self.set_robot_speed()
 
         if len(self.waypoints) > 2 and self.waypoints[1].tank:
-            self.goal_distance = 0.5
+            self.goal_distance = 0.7
 
         msg = Int16()
         msg.data = number_of_visited
@@ -518,7 +521,7 @@ class WaypointFollower(Node):
             self.set_robot_speed()
 
             if self.waypoint_index < len(self.waypoints) - 1 and self.waypoints[self.waypoint_index + 1].tank:
-                self.goal_distance = 0.5
+                self.goal_distance = 0.7
 
             if self.current_waypoint.tank:
                 msg = Twist()
@@ -535,7 +538,7 @@ class WaypointFollower(Node):
                     reverse = True
                     # self.current_action = robot_action.REVERSE
                     self.reverse = True
-                if reverse: self.goal_distance = 0.3
+                if reverse: self.goal_distance = 0.7
         else:
             self.get_logger().info('********************************************************************')
             self.get_logger().info('All waypoint reached')
@@ -591,6 +594,7 @@ class WaypointFollower(Node):
 
             if self.reverse:
                 speed_x *= -1
+                speed_z *= -1
 
             if speed_x >= 0 and self.robot_direction == robot_direction.BACKWARD:
                 self.current_action = robot_action.STOP
@@ -662,13 +666,19 @@ class WaypointFollower(Node):
             msg_actuators = Int32MultiArray()
             msg_actuators.data = [param_1, param_2, param_3, param_4]
             self.actuators_position_pub.publish(msg_actuators)
+            self.actuators_position_pub.publish(msg_actuators)
+            self.actuators_position_pub.publish(msg_actuators)
         elif agar_action == 2: # PTO Start
             msg = UInt64()
             msg.data = 1
             self.extra_motor_pub.publish(msg)
+            self.extra_motor_pub.publish(msg)
+            self.extra_motor_pub.publish(msg)
         elif agar_action == 3: # PTO Stop
             msg = UInt64()
             msg.data = 0
+            self.extra_motor_pub.publish(msg)
+            self.extra_motor_pub.publish(msg)
             self.extra_motor_pub.publish(msg)
         elif agar_action == 20: # Spustanje
             self.set_navigation_active(False)
@@ -835,7 +845,7 @@ class WaypointFollower(Node):
         self.get_logger().info(f'Setting robot speed: {speed}')
         try:
             self.req_speed.speed = speed
-            self.req_speed.tenk_speed = 70
+            self.req_speed.tenk_speed = 80
             future = self.cli_speed.call_async(self.req_speed)
             future.result()
             self.get_logger().info('Service save speed call completed')

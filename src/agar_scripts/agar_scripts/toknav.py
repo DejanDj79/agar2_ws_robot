@@ -91,8 +91,10 @@ class ToknavGpsDriver(Node):
         # self.datum_longitude    = res.values[0].double_array_value[1]
         # self.datum_latitude         = 43.330890405343304
         # self.datum_longitude        = 21.893977363705066
-        self.datum_latitude         = 43.33100874425
-        self.datum_longitude        = 21.89109394616667
+        # self.datum_latitude         = 43.33100874425
+        # self.datum_longitude        = 21.89109394616667
+        self.datum_latitude         = 42.00609939691667
+        self.datum_longitude        = 21.48982421066667
 
         self.tf_broadcaster = TransformBroadcaster(self)
 
@@ -390,16 +392,16 @@ class ToknavGpsDriver(Node):
 
         except socket.error as exc:
             self.get_logger().error("Caught exception socket.error during recvfrom: %s" % exc)
-            self.timer_gps.cancel()
-            self.timer_read_data.cancel()
-            self.socket.close()
-            self.connect_to_device()
+            # self.timer_gps.cancel()
+            # self.timer_read_data.cancel()
+            # self.socket.close()
+            # self.connect_to_device()
         except Exception as exc:
             self.get_logger().error("Caught exception: %s" % exc)
-            self.timer_gps.cancel()
-            self.timer_read_data.cancel()
-            self.socket.close()
-            self.connect_to_device()
+            # self.timer_gps.cancel()
+            # self.timer_read_data.cancel()
+            # self.socket.close()
+            # self.connect_to_device()
 
         #region backup
         # try:
