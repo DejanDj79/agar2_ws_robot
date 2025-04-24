@@ -49,11 +49,11 @@ def generate_launch_description():
       output='screen'
     )
 
-    datum_correction = Node(
-      package='agar_scripts', 
-      executable='datum_correction',
-      output='screen'
-    )
+    # datum_correction = Node(
+    #   package='agar_scripts', 
+    #   executable='datum_correction',
+    #   output='screen'
+    # )
 
     waypoint_service = Node(
       package='agar_scripts', 
@@ -93,8 +93,8 @@ def generate_launch_description():
         # mapviz_launch,
         # robot_steering_node,
 
-        waypoint_follower,
-        datum_correction,
+        # waypoint_follower,
+        # datum_correction,
 
         waypoint_service,
         waypoint_files_service,
