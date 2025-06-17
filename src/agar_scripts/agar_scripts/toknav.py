@@ -93,8 +93,8 @@ class ToknavGpsDriver(Node):
         # self.datum_longitude        = 21.893977363705066
         # self.datum_latitude         = 43.33100874425
         # self.datum_longitude        = 21.89109394616667
-        self.datum_latitude         = 42.00609939691667
-        self.datum_longitude        = 21.48982421066667
+        self.datum_latitude         = 43.330389261166665
+        self.datum_longitude        = 21.890178528916664
 
         self.tf_broadcaster = TransformBroadcaster(self)
 
@@ -381,7 +381,7 @@ class ToknavGpsDriver(Node):
                 if 'GGA'    in parsed_sentence:
                     self.ggah    = parsed_sentence['GGA']
                 if 'GGAH'   in parsed_sentence:
-                    self.gga   = parsed_sentence['GGAH']
+                    self.gga  = parsed_sentence['GGAH']
                 if 'GST'    in parsed_sentence:
                     data = parsed_sentence['GST']
                     # Use receiver-provided error estimate if available

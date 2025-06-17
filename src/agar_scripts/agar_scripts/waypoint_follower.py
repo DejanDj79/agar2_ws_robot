@@ -54,7 +54,7 @@ class WaypointFollower(Node):
     def __init__(self):
         super().__init__('waypoint_follower')
 
-        self.simulator_mode = True
+        self.simulator_mode = False
 
         self.get_logger().info('Initialization completed')
 
@@ -132,8 +132,11 @@ class WaypointFollower(Node):
 
         # self.datum_latitude         = 0.0
         # self.datum_longitude        = 0.0
-        self.datum_latitude         = 43.330641081786034
-        self.datum_longitude        = 21.890280410786158
+        # self.datum_latitude         = 43.330641081786034
+        # self.datum_longitude        = 21.890280410786158
+
+        self.datum_latitude         = 43.330389261166665
+        self.datum_longitude        = 21.890178528916664
         
         # self.datum_latitude         = 42.00609939691667
         # self.datum_longitude        = 21.48982421066667
@@ -609,8 +612,9 @@ class WaypointFollower(Node):
             else:
                 if abs(angle_deg) > 10: speed_z = 1.0
                 elif abs(angle_deg) > 8 and abs(angle_deg) <= 10: speed_z = 0.5
-                elif abs(angle_deg) > 5 and abs(angle_deg) <= 8: speed_z = 0.2
-                elif abs(angle_deg) > 1 and abs(angle_deg) <= 5: speed_z = 0.1
+                elif abs(angle_deg) > 1 and abs(angle_deg) <= 8: speed_z = 0.1
+                # elif abs(angle_deg) > 5 and abs(angle_deg) <= 8: speed_z = 0.2
+                # elif abs(angle_deg) > 1 and abs(angle_deg) <= 5: speed_z = 0.1
                 else: speed_z = 0.0
 
             if self.is_slow:
