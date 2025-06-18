@@ -494,9 +494,9 @@ class WaypointFollower(Node):
         cmd_vel.linear.y = 0.0
         self.cmd_vel_pub.publish(cmd_vel)
 
-        brake_msg = Int16()
-        brake_msg.data = 1
-        self.brake_robot_pub.publish(brake_msg)
+        # brake_msg = Int16()
+        # brake_msg.data = 1
+        # self.brake_robot_pub.publish(brake_msg)
     #endregion
 
     #region Path following
