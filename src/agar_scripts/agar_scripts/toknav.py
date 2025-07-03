@@ -93,8 +93,8 @@ class ToknavGpsDriver(Node):
         # self.datum_longitude        = 21.893977363705066
         # self.datum_latitude         = 43.33100874425
         # self.datum_longitude        = 21.89109394616667
-        self.datum_latitude         = 43.330389261166665
-        self.datum_longitude        = 21.890178528916664
+        self.datum_latitude         = 44.829412176000005
+        self.datum_longitude        = 19.749630910249998
 
         self.tf_broadcaster = TransformBroadcaster(self)
 
