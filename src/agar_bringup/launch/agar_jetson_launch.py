@@ -29,43 +29,50 @@ def generate_launch_description():
     toknav = Node(
       package='agar_scripts', 
       executable='toknav_gps',
-      output='screen'
+      output='screen',
+      respawn=True
     )
 
     datum_correction = Node(
       package='agar_scripts', 
       executable='datum_correction',
-      output='screen'
+      output='screen',
+      respawn=True
     )
 
     waypoint_service = Node(
       package='agar_scripts', 
       executable='waypoint_service',
-      output='screen'
+      output='screen',
+      respawn=True
     )
 
     waypoint_files_service = Node(
       package='agar_scripts', 
       executable='waypoint_files_service',
-      output='screen'
+      output='screen',
+      respawn=True
     )
 
     get_mission_editor_service = Node(
       package='agar_scripts', 
       executable='get_mission_editor_service',
-      output='screen'
+      output='screen',
+      respawn=True
     )
 
     set_mission_editor_service = Node(
       package='agar_scripts', 
       executable='set_mission_editor_service',
-      output='screen'
+      output='screen',
+      respawn=True
     )
      
     position_data_service = Node(
       package='agar_scripts', 
       executable='position_data_service',
-      output='screen'
+      output='screen',
+      respawn=True
     )
 
     return LaunchDescription([

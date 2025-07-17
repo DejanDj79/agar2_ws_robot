@@ -93,8 +93,11 @@ class ToknavGpsDriver(Node):
         # self.datum_longitude        = 21.893977363705066
         # self.datum_latitude         = 43.33100874425
         # self.datum_longitude        = 21.89109394616667
-        self.datum_latitude         = 44.829412176000005
-        self.datum_longitude        = 19.749630910249998
+        # self.datum_latitude         = 44.829412176000005
+        # self.datum_longitude        = 19.749630910249998
+
+        self.datum_latitude         = 43.33037886416666
+        self.datum_longitude        = 21.89015129966667
 
         self.tf_broadcaster = TransformBroadcaster(self)
 
@@ -329,7 +332,7 @@ class ToknavGpsDriver(Node):
 
     def connect_to_device(self):
         while(True):
-            print('Connection...')
+            # print('Connection...')
             if self.socket:
                 self.socket.close()
                 self.socket = None

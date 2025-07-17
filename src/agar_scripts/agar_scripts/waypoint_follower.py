@@ -138,8 +138,12 @@ class WaypointFollower(Node):
         # self.datum_latitude         = 43.330389261166665
         # self.datum_longitude        = 21.890178528916664
 
-        self.datum_latitude         = 44.829412176000005
-        self.datum_longitude        = 19.749630910249998
+        # self.datum_latitude         = 44.829412176000005
+        # self.datum_longitude        = 19.749630910249998
+
+        self.datum_latitude         = 43.33037886416666
+        self.datum_longitude        = 21.89015129966667
+
         
         # self.datum_latitude         = 42.00609939691667
         # self.datum_longitude        = 21.48982421066667
