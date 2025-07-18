@@ -20,8 +20,8 @@ navsat_transform:
     # datum: [42.00609939691667, 21.48982421066667, 0.0]
 
     # datum: [43.330389261166665, 21.890178528916664, 0.0]
-    # datum: [44.829412176000005, 19.749630910249998, 0.0]
-    datum: [43.33037886416666, 21.89015129966667, 0.0]
+    datum: [44.829412176000005, 19.749630910249998, 0.0]
+    # datum: [43.33098928183334, 21.891017097333332, 0.0]
 
     # datum: [42.007604251632976, 21.489645546679498] # Kamnik
 
@@ -36,7 +36,7 @@ ekf_filter_node:
         transform_timeout: 0.0
         print_diagnostics: true
         debug: false
-        debug_out_file: /home/nikolica/workspace/logs/ekf_debug.txt
+        debug_out_file: /home/nvidia/ros_data/logs/ekf_debug.txt
         publish_tf: true
         publish_acceleration: false
         reset_on_time_jump: true

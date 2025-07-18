@@ -18,13 +18,15 @@ from tf_transformations import euler_from_quaternion
 
 from std_msgs.msg import Bool, String, Int16, Int32MultiArray, UInt64
 from geometry_msgs.msg import Twist, PoseStamped
+from geographic_msgs.msg import GeoPoint
 from nav_msgs.msg import Path 
 from agar_msgs.msg import CollisionZones
 # from rcl_interfaces.srv import GetParameters
+from robot_localization.srv import FromLL
 from agar_msgs.srv import Datum, RobotSpeedSave
 
 from agar_common.agar_common_library import agar_navigation
-from agar_common.agar_common_library.alvinxy import ll2xy
+# from agar_common.agar_common_library.alvinxy import ll2xy
 
 from enum import Enum
 
@@ -141,10 +143,12 @@ class WaypointFollower(Node):
         # self.datum_latitude         = 44.829412176000005
         # self.datum_longitude        = 19.749630910249998
 
-        self.datum_latitude         = 43.33037886416666
-        self.datum_longitude        = 21.89015129966667
+        self.datum_latitude         = 43.33098928183334
+        self.datum_longitude        = 21.891017097333332
 
-        
+        # self.datum_latitude         = 43.33037886416666
+        # self.datum_longitude        = 21.89015129966667
+
         # self.datum_latitude         = 42.00609939691667
         # self.datum_longitude        = 21.48982421066667
 
@@ -153,6 +157,15 @@ class WaypointFollower(Node):
             while not self.cli_speed.wait_for_service(timeout_sec=1.0):
                 self.get_logger().info('service not available, waiting again...')
             self.req_speed = RobotSpeedSave.Request()
+
+
+        self.cli = self.create_client(FromLL, '/fromLL')
+        while not self.cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('service not available, waiting again...')
+        self.req = FromLL.Request()
+
+        (x, y) = self.convertLLToXY(self.datum_latitude, self.datum_longitude)
+        self.get_logger().info(f'Datum converted to XY: {x}, {y}')
     #endregion
 
     #region Load waypoints
@@ -206,7 +219,9 @@ class WaypointFollower(Node):
 
             if not visited:
                 # self.get_logger().info(f'Waypoint: {curr_wp.latitude}, {curr_wp.longitude}')
-                (pos_x, pos_y) = ll2xy(curr_wp.latitude, curr_wp.longitude, self.datum_latitude, self.datum_longitude)
+                # (pos_x, pos_y) = ll2xy(curr_wp.latitude, curr_wp.longitude, self.datum_latitude, self.datum_longitude)
+                (pos_x, pos_y) = self.convertLLToXY(curr_wp.latitude, curr_wp.longitude)
+                self.get_logger().info(f'Position x: {pos_x}, y: {pos_y}')
 
                 pose = PoseStamped()
                 pose.pose.position.x = pos_x
@@ -292,7 +307,8 @@ class WaypointFollower(Node):
                     # a_start_y = wp.start_y
                     a_end_x = wp.end_x
                     a_end_y = wp.end_y
-                    (b_start_x, b_start_y)  = ll2xy(self.waypoints_csv[i + 1].latitude, self.waypoints_csv[i + 1].longitude, self.datum_latitude, self.datum_longitude)
+                    # (b_start_x, b_start_y)  = ll2xy(self.waypoints_csv[i + 1].latitude, self.waypoints_csv[i + 1].longitude, self.datum_latitude, self.datum_longitude)
+                    (b_start_x, b_start_y) = self.convertLLToXY(self.waypoints_csv[i + 1].latitude, self.waypoints_csv[i + 1].longitude)
                     # (b_end_x, b_end_y)      = ll2xy(self.waypoints_csv[i + 2].latitude, self.waypoints_csv[i + 2].longitude, self.datum_latitude, self.datum_longitude)
 
                     wp1 = self.move_point((a_end_x, a_end_y), (b_start_x, b_start_y), self.reverse_turn_distance)
@@ -900,12 +916,41 @@ class WaypointFollower(Node):
         self.get_logger().info(f'Setting robot speed: {speed}')
         try:
             self.req_speed.speed = speed
-            self.req_speed.tenk_speed = 80
+            self.req_speed.tenk_speed = 50
             future = self.cli_speed.call_async(self.req_speed)
             future.result()
             self.get_logger().info('Service save speed call completed')
         except Exception as exc:
             self.get_logger().error('Service call failed %r' % exc)
+    
+    def convertLLToXY(self, latitude, longitude, altitude=0.0):
+        try:
+            self.get_logger().info('Converting latitude: {0}, longitude: {1}, altitude: {2} to XY'.format(latitude, longitude, altitude))
+            point = GeoPoint()
+            point.latitude  = latitude
+            point.longitude = longitude
+            point.altitude  = altitude
+            self.req.ll_point = point
+
+            # self.future = self.cli.call_async(self.req)
+            # rclpy.spin_until_future_complete(self, self.future)
+            # res = self.future.result()
+
+            self.future = self.cli.call_async(self.req)
+            rclpy.spin_until_future_complete(self, self.future)
+            response = self.future.result()
+
+            # self.get_logger().info('Latitude: {0}, longitude: {1}'.format(latitude, longitude))
+            # response = self.cli.call(self.req)
+            # self.get_logger().info('Latitude: {0}, longitude: {1}'.format(latitude, longitude))
+            self.get_logger().info('x: {0}, y: {1}, z: {2}'.format(response.map_point.x, response.map_point.y, response.map_point.z))
+
+            return (response.map_point.x, response.map_point.y)
+
+        except Exception as exc:
+            self.get_logger().error('Service call failed %r' % exc)
+
+        return (0.0, 0.0)
     #endregion
 
 #region Main

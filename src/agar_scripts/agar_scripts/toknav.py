@@ -93,11 +93,12 @@ class ToknavGpsDriver(Node):
         # self.datum_longitude        = 21.893977363705066
         # self.datum_latitude         = 43.33100874425
         # self.datum_longitude        = 21.89109394616667
-        # self.datum_latitude         = 44.829412176000005
-        # self.datum_longitude        = 19.749630910249998
+        
+        self.datum_latitude         = 44.829412176000005
+        self.datum_longitude        = 19.749630910249998
 
-        self.datum_latitude         = 43.33037886416666
-        self.datum_longitude        = 21.89015129966667
+        # self.datum_latitude         = 43.33037886416666
+        # self.datum_longitude        = 21.89015129966667
 
         self.tf_broadcaster = TransformBroadcaster(self)
 
@@ -406,139 +407,8 @@ class ToknavGpsDriver(Node):
             # self.socket.close()
             # self.connect_to_device()
 
-        #region backup
-        # try:
-        #     self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'gps_link', [0.0, 0.0, 0.5], [0.0, 0.0, 0.0, 1.0]))
-        #     self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'imu', [0.0, 0.0, 0.4], [0.0, 0.0, 0.0, 1.0]))
-
-
-
-        #     data, remote_address = self.socket.recvfrom(4096)
-        #     data_list = data.decode("ascii").strip().split("\n")
-
-        #     # self.get_logger().info(f'{len(data_list)}')
-        #     # self.get_logger().info(f'{data_list}')
-
-        #     for nmea_string in data_list:
-        #         parsed_sentence = self.parse_nmea_sentence(nmea_string)
-        #         # self.get_logger().info(f'{parsed_sentence}')
-
-        #         if 'GGA' in parsed_sentence:
-        #             gps_fix_msg = NavSatFix()
-        #             gps_fix_msg.header.stamp        = self.get_clock().now().to_msg()
-        #             gps_fix_msg.header.frame_id     = "gps_link"
-
-        #             gps_fix_msg.position_covariance_type = NavSatFix.COVARIANCE_TYPE_APPROXIMATED
-
-        #             data = parsed_sentence['GGA']
-        #             if self.use_GNSS_time:
-        #                 gps_fix_msg.header.stamp = rclpy.time.Time(seconds=data['utc_time'][0], nanoseconds=data['utc_time'][1]).to_msg()
-
-        #             fix_type = data['fix_type']
-        #             if not (fix_type in self.gps_qualities):
-        #                 fix_type = -1
-        #             gps_qual = self.gps_qualities[fix_type]
-        #             default_epe = gps_qual[0]
-        #             gps_fix_msg.status.status = gps_qual[1]
-        #             gps_fix_msg.position_covariance_type = gps_qual[2]
-        #             if gps_fix_msg.status.status > 0:
-        #                 self.valid_fix = True
-        #             else:
-        #                 self.valid_fix = False
-
-        #             gps_fix_msg.status.service = NavSatStatus.SERVICE_GPS
-        #             latitude = data['latitude']
-        #             if data['latitude_direction'] == 'S':
-        #                 latitude = -latitude
-        #             gps_fix_msg.latitude = latitude
-
-        #             longitude = data['longitude']
-        #             if data['longitude_direction'] == 'W':
-        #                 longitude = -longitude
-        #             gps_fix_msg.longitude = longitude
-
-        #             # Altitude is above ellipsoid, so adjust for mean-sea-level
-        #             altitude = data['altitude'] + data['mean_sea_level']
-        #             gps_fix_msg.altitude = altitude
-
-        #             position = alvinxy.ll2xy(latitude, longitude, self.datum_latitude, self.datum_longitude)
-        #             self.position[0] = position[0]
-        #             self.position[1] = position[1]
-
-        #             # use default epe std_dev unless we've received a GST sentence with epes
-        #             if not self.using_receiver_epe or isnan(self.lon_std_dev):
-        #                 self.lon_std_dev = default_epe
-        #             if not self.using_receiver_epe or isnan(self.lat_std_dev):
-        #                 self.lat_std_dev = default_epe
-        #             if not self.using_receiver_epe or isnan(self.alt_std_dev):
-        #                 self.alt_std_dev = default_epe * 2
-
-        #             hdop = data['hdop']
-        #             gps_fix_msg.position_covariance[0] = (hdop * self.lon_std_dev) ** 2
-        #             gps_fix_msg.position_covariance[4] = (hdop * self.lat_std_dev) ** 2
-        #             gps_fix_msg.position_covariance[8] = (2 * hdop * self.alt_std_dev) ** 2  # FIXME
-
-        #             self.gps_pub.publish(gps_fix_msg)
-        #         elif 'HDT' in parsed_sentence:
-        #             data = parsed_sentence['HDT']
-        #             # self.get_logger().info(f'{data}')
-        #             # self.get_logger().info("Heading: {0}".format(data['heading']))
-        #             heading = radians(data['heading']) - pi
-        #             self.orientation = quaternion_from_euler(0, 0, heading)
-        #             imu_msg = Imu()
-        #             imu_msg.header.stamp        = self.get_clock().now().to_msg()
-        #             imu_msg.header.frame_id     = "imu"
-        #             imu_msg.orientation.x         = self.orientation[0]
-        #             imu_msg.orientation.y         = self.orientation[1]
-        #             imu_msg.orientation.z         = self.orientation[2]
-        #             imu_msg.orientation.w         = self.orientation[3]
-        #             self.imu_pub.publish(imu_msg)
-
-        #             # current_heading = QuaternionStamped()
-        #             # current_heading.header.stamp = self.get_clock().now().to_msg()
-        #             # current_heading.header.frame_id = "imu"
-        #             # current_heading.quaternion.x = self.orientation[0]
-        #             # current_heading.quaternion.y = self.orientation[1]
-        #             # current_heading.quaternion.z = self.orientation[2]
-        #             # current_heading.quaternion.w = self.orientation[3]
-        #             # self.heading_pub.publish(current_heading) 
-
-        #         elif 'GST' in parsed_sentence:
-        #             data = parsed_sentence['GST']
-        #             # Use receiver-provided error estimate if available
-        #             self.using_receiver_epe = True
-        #             self.lon_std_dev = data['lon_std_dev']
-        #             self.lat_std_dev = data['lat_std_dev']
-        #             self.alt_std_dev = data['alt_std_dev']
-
-
-        #         # self.get_logger().info(f'{self.position}')
-        #         # odom_msg = Odometry()
-        #         # odom_msg.header.stamp = self.get_clock().now().to_msg()
-        #         # odom_msg.header.frame_id = "odom"
-        #         # odom_msg.child_frame_id = "base_footprint"
-        #         # odom_msg.pose.pose.position.x = self.position[0]
-        #         # odom_msg.pose.pose.position.y = self.position[1]
-        #         # odom_msg.pose.pose.position.z = self.position[2]
-        #         # odom_msg.pose.pose.orientation.x = self.orientation[0]
-        #         # odom_msg.pose.pose.orientation.y = self.orientation[1]
-        #         # odom_msg.pose.pose.orientation.z = self.orientation[2]
-        #         # odom_msg.pose.pose.orientation.w = self.orientation[3]
-        #         # self.odom_pub.publish(odom_msg)
-
-        #         # self.tf_broadcaster.sendTransform(self.set_transform('odom', 'base_footprint', [self.position[0], self.position[1], self.position[2]], self.orientation))
-        #         # self.tf_broadcaster.sendTransform(self.set_transform('map', 'odom', [0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
-        # except socket.error as exc:
-        #     self.get_logger().error("Caught exception socket.error during recvfrom: %s" % exc)
-        #     self.socket.close()
-        #endregion
-
     def publish_data(self):
         try:
-            # self.get_logger().info(f'{self.gga}')
-            # self.get_logger().info(f'{self.ggah}')
-            # self.get_logger().info(f'----------------------------')
-
             self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'gps_link', [0.0, 0.0, 0.5], [0.0, 0.0, 0.0, 1.0]))
             self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'imu', [0.0, 0.0, 0.4], [0.0, 0.0, 0.0, 1.0]))
 
@@ -590,7 +460,7 @@ class ToknavGpsDriver(Node):
             gps_fix_msg.status.service = NavSatStatus.SERVICE_GPS
 
             latitude = (self.gga['latitude'] + self.ggah['latitude']) / 2
-            longitude = (self.gga['longitude'] + self.ggah['longitude']) / 2 
+            longitude = (self.gga['longitude'] + self.ggah['longitude']) / 2
 
             if self.gga['latitude_direction'] == 'S':
                 latitude = -latitude
@@ -634,6 +504,9 @@ class ToknavGpsDriver(Node):
             position_1 = alvinxy.ll2xy(self.gga['latitude'], self.gga['longitude'], latitude, longitude)
             position_2 = alvinxy.ll2xy(self.ggah['latitude'], self.ggah['longitude'], latitude, longitude)
             heading = atan2(position_2[1] - position_1[1], position_2[0] - position_1[0]) + (pi / 2)
+
+
+            # self.get_logger().info(f'Latitude: {latitude}, Longitude: {longitude}, Heading: {degrees(heading)} - {heading}')
 
             self.orientation = quaternion_from_euler(0, 0, heading)
             imu_msg = Imu()

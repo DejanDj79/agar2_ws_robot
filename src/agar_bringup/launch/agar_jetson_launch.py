@@ -76,10 +76,10 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        toknav,
         description_launch,
         localization_launch,
-        toknav,
-        waypoint_follower,
+        # waypoint_follower,
         # datum_correction,
 
         waypoint_service,
