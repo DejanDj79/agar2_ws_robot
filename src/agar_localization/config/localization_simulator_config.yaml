@@ -12,7 +12,8 @@ navsat_transform:
 
     wait_for_datum: true
     # datum: [43.330890405343304, 21.893977363705066, 0.0] #  latitude, longitude, heading (in radians)
-    datum: [43.330641081786034, 21.890280410786158, 0.0]
+    datum: [43.33038590272533, 21.89012646896411, 0.0]
+    
 
 ### ekf config file ###
 ekf_filter_node:
