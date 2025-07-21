@@ -27,6 +27,7 @@ from agar_msgs.srv import Datum, RobotSpeedSave
 
 from agar_common.agar_common_library import agar_navigation
 # from agar_common.agar_common_library.alvinxy import ll2xy
+from rclpy.callback_groups import ReentrantCallbackGroup
 
 from enum import Enum
 
@@ -57,6 +58,8 @@ class WaypointFollower(Node):
         super().__init__('waypoint_follower')
 
         self.simulator_mode = False
+
+        self.callback_group = ReentrantCallbackGroup()
 
         self.get_logger().info('Initialization completed')
 
@@ -92,7 +95,7 @@ class WaypointFollower(Node):
 
         self.navigation_active_sub          = self.create_subscription(Bool, '/navigation_active', self.navigation_active_callback, 10)
         self.collision_zones_sub            = self.create_subscription(CollisionZones, '/collision_zones', self.collision_zones_callback, 10)
-        self.load_waypoints_sub             = self.create_subscription(String, '/load_waypoints', self.load_waypoints_callback, 10)
+        self.load_waypoints_sub             = self.create_subscription(String, '/load_waypoints', self.load_waypoints_callback, 10, callback_group=self.callback_group)
         self.reset_waypoints_sub            = self.create_subscription(UInt64, '/reset_waypoints', self.reset_waypoints_callback, 10)
 
         self.source_frame = 'odom'
@@ -143,8 +146,8 @@ class WaypointFollower(Node):
         # self.datum_latitude         = 44.829412176000005
         # self.datum_longitude        = 19.749630910249998
 
-        self.datum_latitude         = 43.33098928183334
-        self.datum_longitude        = 21.891017097333332
+        # self.datum_latitude         = 43.33098928183334
+        # self.datum_longitude        = 21.891017097333332
 
         # self.datum_latitude         = 43.33037886416666
         # self.datum_longitude        = 21.89015129966667
@@ -159,13 +162,13 @@ class WaypointFollower(Node):
             self.req_speed = RobotSpeedSave.Request()
 
 
-        self.cli = self.create_client(FromLL, '/fromLL')
+        self.cli = self.create_client(FromLL, '/fromLL', callback_group=self.callback_group)
         while not self.cli.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
         self.req = FromLL.Request()
 
-        (x, y) = self.convertLLToXY(self.datum_latitude, self.datum_longitude)
-        self.get_logger().info(f'Datum converted to XY: {x}, {y}')
+        # (x, y) = self.convertLLToXY(self.datum_latitude, self.datum_longitude)
+        # self.get_logger().info(f'Datum converted to XY: {x}, {y}')
     #endregion
 
     #region Load waypoints
@@ -196,7 +199,7 @@ class WaypointFollower(Node):
             self.get_logger().error(ex)
 
     def generate_waypoint_list(self):
-        self.get_logger().info(f'Datum: {self.datum_latitude}, {self.datum_longitude}')
+        # self.get_logger().info(f'Datum: {self.datum_latitude}, {self.datum_longitude}')
         self.robot_direction        = robot_direction.FORWARD
 
         number_of_visited = 0
@@ -552,6 +555,15 @@ class WaypointFollower(Node):
         if self.waypoints[self.waypoint_index].generated_wp == False:
             self.update_waypoints_to_file(self.waypoints[self.waypoint_index].idx)
 
+        agar_action = self.waypoints[self.waypoint_index].agar_action
+        if agar_action > 0:
+            param_1 = self.waypoints[self.waypoint_index].param_1
+            param_2 = self.waypoints[self.waypoint_index].param_2
+            param_3 = self.waypoints[self.waypoint_index].param_3
+            param_4 = self.waypoints[self.waypoint_index].param_4
+            self.get_logger().info(f'Performing agar action {agar_action} with parameters {param_1}, {param_2}, {param_3}, {param_4}')
+            self.perform_agar_action(agar_action, param_1, param_2, param_3, param_4)
+
         self.waypoint_index += 1
         self.goal_distance = self.default_goal_distance
         if self.waypoint_index == len(self.waypoints) - 1:
@@ -559,14 +571,14 @@ class WaypointFollower(Node):
 
         if self.waypoint_index < len(self.waypoints):
             self.get_logger().info(f'Moving to waypoint {self.waypoint_index}')
-            agar_action = self.waypoints[self.waypoint_index].agar_action
-            if agar_action > 0:
-                param_1 = self.waypoints[self.waypoint_index].param_1
-                param_2 = self.waypoints[self.waypoint_index].param_2
-                param_3 = self.waypoints[self.waypoint_index].param_3
-                param_4 = self.waypoints[self.waypoint_index].param_4
-                self.get_logger().info(f'Performing agar action {agar_action} with parameters {param_1}, {param_2}, {param_3}, {param_4}')
-                self.perform_agar_action(agar_action, param_1, param_2, param_3, param_4)
+            # agar_action = self.waypoints[self.waypoint_index].agar_action
+            # if agar_action > 0:
+            #     param_1 = self.waypoints[self.waypoint_index].param_1
+            #     param_2 = self.waypoints[self.waypoint_index].param_2
+            #     param_3 = self.waypoints[self.waypoint_index].param_3
+            #     param_4 = self.waypoints[self.waypoint_index].param_4
+            #     self.get_logger().info(f'Performing agar action {agar_action} with parameters {param_1}, {param_2}, {param_3}, {param_4}')
+            #     self.perform_agar_action(agar_action, param_1, param_2, param_3, param_4)
 
             self.current_waypoint = self.waypoints[self.waypoint_index]
             reverse = False
@@ -635,7 +647,7 @@ class WaypointFollower(Node):
             else:
                 if abs(angle_deg) > 10: speed_z = 1.0
                 elif abs(angle_deg) > 8 and abs(angle_deg) <= 10: speed_z = 0.5
-                elif abs(angle_deg) > 1 and abs(angle_deg) <= 8: speed_z = 0.1
+                elif abs(angle_deg) > 3 and abs(angle_deg) <= 8: speed_z = 0.1
                 # elif abs(angle_deg) > 5 and abs(angle_deg) <= 8: speed_z = 0.2
                 # elif abs(angle_deg) > 1 and abs(angle_deg) <= 5: speed_z = 0.1
                 else: speed_z = 0.0
@@ -766,31 +778,19 @@ class WaypointFollower(Node):
             self.actuators_position_brake_pub.publish(msg_actuators_brake)
             self.actuators_position_brake_pub.publish(msg_actuators_brake)
         elif agar_action == 10: # Reverse distance
-            # reverse_distance = param_1
-            # self.get_logger().info(f'Reverse distance, distance: {reverse_distance}')
-            # self.get_logger().info(f'Waypoint index {self.waypoint_index}, idx: {self.current_waypoint.idx}')
             self.backup_start_position = [self.robot_position.x, self.robot_position.y]
-            # distance_in_m   = sqrt(pow(self.robot_position.x - self.backup_start_position[0], 2) + pow(self.robot_position.y - self.backup_start_position[1], 2))
-            # self.backup_distance = distance_in_m + reverse_distance
             self.backup_distance = param_1
-            # self.get_logger().info(f'Distance: {round(distance_in_m, 2)}, backup distance: {round(self.backup_distance, 2)}')
             self.get_logger().info(f'Backup distance: {round(self.backup_distance, 2)}')
             
-            self.goal_reached()
+            # self.goal_reached()
 
             self.current_action     = robot_action.STOP
             self.robot_direction    = robot_direction.BACKWARD
             self.wait_action        = robot_action.BACKUP
             self.timer_stop.reset()
         elif agar_action == 11: # Forward distance
-            # forward_distance = param_1
-            # self.get_logger().info(f'Forward distance, distance: {forward_distance}')
-            # self.get_logger().info(f'Waypoint index {self.waypoint_index}, idx: {self.current_waypoint.idx}')
             self.backup_start_position = [self.robot_position.x, self.robot_position.y]
-            # distance_in_m   = sqrt(pow(self.robot_position.x - self.backup_start_position[0], 2) + pow(self.robot_position.y - self.backup_start_position[1], 2))
-            # self.backup_distance = distance_in_m + forward_distance
             self.backup_distance = param_1
-            # self.get_logger().info(f'Distance: {round(distance_in_m, 2)}, forward distance: {round(self.backup_distance, 2)}')
             self.get_logger().info(f'Forward distance: {round(self.backup_distance, 2)}')
             
             self.current_action     = robot_action.STOP
