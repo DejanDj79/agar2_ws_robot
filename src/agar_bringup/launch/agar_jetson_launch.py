@@ -29,7 +29,7 @@ def generate_launch_description():
     toknav = Node(
       package='agar_scripts', 
       executable='toknav_gps',
-      output='screen',
+      # output='screen',
       respawn=True
     )
 
@@ -71,7 +71,7 @@ def generate_launch_description():
     position_data_service = Node(
       package='agar_scripts', 
       executable='position_data_service',
-      output='screen',
+      # output='screen',
       respawn=True
     )
 

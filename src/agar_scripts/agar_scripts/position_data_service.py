@@ -7,14 +7,13 @@ from sensor_msgs.msg import NavSatFix
 
 
 class PositionDataService(Node):
-
     def __init__(self):
         super().__init__('position_data_service')
 
         self.navigation_active_sub      = self.create_subscription(Bool, '/navigation_active', self.navigation_active_callback, 10)
         self.reset_waypoints_sub        = self.create_subscription(UInt64, '/reset_waypoints', self.reset_waypoints_callback, 10)
         self.visited_waypoint_sub       = self.create_subscription(Int16, "/visited_waypoint", self.visited_waypoint_callback, 10)
-        self.gps_subscriber             = self.create_subscription(NavSatFix, 'gps/fix', self.gps_fix_callback, 10)
+        self.gps_subscriber             = self.create_subscription(NavSatFix, '/gps/fix', self.gps_fix_callback, 10)
         self.load_waypoints_sub         = self.create_subscription(String, '/load_waypoints', self.load_waypoints_callback, 10)
 
         self.init_data(True)
@@ -52,7 +51,7 @@ class PositionDataService(Node):
         self.mission = msg.data
 
     def position_data_callback(self, request, response):
-        data = []
+        # data = []
         try:
             response.altitude           = self.altitude
             response.current_mission    = self.current_mission
