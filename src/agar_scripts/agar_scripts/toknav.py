@@ -224,7 +224,8 @@ class ToknavGpsDriver(Node):
         try:
             return float(field)
         except ValueError:
-            return float('NaN')
+            # return float('NaN')
+            return 0.0
 
     def safe_int(self, field):
         try:

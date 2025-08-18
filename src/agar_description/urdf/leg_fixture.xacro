@@ -5,7 +5,8 @@
             <visual>
                 <origin xyz="${xyz}" rpy="${rpy}" />
                 <geometry>
-                    <mesh filename="file://$(find agar_description)/meshes/leg_fixture_${type}.stl" />
+                    <!-- <mesh filename="file://$(find agar_description)/meshes/leg_fixture_${type}.stl" /> -->
+                    <mesh filename="package://agar_description/meshes/leg_fixture_${type}.stl" />
                 </geometry>
                 <material name="grey" />
             </visual>
@@ -17,7 +18,8 @@
             <collision>
                 <origin xyz="${xyz}" rpy="${rpy}" />
                 <geometry>
-                    <mesh filename="file://$(find agar_description)/meshes/leg_fixture_${type}.stl" />
+                    <!-- <mesh filename="file://$(find agar_description)/meshes/leg_fixture_${type}.stl" /> -->
+                    <mesh filename="package://agar_description/meshes/leg_fixture_${type}.stl" />
                 </geometry>
             </collision>
         </link>
