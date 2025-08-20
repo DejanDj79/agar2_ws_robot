@@ -466,14 +466,17 @@ class ToknavGpsDriver(Node):
             if self.gga['latitude_direction'] == 'S':
                 latitude = -latitude
             gps_fix_msg.latitude = latitude
+            # gps_fix_msg.latitude = 43.331028284333335
 
             if self.gga['longitude_direction'] == 'W':
                 longitude = -longitude
             gps_fix_msg.longitude = longitude
+            # gps_fix_msg.longitude = 21.891203139166667
 
             # Altitude is above ellipsoid, so adjust for mean-sea-level
             altitude = self.gga['altitude'] + self.gga['mean_sea_level']
             gps_fix_msg.altitude = altitude
+            # gps_fix_msg.altitude = 242.7543
 
             # use default epe std_dev unless we've received a GST sentence with epes
             if not self.using_receiver_epe or isnan(self.lon_std_dev):
