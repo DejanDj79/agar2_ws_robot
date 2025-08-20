@@ -369,14 +369,14 @@ class WaypointFollower(Node):
             if not self.simulator_mode:
                 self.set_robot_speed()
             
-            agar_action = self.waypoints[self.waypoint_index].agar_action
-            if agar_action > 0:
-                param_1 = self.waypoints[self.waypoint_index].param_1
-                param_2 = self.waypoints[self.waypoint_index].param_2
-                param_3 = self.waypoints[self.waypoint_index].param_3
-                param_4 = self.waypoints[self.waypoint_index].param_4
-                self.get_logger().info(f'Performing agar action {agar_action} with parameters {param_1}, {param_2}, {param_3}, {param_4}')
-                self.perform_agar_action(agar_action, param_1, param_2, param_3, param_4)
+            # agar_action = self.waypoints[self.waypoint_index].agar_action
+            # if agar_action > 0:
+            #     param_1 = self.waypoints[self.waypoint_index].param_1
+            #     param_2 = self.waypoints[self.waypoint_index].param_2
+            #     param_3 = self.waypoints[self.waypoint_index].param_3
+            #     param_4 = self.waypoints[self.waypoint_index].param_4
+            #     self.get_logger().info(f'Performing agar action {agar_action} with parameters {param_1}, {param_2}, {param_3}, {param_4}')
+            #     self.perform_agar_action(agar_action, param_1, param_2, param_3, param_4)
 
         if len(self.waypoints) > 2 and self.waypoints[1].tank:
             self.goal_distance = 0.7
