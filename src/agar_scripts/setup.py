@@ -34,6 +34,8 @@ setup(
             'set_mission_editor_service = agar_scripts.set_mission_editor_service:main',
             'position_data_service = agar_scripts.position_data_service:main',
             'camera_parser = agar_scripts.camera_parser:main',
+            'telegram_bot = agar_scripts.telegram_bot:main',
+            'notifications = agar_scripts.notifications:main',
         ],
     },
 )

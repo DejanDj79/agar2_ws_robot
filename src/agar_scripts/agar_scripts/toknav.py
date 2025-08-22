@@ -369,7 +369,7 @@ class ToknavGpsDriver(Node):
             time.sleep(3) 
 
     def __del__(self):
-        print('Closing connection...')
+        self.get_logger().info('Closing connection...')
         if self.socket:
             self.socket.close()
 
