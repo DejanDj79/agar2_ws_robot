@@ -9,9 +9,9 @@ from sensor_msgs.msg import Image
 from zed_msgs.msg import ObjectsStamped
 
 
-class CameraParser(Node):
+class ObjectDetection(Node):
     def __init__(self):
-        super().__init__('camera_parser')
+        super().__init__('object_detection')
         self.get_logger().info('Initialization completed')
 
         self.timer_check     = self.create_timer(20.0, self.check_object)
@@ -36,7 +36,7 @@ class CameraParser(Node):
         self.images_for_video = []
 
     def __del__(self):
-        print('Closing camera parser...')
+        self.get_logger().info('Closing object detection...')
 
         fourcc = cv2.VideoWriter_fourcc(*'XVID') 
         video = cv2.VideoWriter('/home/nikolica/Pictures/stereolabs/video.avi', fourcc, 5, (960, 600))
@@ -146,12 +146,9 @@ class CameraParser(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    camera_parser = CameraParser()
-    rclpy.spin(camera_parser)
-
-    camera_parser.get_logger().info('Closed')
-
-    camera_parser.destroy_node()
+    object_detection = ObjectDetection()
+    rclpy.spin(object_detection)
+    object_detection.destroy_node()
     rclpy.shutdown()
 
 if __name__ == '__main__':
