@@ -26,6 +26,10 @@ class Telegram_bot(Node):
             await update.channel_post.reply_text("List of available commands:\n"
                 "/start_nav - Start navigation\n"
                 "/stop_nav - Stop navigation\n"
+                "/brake_on - Activate brake\n"
+                "/brake_off - Deactivate brake\n"
+                "/light_on - Bridge light ON\n"
+                "/light_off - Bridge light OFF\n"
                 "/help - Show this help message")
         elif message_text == "/start_nav":
             msg = Bool()
@@ -40,7 +44,12 @@ class Telegram_bot(Node):
         else:
             await update.channel_post.reply_text(f"Unknown command!!!\nList of available commands:\n"
                 "/start_nav - Start navigation\n"
-                "/help - Show this help message")  
+                "/stop_nav - Stop navigation\n"
+                "/brake_on - Activate brake\n"
+                "/brake_off - Deactivate brake\n"
+                "/light_on - Bridge light ON\n"
+                "/light_off - Bridge light OFF\n"
+                "/help - Show this help message")
 
     def __del__(self):
         self.get_logger().info('Closing telegram bot...')
