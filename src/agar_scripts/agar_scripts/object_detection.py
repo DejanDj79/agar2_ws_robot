@@ -4,7 +4,7 @@ from rclpy.node import Node
 import cv2
 from cv_bridge import CvBridge
 
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 from sensor_msgs.msg import Image
 from zed_msgs.msg import ObjectsStamped
 
@@ -25,13 +25,12 @@ class ObjectDetection(Node):
         self.object_in_stop_zone    = False
         self.publish_notification   = False
 
-        self.capture_image      = self.create_subscription(Image, '/zedx/zed_node/rgb/image_rect_color', self.capture_image_callback, 10)
-        self.detected_object    = self.create_subscription(ObjectsStamped, '/zedx/zed_node/obj_det/objects', self.detected_object_callback, 10)
+        self.take_photo_sub         = self.create_subscription(Bool, '/image/take_photo', self.take_photo_callback, 10)
+        self.capture_image_sub      = self.create_subscription(Image, '/zedx/zed_node/rgb/image_rect_color', self.capture_image_callback, 10)
+        self.detected_object_sub    = self.create_subscription(ObjectsStamped, '/zedx/zed_node/obj_det/objects', self.detected_object_callback, 10)
 
         self.notification_pub   = self.create_publisher(String, '/agar_notifications', 10)
         self.image_pub          = self.create_publisher(Image, '/image/detected_object', 10)
-
-        self.image_pub = self.create_publisher(Image, '/image/detected_object', 10)
 
         self.images_for_video = []
 
@@ -47,6 +46,22 @@ class ObjectDetection(Node):
     def capture_image_callback(self, msg):
         self.cv_image = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
 
+    def take_photo_callback(self, msg):
+        self.get_logger().info('Take photo command received')
+        self.get_logger().info(f'Data: {msg.data}')
+        self.get_logger().info(f'Image: {self.cv_image}')
+
+        if msg.data == True and len(self.cv_image) > 0:
+            self.get_logger().info('Publishing photo...')
+            img = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
+            self.image_pub.publish(img)
+        else:
+            self.get_logger().info('Publishing text...')
+            text = String()
+            text.data = 'No image available to take photo.'
+            self.notification_pub.publish(text)
+            self.publish_notification = False
+            
     def detected_object_callback(self, msg):
         if len(self.cv_image) > 0:
             # curr_detection = 0
@@ -133,7 +148,6 @@ class ObjectDetection(Node):
                     text.data = text_msg
                     self.notification_pub.publish(text)
                     self.publish_notification = False
-
 
                 # curr_detection += 1
             self.cv_image = []
