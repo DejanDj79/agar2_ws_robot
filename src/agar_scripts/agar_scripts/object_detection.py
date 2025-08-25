@@ -20,6 +20,7 @@ class ObjectDetection(Node):
 
         self.cv_image       = []
         self.last_image     = []
+        self.detected_img   = []
         self.bridge         = CvBridge()
 
         # self.img_counter = 0
@@ -161,10 +162,10 @@ class ObjectDetection(Node):
                     # img = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
                     img = self.bridge.cv2_to_compressed_imgmsg(self.cv_image)
                     self.image_pub.publish(img)
-                    # text = String()
-                    # text.data = text_msg
-                    # self.notification_pub.publish(text)
-                    # self.publish_notification = False
+                    text = String()
+                    text.data = text_msg
+                    self.notification_pub.publish(text)
+                    self.publish_notification = False
 
                 # curr_detection += 1
             self.cv_image = []
