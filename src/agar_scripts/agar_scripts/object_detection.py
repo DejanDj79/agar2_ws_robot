@@ -47,16 +47,15 @@ class ObjectDetection(Node):
         self.cv_image = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
 
     def take_photo_callback(self, msg):
-        self.get_logger().info('Take photo command received')
-        self.get_logger().info(f'Data: {msg.data}')
-        self.get_logger().info(f'Image: {self.cv_image}')
-
+        # self.get_logger().info('Take photo command received')
+        # self.get_logger().info(f'Data: {msg.data}')
+        # self.get_logger().info(f'Image: {self.cv_image}')
         if msg.data == True and len(self.cv_image) > 0:
-            self.get_logger().info('Publishing photo...')
+            # self.get_logger().info('Publishing photo...')
             img = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
             self.image_pub.publish(img)
         else:
-            self.get_logger().info('Publishing text...')
+            # self.get_logger().info('Publishing text...')
             text = String()
             text.data = 'No image available to take photo.'
             self.notification_pub.publish(text)

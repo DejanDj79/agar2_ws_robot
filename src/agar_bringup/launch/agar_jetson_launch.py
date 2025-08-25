@@ -75,11 +75,18 @@ def generate_launch_description():
       respawn=True
     )
 
+    object_detection = Node(
+      package='agar_scripts', 
+      executable='object_detection',
+      respawn=True
+    )
+
     return LaunchDescription([
         toknav,
         description_launch,
         localization_launch,
         waypoint_follower,
+        object_detection,
         # datum_correction,
 
         waypoint_service,
