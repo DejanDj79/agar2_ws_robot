@@ -81,18 +81,29 @@ def generate_launch_description():
       respawn=True
     )
 
+    zedcamera_launch = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('zed_wrapper'), 'launch'),
+         '/zed_camera.launch.py']),
+          launch_arguments={
+              'camera_model': 'zedx',
+              'camera_name': 'zedx',
+          }.items()
+      )
+    
     return LaunchDescription([
         toknav,
         description_launch,
         localization_launch,
         waypoint_follower,
         object_detection,
-        # datum_correction,
 
         waypoint_service,
         waypoint_files_service,
         get_mission_editor_service,
         set_mission_editor_service,
         position_data_service,
+
+        zedcamera_launch,
     ])
     

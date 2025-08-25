@@ -57,7 +57,7 @@ class WaypointFollower(Node):
     def __init__(self):
         super().__init__('waypoint_follower')
 
-        self.simulator_mode = True
+        self.simulator_mode = False
 
         self.callback_group = ReentrantCallbackGroup()
 

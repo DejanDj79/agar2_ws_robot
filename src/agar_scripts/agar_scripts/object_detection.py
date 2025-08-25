@@ -22,7 +22,7 @@ class ObjectDetection(Node):
         self.last_image     = []
         self.bridge         = CvBridge()
 
-        self.img_counter = 0
+        # self.img_counter = 0
         self.robot_is_moving        = False
 
         self.object_in_stop_zone    = False
@@ -38,14 +38,13 @@ class ObjectDetection(Node):
 
         self.notification_pub   = self.create_publisher(String, '/agar_notifications', 10)
         # self.image_pub          = self.create_publisher(Image, '/image/detected_object', 10)
-        self.image_pub          = self.create_publisher(CompressedImage, '/image/detected_object', 10)
+        self.image_pub          = self.create_publisher(CompressedImage, '/image/detected_object/compressed', 10)
         self.brake_robot_pub    = self.create_publisher(Int16, '/brake_status', 10)
 
-        self.images_for_video = []
+        # self.images_for_video = []
 
     def __del__(self):
         self.get_logger().info('Closing object detection...')
-
         # fourcc = cv2.VideoWriter_fourcc(*'XVID') 
         # video = cv2.VideoWriter('/home/nikolica/Pictures/stereolabs/video.avi', fourcc, 5, (960, 600))
         # for img in self.images_for_video:
@@ -54,6 +53,9 @@ class ObjectDetection(Node):
 
     def cmd_vel_callback(self, msg):
         self.robot_is_moving = (msg.linear.x != 0.0 or msg.angular.z != 0.0)
+        if self.robot_is_moving:
+            self.object_in_stop_zone = False
+        # self.get_logger().info(f'Robot is moving: {self.robot_is_moving}')
 
     def capture_image_callback(self, msg):
         self.cv_image = self.bridge.compressed_imgmsg_to_cv2(msg)
@@ -107,17 +109,17 @@ class ObjectDetection(Node):
                 color = (0, 255, 0)
                 text_msg = 'Object detected in SAFE zone.'
 
-                if (top_left_y > -0.75 and top_left_y < 0.75 and top_left_x > 2 and top_left_x < 5) or \
-                    (bottom_left_y > -0.75 and bottom_left_y < 0.75 and bottom_left_x > 2 and bottom_left_x < 5) or \
-                    (top_right_y > -0.75 and top_right_y < 0.75 and top_right_x > 2 and top_right_x < 5) or \
-                    (bottom_right_y > -0.75 and bottom_right_y < 0.75 and bottom_right_x > 2 and bottom_right_x < 5):
+                if (top_left_y > -0.75 and top_left_y < 0.75 and top_left_x > 3 and top_left_x < 5) or \
+                    (bottom_left_y > -0.75 and bottom_left_y < 0.75 and bottom_left_x > 3 and bottom_left_x < 5) or \
+                    (top_right_y > -0.75 and top_right_y < 0.75 and top_right_x > 3 and top_right_x < 5) or \
+                    (bottom_right_y > -0.75 and bottom_right_y < 0.75 and bottom_right_x > 3 and bottom_right_x < 5):
                         color = (28,153,255)
                         distance = min(top_left_x, bottom_left_x, top_right_x, bottom_right_x)
                         text_msg = 'Object detected in SLOW zone. Distance: {:.4f} m.'.format(distance)
-                elif (top_left_y > -0.75 and top_left_y < 0.75 and top_left_x > 1 and top_left_x < 2) or \
-                    (bottom_left_y > -0.75 and bottom_left_y < 0.75 and bottom_left_x > 1 and bottom_left_x < 2) or \
-                    (top_right_y > -0.75 and top_right_y < 0.75 and top_right_x > 1 and top_right_x < 2) or \
-                    (bottom_right_y > -0.75 and bottom_right_y < 0.75 and bottom_right_x > 1 and bottom_right_x < 2):
+                elif (top_left_y > -0.75 and top_left_y < 0.75 and top_left_x > 1 and top_left_x < 3) or \
+                    (bottom_left_y > -0.75 and bottom_left_y < 0.75 and bottom_left_x > 1 and bottom_left_x < 3) or \
+                    (top_right_y > -0.75 and top_right_y < 0.75 and top_right_x > 1 and top_right_x < 3) or \
+                    (bottom_right_y > -0.75 and bottom_right_y < 0.75 and bottom_right_x > 1 and bottom_right_x < 3):
                     color = (0,0,255)
                     distance = min(top_left_x, bottom_left_x, top_right_x, bottom_right_x)
                     text_msg = 'Object detected in STOP zone. Distance: {:.4f} m.'.format(top_left_x)
@@ -126,6 +128,9 @@ class ObjectDetection(Node):
                         self.object_in_stop_zone    = True
                         self.publish_notification   = True
                         self.get_logger().info('Object detected in STOP zone. Stopping navigation...')
+                        brake_msg = Int16()
+                        brake_msg.data = 1
+                        self.brake_robot_pub.publish(brake_msg)
                         self.timer_check.reset()
                 else:
                     self.object_in_stop_zone = False
@@ -146,26 +151,20 @@ class ObjectDetection(Node):
                 # cv2.putText(self.cv_image, f'BR: x: {bottom_right_x}, y: {bottom_right_y}, z: {bottom_right_z}', (10, 75), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
 
                 cv2.rectangle(self.cv_image, (x1, y1), (x2, y1 + 20), color, -1)
-
                 cv2.putText(self.cv_image, 'Person', (x1 + 7, y1 + 15), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 1)
-
-                self.images_for_video.append(self.cv_image.copy())
+                # self.images_for_video.append(self.cv_image.copy())
                 
-                cv2.imwrite(f"/home/nikolica/Pictures/stereolabs/zedx_{self.img_counter}.jpg", self.cv_image)
-                self.img_counter += 1
+                # cv2.imwrite(f"/home/nikolica/Pictures/stereolabs/zedx_{self.img_counter}.jpg", self.cv_image)
+                # self.img_counter += 1
 
                 if self.publish_notification:
                     # img = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
                     img = self.bridge.cv2_to_compressed_imgmsg(self.cv_image)
                     self.image_pub.publish(img)
-                    text = String()
-                    text.data = text_msg
-                    self.notification_pub.publish(text)
-                    self.publish_notification = False
-
-                    brake_msg = Int16()
-                    brake_msg.data = 1
-                    self.brake_robot_pub.publish(brake_msg)
+                    # text = String()
+                    # text.data = text_msg
+                    # self.notification_pub.publish(text)
+                    # self.publish_notification = False
 
                 # curr_detection += 1
             self.cv_image = []
