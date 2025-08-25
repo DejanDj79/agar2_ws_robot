@@ -4,9 +4,10 @@ from rclpy.node import Node
 import cv2
 from cv_bridge import CvBridge
 
-from std_msgs.msg import String, Bool
-from sensor_msgs.msg import Image
+from std_msgs.msg import String, Bool, Int16
+from sensor_msgs.msg import CompressedImage #Image
 from zed_msgs.msg import ObjectsStamped
+from geometry_msgs.msg import Twist
 
 
 class ObjectDetection(Node):
@@ -17,42 +18,55 @@ class ObjectDetection(Node):
         self.timer_check     = self.create_timer(20.0, self.check_object)
         self.timer_check.cancel()
 
-        self.cv_image = []
-        self.bridge = CvBridge()
+        self.cv_image       = []
+        self.last_image     = []
+        self.bridge         = CvBridge()
 
         self.img_counter = 0
+        self.robot_is_moving        = False
 
         self.object_in_stop_zone    = False
         self.publish_notification   = False
 
         self.take_photo_sub         = self.create_subscription(Bool, '/image/take_photo', self.take_photo_callback, 10)
-        self.capture_image_sub      = self.create_subscription(Image, '/zedx/zed_node/rgb/image_rect_color', self.capture_image_callback, 10)
+        
+        # self.capture_image_sub      = self.create_subscription(Image, '/zedx/zed_node/rgb/image_rect_color', self.capture_image_callback, 10)
+        self.capture_image_sub      = self.create_subscription(CompressedImage, '/zedx/zed_node/rgb_raw/image_raw_color/compressed', self.capture_image_callback, 10)
+        self.cmd_vel_sub            = self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
+
         self.detected_object_sub    = self.create_subscription(ObjectsStamped, '/zedx/zed_node/obj_det/objects', self.detected_object_callback, 10)
 
         self.notification_pub   = self.create_publisher(String, '/agar_notifications', 10)
-        self.image_pub          = self.create_publisher(Image, '/image/detected_object', 10)
+        # self.image_pub          = self.create_publisher(Image, '/image/detected_object', 10)
+        self.image_pub          = self.create_publisher(CompressedImage, '/image/detected_object', 10)
+        self.brake_robot_pub    = self.create_publisher(Int16, '/brake_status', 10)
 
         self.images_for_video = []
 
     def __del__(self):
         self.get_logger().info('Closing object detection...')
 
-        fourcc = cv2.VideoWriter_fourcc(*'XVID') 
-        video = cv2.VideoWriter('/home/nikolica/Pictures/stereolabs/video.avi', fourcc, 5, (960, 600))
-        for img in self.images_for_video:
-            video.write(img)
-        video.release()
+        # fourcc = cv2.VideoWriter_fourcc(*'XVID') 
+        # video = cv2.VideoWriter('/home/nikolica/Pictures/stereolabs/video.avi', fourcc, 5, (960, 600))
+        # for img in self.images_for_video:
+        #     video.write(img)
+        # video.release()
+
+    def cmd_vel_callback(self, msg):
+        self.robot_is_moving = (msg.linear.x != 0.0 or msg.angular.z != 0.0)
 
     def capture_image_callback(self, msg):
-        self.cv_image = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
+        self.cv_image = self.bridge.compressed_imgmsg_to_cv2(msg)
+        self.last_image = self.cv_image.copy()
 
     def take_photo_callback(self, msg):
         # self.get_logger().info('Take photo command received')
         # self.get_logger().info(f'Data: {msg.data}')
         # self.get_logger().info(f'Image: {self.cv_image}')
-        if msg.data == True and len(self.cv_image) > 0:
+        if msg.data == True and len(self.last_image) > 0:
             # self.get_logger().info('Publishing photo...')
-            img = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
+            # img = self.bridge.cv2_to_imgmsg(self.last_image, encoding="bgr8")
+            img = self.bridge.cv2_to_compressed_imgmsg(self.last_image)
             self.image_pub.publish(img)
         else:
             # self.get_logger().info('Publishing text...')
@@ -62,7 +76,7 @@ class ObjectDetection(Node):
             self.publish_notification = False
             
     def detected_object_callback(self, msg):
-        if len(self.cv_image) > 0:
+        if len(self.cv_image) > 0 and self.robot_is_moving:
             # curr_detection = 0
             # self.get_logger().info(f'Detected {len(msg.objects)} objects')
             for obj in msg.objects:
@@ -141,12 +155,17 @@ class ObjectDetection(Node):
                 self.img_counter += 1
 
                 if self.publish_notification:
-                    img = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
+                    # img = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
+                    img = self.bridge.cv2_to_compressed_imgmsg(self.cv_image)
                     self.image_pub.publish(img)
                     text = String()
                     text.data = text_msg
                     self.notification_pub.publish(text)
                     self.publish_notification = False
+
+                    brake_msg = Int16()
+                    brake_msg.data = 1
+                    self.brake_robot_pub.publish(brake_msg)
 
                 # curr_detection += 1
             self.cv_image = []

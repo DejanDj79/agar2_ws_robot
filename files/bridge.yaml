@@ -17,7 +17,7 @@
      queue_size: 1
  -
      topic: /image/detected_object
-     type: sensor_msgs/msg/Image
+     type: sensor_msgs/msg/CompressedImage
      queue_size: 1
  -
      topic: /extra_motor_status
