@@ -96,7 +96,7 @@ def generate_launch_description():
         description_launch,
         localization_launch,
         waypoint_follower,
-        # object_detection,
+        object_detection,
 
         waypoint_service,
         waypoint_files_service,
