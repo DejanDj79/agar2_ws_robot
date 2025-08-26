@@ -18,6 +18,11 @@ class ObjectDetection(Node):
         self.timer_check     = self.create_timer(20.0, self.check_object)
         self.timer_check.cancel()
 
+        self.timer_notification_reset   = self.create_timer(3.0, self.notification_reset)
+        self.timer_notification_reset.cancel()
+
+        self.notification_sent = False
+
         self.cv_image       = []
         self.last_image     = []
         self.detected_img   = []
@@ -54,7 +59,7 @@ class ObjectDetection(Node):
 
     def cmd_vel_callback(self, msg):
         self.robot_is_moving = (msg.linear.x != 0.0 or msg.angular.z != 0.0)
-        if self.robot_is_moving:
+        if self.robot_is_moving and self.notification_sent == False:
             self.object_in_stop_zone = False
         # self.get_logger().info(f'Robot is moving: {self.robot_is_moving}')
 
@@ -158,14 +163,16 @@ class ObjectDetection(Node):
                 # cv2.imwrite(f"/home/nikolica/Pictures/stereolabs/zedx_{self.img_counter}.jpg", self.cv_image)
                 # self.img_counter += 1
 
-                if self.publish_notification:
-                    # img = self.bridge.cv2_to_imgmsg(self.cv_image, encoding="bgr8")
+                if self.publish_notification and self.notification_sent == False:
+                    self.notification_sent = True
                     img = self.bridge.cv2_to_compressed_imgmsg(self.cv_image)
                     self.image_pub.publish(img)
                     text = String()
                     text.data = text_msg
                     self.notification_pub.publish(text)
                     self.publish_notification = False
+                    # self.get_logger().info('Notification published.')
+                    self.timer_notification_reset.reset()
 
                 # curr_detection += 1
             self.cv_image = []
@@ -173,8 +180,12 @@ class ObjectDetection(Node):
     def check_object(self):
         if self.object_in_stop_zone == False:
             self.get_logger().info('No object in STOP zone. Resuming navigation...')
-            self.timer_check.cancel()
+        self.timer_check.cancel()
 
+    def notification_reset(self):
+        self.timer_notification_reset.cancel()
+        self.notification_sent = False
+        # self.get_logger().info('Notification publish reset.')
 
 def main(args=None):
     rclpy.init(args=args)
