@@ -25,7 +25,9 @@
       - model: the type of camera, one of zed, zedm, zed2, zed2i, zedx, zedxm, virtual
       - enable_gnss: if true enable the URDF link
   -->
-  <xacro:macro name="zed_camera" params="name=zed model=zed enable_gnss=false custom_baseline=0 *gnss_origin">
+  <xacro:macro name="zed_camera" params="name=zed model=zed enable_gnss=false custom_baseline=0 *gnss_origin *camera_origin">
+    
+  <!-- <xacro:macro name="zed_camera" params="name model xyz enable_gnss custom_baseline"> -->
     <xacro:if value="${model == 'zed'}">
       <xacro:property name="baseline" value="0.12" />
       <xacro:property name="height" value="0.03" />
@@ -111,9 +113,10 @@
     <!-- Camera mounting point (the threaded screw hole in the bottom) -->
     <link name="${name}_camera_link" />
     <joint name="${name}_camera_link_joint" type="fixed">
-      <parent link="top_stand" />
+      <parent link="main_camera_link" />
       <child link="${name}_camera_link" />
-      <origin xyz="0.6 0 -0.05" rpy="0 0 0" />
+      <!-- <origin xyz="0.6 0 -0.05" rpy="0 0 0" /> -->
+       <xacro:insert_block name="camera_origin" />
     </joint>
 
     <!-- Camera Center -->

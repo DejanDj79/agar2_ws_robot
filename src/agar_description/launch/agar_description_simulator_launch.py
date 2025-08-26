@@ -18,7 +18,8 @@ def generate_launch_description():
     )
     
     pkg_agar_description = FindPackageShare(package='agar_description').find('agar_description')
-    urdf_path = os.path.join(pkg_agar_description, 'urdf', 'agar_low_poly_simulator.xacro')
+    # urdf_path = os.path.join(pkg_agar_description, 'urdf', 'agar_low_poly_simulator.xacro')
+    urdf_path = os.path.join(pkg_agar_description, 'urdf', 'agar_low_poly.xacro')
 
     joint_state_publisher_node = Node(
         package="joint_state_publisher",

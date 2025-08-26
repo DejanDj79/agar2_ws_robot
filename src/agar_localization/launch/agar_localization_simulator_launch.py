@@ -47,13 +47,13 @@ def generate_launch_description():
       arguments=['0', '0', '0', '0', '0', '0', '1', 'map', 'odom'],
   )
   
-  # odom_to_basefootprint = Node(
-  #     package="tf2_ros",
-  #     executable="static_transform_publisher",
-  #     name="odom_to_map",
-  #     output="screen",
-  #     arguments=['0', '0', '0', '0', '0', '0', '1', 'odom', 'base_footprint'],
-  # )
+  odom_to_basefootprint = Node(
+      package="tf2_ros",
+      executable="static_transform_publisher",
+      name="odom_to_map",
+      output="screen",
+      arguments=['0', '0', '0', '0', '0', '0', '1', 'odom', 'base_footprint'],
+  )
   
   pointcloud_to_laserscan = IncludeLaunchDescription(
     PythonLaunchDescriptionSource(os.path.join(pkg_localization, 'launch', 'agar_laserscan_launch.py')),
@@ -66,8 +66,8 @@ def generate_launch_description():
   ld.add_action(gnss_fix_to_odometry_node)
   
   ld.add_action(map_to_odom)
-  # ld.add_action(odom_to_basefootprint)
+  ld.add_action(odom_to_basefootprint)
 
-  ld.add_action(pointcloud_to_laserscan)
+  # ld.add_action(pointcloud_to_laserscan)
 
   return ld

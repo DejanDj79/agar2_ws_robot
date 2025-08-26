@@ -4,12 +4,10 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /TF1
-        - /AgAR1
         - /Odometry1
         - /Lidar1/LaserScan1
         - /DepthCamera1/DepthCamera1/Topic1
-      Splitter Ratio: 0.5076141953468323
+      Splitter Ratio: 0.6015228629112244
     Tree Height: 727
   - Class: rviz_common/Selection
     Name: Selection
@@ -73,10 +71,6 @@ Visualization Manager:
           Value: false
         front_right_wheel:
           Value: true
-        gps_link:
-          Value: true
-        imu:
-          Value: true
         left_stand:
           Value: false
         map:
@@ -119,6 +113,18 @@ Visualization Manager:
           Value: false
         zedx_right_camera_optical_frame:
           Value: false
+        zedxm_camera_center:
+          Value: false
+        zedxm_camera_link:
+          Value: true
+        zedxm_left_camera_frame:
+          Value: false
+        zedxm_left_camera_optical_frame:
+          Value: false
+        zedxm_right_camera_frame:
+          Value: false
+        zedxm_right_camera_optical_frame:
+          Value: false
       Marker Scale: 0.5
       Name: TF
       Show Arrows: true
@@ -137,10 +143,6 @@ Visualization Manager:
                   front_right_leg:
                     front_right_wheel:
                       {}
-                gps_link:
-                  {}
-                imu:
-                  {}
                 raster:
                   {}
                 rear_left_leg_fixture:
@@ -167,6 +169,14 @@ Visualization Manager:
                           {}
                       zedx_right_camera_frame:
                         zedx_right_camera_optical_frame:
+                          {}
+                  zedxm_camera_link:
+                    zedxm_camera_center:
+                      zedxm_left_camera_frame:
+                        zedxm_left_camera_optical_frame:
+                          {}
+                      zedxm_right_camera_frame:
+                        zedxm_right_camera_optical_frame:
                           {}
       Update Interval: 0
       Value: true
@@ -315,6 +325,31 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
         zedx_right_camera_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zedxm_camera_center:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        zedxm_camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zedxm_left_camera_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zedxm_left_camera_optical_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zedxm_right_camera_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zedxm_right_camera_optical_frame:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -893,25 +928,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/ThirdPersonFollower
-      Distance: 21.170778274536133
+      Distance: 4.100287437438965
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 15.549430847167969
-        Y: 11.209056854248047
-        Z: -4.900675412500277e-05
+        X: 0
+        Y: 0
+        Z: 0
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.7853981852531433
+      Pitch: 1.1753977537155151
       Target Frame: base_footprint
       Value: ThirdPersonFollower (rviz_default_plugins)
-      Yaw: 0.7853981852531433
+      Yaw: 1.035398006439209
     Saved: ~
 Window Geometry:
   DepthCamera:
