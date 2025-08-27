@@ -25,7 +25,6 @@ class ObjectDetection(Node):
 
         self.cv_image       = []
         self.last_image     = []
-        self.detected_img   = []
         self.bridge         = CvBridge()
 
         # self.img_counter = 0
@@ -37,10 +36,10 @@ class ObjectDetection(Node):
         self.take_photo_sub         = self.create_subscription(Bool, '/image/take_photo', self.take_photo_callback, 10)
         
         # self.capture_image_sub      = self.create_subscription(Image, '/zedx/zed_node/rgb/image_rect_color', self.capture_image_callback, 10)
-        self.capture_image_sub      = self.create_subscription(CompressedImage, '/zedx/zed_node/rgb_raw/image_raw_color/compressed', self.capture_image_callback, 10)
+        self.capture_image_sub      = self.create_subscription(CompressedImage, '/zedx/zed_node/rgb_raw/image_raw_color/compressed', self.capture_image_callback, 1)
         self.cmd_vel_sub            = self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
 
-        self.detected_object_sub    = self.create_subscription(ObjectsStamped, '/zedx/zed_node/obj_det/objects', self.detected_object_callback, 10)
+        self.detected_object_sub    = self.create_subscription(ObjectsStamped, '/zedx/zed_node/obj_det/objects', self.detected_object_callback, 1)
 
         self.notification_pub   = self.create_publisher(String, '/agar_notifications', 10)
         # self.image_pub          = self.create_publisher(Image, '/image/detected_object', 10)
@@ -58,7 +57,8 @@ class ObjectDetection(Node):
         # video.release()
 
     def cmd_vel_callback(self, msg):
-        self.robot_is_moving = (msg.linear.x != 0.0 or msg.angular.z != 0.0)
+        # self.robot_is_moving = (msg.linear.x != 0.0 or msg.angular.z != 0.0)
+        self.robot_is_moving = msg.linear.x > 0.0
         if self.robot_is_moving and self.notification_sent == False:
             self.object_in_stop_zone = False
         # self.get_logger().info(f'Robot is moving: {self.robot_is_moving}')
@@ -84,7 +84,9 @@ class ObjectDetection(Node):
             self.publish_notification = False
             
     def detected_object_callback(self, msg):
-        if len(self.cv_image) > 0 and self.robot_is_moving:
+        detected_img = self.cv_image.copy()
+
+        if len(detected_img) > 0 and self.robot_is_moving:
             # curr_detection = 0
             # self.get_logger().info(f'Detected {len(msg.objects)} objects')
             for obj in msg.objects:
@@ -115,17 +117,17 @@ class ObjectDetection(Node):
                 color = (0, 255, 0)
                 text_msg = 'Object detected in SAFE zone.'
 
-                if (top_left_y > -0.75 and top_left_y < 0.75 and top_left_x > 3 and top_left_x < 5) or \
-                    (bottom_left_y > -0.75 and bottom_left_y < 0.75 and bottom_left_x > 3 and bottom_left_x < 5) or \
-                    (top_right_y > -0.75 and top_right_y < 0.75 and top_right_x > 3 and top_right_x < 5) or \
-                    (bottom_right_y > -0.75 and bottom_right_y < 0.75 and bottom_right_x > 3 and bottom_right_x < 5):
+                if (top_left_y > -0.80 and top_left_y < 0.80 and top_left_x > 3 and top_left_x < 5) or \
+                    (bottom_left_y > -0.80 and bottom_left_y < 0.80 and bottom_left_x > 3 and bottom_left_x < 5) or \
+                    (top_right_y > -0.80 and top_right_y < 0.80 and top_right_x > 3 and top_right_x < 5) or \
+                    (bottom_right_y > -0.80 and bottom_right_y < 0.80 and bottom_right_x > 3 and bottom_right_x < 5):
                         color = (28,153,255)
                         distance = min(top_left_x, bottom_left_x, top_right_x, bottom_right_x)
                         text_msg = 'Object detected in SLOW zone. Distance: {:.4f} m.'.format(distance)
-                elif (top_left_y > -0.75 and top_left_y < 0.75 and top_left_x > 1 and top_left_x < 3) or \
-                    (bottom_left_y > -0.75 and bottom_left_y < 0.75 and bottom_left_x > 1 and bottom_left_x < 3) or \
-                    (top_right_y > -0.75 and top_right_y < 0.75 and top_right_x > 1 and top_right_x < 3) or \
-                    (bottom_right_y > -0.75 and bottom_right_y < 0.75 and bottom_right_x > 1 and bottom_right_x < 3):
+                elif (top_left_y > -0.80 and top_left_y < 0.80 and top_left_x > 1 and top_left_x < 3) or \
+                    (bottom_left_y > -0.80 and bottom_left_y < 0.80 and bottom_left_x > 1 and bottom_left_x < 3) or \
+                    (top_right_y > -0.80 and top_right_y < 0.80 and top_right_x > 1 and top_right_x < 3) or \
+                    (bottom_right_y > -0.80 and bottom_right_y < 0.80 and bottom_right_x > 1 and bottom_right_x < 3):
                     color = (0,0,255)
                     distance = min(top_left_x, bottom_left_x, top_right_x, bottom_right_x)
                     text_msg = 'Object detected in STOP zone. Distance: {:.4f} m.'.format(top_left_x)
@@ -141,14 +143,14 @@ class ObjectDetection(Node):
                 else:
                     self.object_in_stop_zone = False
 
-                cv2.rectangle(self.cv_image, (xmin, ymin), (xmax, ymax), color, 2)
+                cv2.rectangle(detected_img, (xmin, ymin), (xmax, ymax), color, 2)
 
                 x1 = xmin
                 x2 = xmax
                 y1 = ymin
                 y2 = ymax
 
-                cv2.putText(self.cv_image, text_msg, (10, 15), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
+                cv2.putText(detected_img, text_msg, (10, 15), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
 
                 # cv2.putText(self.cv_image, f'TL: x: {top_left_x}, y: {top_left_y}, z: {top_left_z}', (10, 30), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
                 # cv2.putText(self.cv_image, f'BL: x: {bottom_left_x}, y: {bottom_left_y}, z: {bottom_left_z}', (10, 45), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
@@ -156,8 +158,8 @@ class ObjectDetection(Node):
                 # cv2.putText(self.cv_image, f'TR: x: {top_right_x}, y: {top_right_y}, z: {top_right_z}', (10, 60), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
                 # cv2.putText(self.cv_image, f'BR: x: {bottom_right_x}, y: {bottom_right_y}, z: {bottom_right_z}', (10, 75), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 2)
 
-                cv2.rectangle(self.cv_image, (x1, y1), (x2, y1 + 20), color, -1)
-                cv2.putText(self.cv_image, 'Person', (x1 + 7, y1 + 15), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 1)
+                cv2.rectangle(detected_img, (x1, y1), (x2, y1 + 20), color, -1)
+                cv2.putText(detected_img, 'Person', (x1 + 7, y1 + 15), cv2.FONT_HERSHEY_PLAIN, 1.0, (0, 0, 0), 1)
                 # self.images_for_video.append(self.cv_image.copy())
                 
                 # cv2.imwrite(f"/home/nikolica/Pictures/stereolabs/zedx_{self.img_counter}.jpg", self.cv_image)
@@ -165,17 +167,16 @@ class ObjectDetection(Node):
 
                 if self.publish_notification and self.notification_sent == False:
                     self.notification_sent = True
-                    img = self.bridge.cv2_to_compressed_imgmsg(self.cv_image)
+                    img = self.bridge.cv2_to_compressed_imgmsg(detected_img)
                     self.image_pub.publish(img)
                     text = String()
                     text.data = text_msg
                     self.notification_pub.publish(text)
                     self.publish_notification = False
-                    # self.get_logger().info('Notification published.')
                     self.timer_notification_reset.reset()
 
                 # curr_detection += 1
-            self.cv_image = []
+        self.cv_image = []
 
     def check_object(self):
         if self.object_in_stop_zone == False:
