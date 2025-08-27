@@ -141,7 +141,8 @@ class ObjectDetection(Node):
                         self.brake_robot_pub.publish(brake_msg)
                         self.timer_check.reset()
                 else:
-                    self.object_in_stop_zone = False
+                    self.object_in_stop_zone    = False
+                    self.publish_notification   = False 
 
                 cv2.rectangle(detected_img, (xmin, ymin), (xmax, ymax), color, 2)
 
