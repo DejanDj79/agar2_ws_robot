@@ -33,7 +33,7 @@ def generate_launch_description():
   
   declare_simulator_cmd = DeclareLaunchArgument(
     name='headless',
-    default_value='True',
+    default_value='False',
     description='Whether to execute gzclient')
      
   declare_use_simulator_cmd = DeclareLaunchArgument(
@@ -92,8 +92,8 @@ def generate_launch_description():
   ld.add_action(declare_use_simulator_cmd)
   ld.add_action(declare_world_cmd)
  
-  # ld.add_action(start_gazebo_server_cmd)
-  # ld.add_action(start_gazebo_client_cmd)
+  ld.add_action(start_gazebo_server_cmd)
+  ld.add_action(start_gazebo_client_cmd)
   ld.add_action(spawn_entity_node)
   # ld.add_action(robot_steering_node)
 
