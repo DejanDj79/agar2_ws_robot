@@ -150,9 +150,9 @@ global_costmap:
         enabled: True
         observation_sources: lidar_point_cloud #scan
         lidar_point_cloud:
-          topic: /velodyne_points
+          topic: /camera/rgbd/image_raw/points #/velodyne_points
           data_type: "PointCloud2"
-          max_obstacle_height: 3.0
+          max_obstacle_height: 1.5 #3.0
           min_obstacle_height: 0.15
           obstacle_max_range: 30.0
           obstacle_min_range: 0.6
@@ -166,6 +166,6 @@ global_costmap:
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
         cost_scaling_factor: 3.0 #3.0
-        inflation_radius: 0.25 #2.5 #1.2 #0.55
+        inflation_radius: 0.3 # 0.25 #2.5 #1.2 #0.55
         inflate_around_unknown: False
       always_send_full_costmap: True

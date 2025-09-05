@@ -18,7 +18,7 @@
 
     <xacro:include filename="$(find agar_description)/urdf/inertia.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/materials.xacro" />
-    <xacro:include filename="$(find agar_description)/urdf/leg_fixture.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/leg_fixture_simulator.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/leg_low_poly.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/wheel_low_poly_fix.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/stand.xacro" />

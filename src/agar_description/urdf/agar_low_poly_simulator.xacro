@@ -18,17 +18,18 @@
 
     <xacro:include filename="$(find agar_description)/urdf/inertia.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/materials.xacro" />
-    <xacro:include filename="$(find agar_description)/urdf/leg_fixture.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/leg_fixture_simulator.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/leg_low_poly.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/wheel.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/wheel_low_poly.xacro" />
-    <xacro:include filename="$(find agar_description)/urdf/ros2_control.xacro" />
+    <!-- <xacro:include filename="$(find agar_description)/urdf/ros2_control.xacro" /> -->
     <xacro:include filename="$(find agar_description)/urdf/stand.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/gps_imu.xacro" />
     <!-- <xacro:include filename="$(find agar_description)/urdf/lidar.xacro" /> -->
-    <!-- <xacro:include filename="$(find agar_description)/urdf/camera.xacro" /> -->
+    <xacro:include filename="$(find agar_description)/urdf/camera.xacro" />
 
     <xacro:include filename="$(find agar_description)/urdf/zed_cameras.urdf.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/agar_control.xacro" />
     
     <!-- AgAR frame -->
     <link name="base_footprint">
@@ -137,6 +138,5 @@
         ixx="0.4193309158223555" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.4193309158223555" jxyz="0.341 0.18999 -0.0002" jrpy="0 -${pi/3} 0" />
     <xacro:wheel name="${rear_left_wheel}" type="b" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.4193309158223555" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.4193309158223555" jxyz="0.341 -0.18999 -0.000" jrpy="0 ${pi/3} ${pi}" /> -->
-                                    
-
+      
 </robot>

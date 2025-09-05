@@ -13,18 +13,18 @@ def generate_launch_description():
     velodyne_to_laser = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
-        name="velodyne_to_laser",
+        name="camera_to_laser",
         output="screen",
-        arguments=['0', '0', '0', '0', '0', '0', '1', 'velodyne', 'lidar_laserscan'],
+        arguments=['0', '0', '0', '0', '0', '0', '1', 'rgbd_camera_link', 'camera_laserscan'],
     )
 
     pointcloud_to_laserscan = Node(
         name='pointcloud_to_laserscan',
         package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
-        remappings=[('cloud_in', '/velodyne_points'),
-                    ('scan', '/lidar_scan')],
+        remappings=[('cloud_in', '/camera/rgbd/image_raw/points'),
+                    ('scan', '/camera_scan')],
         parameters=[{
-            'target_frame': 'lidar_laserscan',
+            'target_frame': 'camera_laserscan',
             'transform_tolerance': 0.01,
             'min_height': -1.8,
             'max_height': 1.8,
@@ -66,7 +66,7 @@ def generate_launch_description():
     # )
     
     ld = LaunchDescription()
-    ld.add_action(velodyne_to_laser)
+    # ld.add_action(velodyne_to_laser)
     ld.add_action(pointcloud_to_laserscan)
     # ld.add_action(camera_to_laser)
     # ld.add_action(depthimage_to_laserscan)

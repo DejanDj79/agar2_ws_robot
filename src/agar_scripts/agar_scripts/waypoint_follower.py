@@ -57,7 +57,7 @@ class WaypointFollower(Node):
     def __init__(self):
         super().__init__('waypoint_follower')
 
-        self.simulator_mode = False
+        self.simulator_mode = True
 
         self.callback_group = ReentrantCallbackGroup()
 
@@ -78,8 +78,8 @@ class WaypointFollower(Node):
         self.tf_broadcaster = TransformBroadcaster(self)
 
         self.cmd_vel_pub            = self.create_publisher(Twist, '/cmd_vel', 10)
-        if self.simulator_mode:
-            self.cmd_vel_pub = self.create_publisher(Twist, 'diff_drive_base_controller/cmd_vel_unstamped', 10)
+        # if self.simulator_mode:
+        #     self.cmd_vel_pub = self.create_publisher(Twist, 'diff_drive_base_controller/cmd_vel_unstamped', 10)
 
         self.waypoints_path_pub             = self.create_publisher(Path, '/plan', 10)
         self.angle_path_pub                 = self.create_publisher(Path, '/angle_path', 10)
@@ -158,13 +158,13 @@ class WaypointFollower(Node):
         if not self.simulator_mode:
             self.cli_speed = self.create_client(RobotSpeedSave, '/robot_speed_save_server')
             while not self.cli_speed.wait_for_service(timeout_sec=1.0):
-                self.get_logger().info('service not available, waiting again...')
+                self.get_logger().info('service robot_speed_save_server not available, waiting again...')
             self.req_speed = RobotSpeedSave.Request()
 
 
         self.cli = self.create_client(FromLL, '/fromLL', callback_group=self.callback_group)
         while not self.cli.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('service not available, waiting again...')
+            self.get_logger().info('service fromLL not available, waiting again...')
         self.req = FromLL.Request()
 
         # (x, y) = self.convertLLToXY(self.datum_latitude, self.datum_longitude)
