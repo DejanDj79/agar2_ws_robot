@@ -81,13 +81,25 @@ def generate_launch_description():
       respawn=True
     )
 
-    zedcamera_launch = IncludeLaunchDescription(
+    zedcamera_front_launch = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('zed_wrapper'), 'launch'),
          '/zed_camera.launch.py']),
           launch_arguments={
               'camera_model': 'zedx',
               'camera_name': 'zedx',
+              'serial_number': '45931755',
+          }.items()
+      )
+    
+    zedcamera_rear_launch = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('zed_wrapper'), 'launch'),
+         '/zed_camera.launch.py']),
+          launch_arguments={
+              'camera_model': 'zedxm',
+              'camera_name': 'zedxm',
+              'serial_number': '55327043',
           }.items()
       )
     
@@ -104,6 +116,7 @@ def generate_launch_description():
         set_mission_editor_service,
         position_data_service,
 
-        zedcamera_launch,
+        zedcamera_front_launch,
+        zedcamera_rear_launch,
     ])
     
