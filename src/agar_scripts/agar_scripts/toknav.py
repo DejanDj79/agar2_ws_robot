@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from tf2_ros import TransformBroadcaster
 
-from tf_transformations import quaternion_from_euler, euler_from_quaternion
+from tf_transformations import quaternion_from_euler
 
 import socket
 import time
@@ -460,8 +460,11 @@ class ToknavGpsDriver(Node):
                 
             gps_fix_msg.status.service = NavSatStatus.SERVICE_GPS
 
-            latitude = (self.gga['latitude'] + self.ggah['latitude']) / 2
-            longitude = (self.gga['longitude'] + self.ggah['longitude']) / 2
+            # latitude = (self.gga['latitude'] + self.ggah['latitude']) / 2
+            # longitude = (self.gga['longitude'] + self.ggah['longitude']) / 2
+            
+            latitude = (43.33101792833333 + 43.33100844883333) / 2
+            longitude = (21.891169322833335 + 21.891159543666667) / 2
 
             if self.gga['latitude_direction'] == 'S':
                 latitude = -latitude
@@ -505,8 +508,10 @@ class ToknavGpsDriver(Node):
 
             # heading = self.calculate_heading(self.gga['latitude'], self.gga['longitude'], self.ggah['latitude'], self.ggah['longitude'])
 
-            position_1 = alvinxy.ll2xy(self.gga['latitude'], self.gga['longitude'], latitude, longitude)
-            position_2 = alvinxy.ll2xy(self.ggah['latitude'], self.ggah['longitude'], latitude, longitude)
+            # position_1 = alvinxy.ll2xy(self.gga['latitude'], self.gga['longitude'], latitude, longitude)
+            # position_2 = alvinxy.ll2xy(self.ggah['latitude'], self.ggah['longitude'], latitude, longitude)
+            position_1 = alvinxy.ll2xy(43.33101792833333, 21.891169322833335, latitude, longitude)
+            position_2 = alvinxy.ll2xy(43.33100844883333, 21.891159543666667, latitude, longitude)
             heading = atan2(position_2[1] - position_1[1], position_2[0] - position_1[0]) + (pi / 2)
 
 

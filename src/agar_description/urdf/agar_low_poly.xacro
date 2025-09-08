@@ -18,17 +18,18 @@
 
     <xacro:include filename="$(find agar_description)/urdf/inertia.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/materials.xacro" />
-    <xacro:include filename="$(find agar_description)/urdf/leg_fixture_simulator.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/leg_fixture.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/leg_low_poly.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/wheel_low_poly_fix.xacro" />
+     <!-- <xacro:include filename="$(find agar_description)/urdf/wheel_low_poly.xacro" /> -->
     <xacro:include filename="$(find agar_description)/urdf/stand.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/lidar_vlp16.xacro" />
     <!-- <xacro:include filename="$(find agar_description)/urdf/gps_imu_fix.xacro" /> -->
     <!-- <xacro:include filename="$(find agar_description)/urdf/lidar.xacro" />
     <xacro:include filename="$(find agar_description)/urdf/camera.xacro" /> -->
 
-    <!-- <xacro:include filename="$(find agar_description)/urdf/zed_descr.urdf.xacro" /> -->
-    <xacro:include filename="$(find agar_description)/urdf/zed_cameras.urdf.xacro" />
+    <!-- <xacro:include filename="$(find agar_description)/urdf/zed_descr.urdf.xacro" />
+    <xacro:include filename="$(find agar_description)/urdf/zed_cameras.urdf.xacro" /> -->
     
     <!-- AgAR frame -->
     <link name="base_footprint">
@@ -133,13 +134,13 @@
     <xacro:wheel_low_poly_fix name="${rear_left_wheel}" type="a" xyz="0 0 0" rpy="${pi/2} 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 -0.18999 -0.0002" jrpy="0 0 ${pi}" />
 
-    <!-- <xacro:wheel name="${front_right_wheel}" type="a" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
+    <!-- <xacro:wheel_low_poly name="${front_right_wheel}" type="a" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 -0.18999 -0.0002" jrpy="0 -${pi/3} 0" />
-    <xacro:wheel name="${rear_right_wheel}" type="a" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
+    <xacro:wheel_low_poly name="${rear_right_wheel}" type="a" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.419330921877652" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.419330921877652" jxyz="0.341 0.18999 -0.0002" jrpy="0 ${pi/3} ${pi}" />
-    <xacro:wheel name="${front_left_wheel}" type="b" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
+    <xacro:wheel_low_poly name="${front_left_wheel}" type="b" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.4193309158223555" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.4193309158223555" jxyz="0.341 0.18999 -0.0002" jrpy="0 -${pi/3} 0" />
-    <xacro:wheel name="${rear_left_wheel}" type="b" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
+    <xacro:wheel_low_poly name="${rear_left_wheel}" type="b" xyz="0 0 0" rpy="0 0 0" ixyz="0 0 0" irpy="0 0 0" 
         ixx="0.4193309158223555" ixy="0" ixz="0" iyy="0.7560959596612022" iyz="0" izz="0.4193309158223555" jxyz="0.341 -0.18999 -0.000" jrpy="0 ${pi/3} ${pi}" /> -->
                                     
 

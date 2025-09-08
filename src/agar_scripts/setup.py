@@ -36,6 +36,7 @@ setup(
             # 'notifications = agar_scripts.notifications:main',
             'object_detection = agar_scripts.object_detection:main',
             # 'telegram_commands = agar_scripts.telegram_commands:main',
+            'camera_mount_position = agar_scripts.camera_mount_position:main',
         ],
     },
 )

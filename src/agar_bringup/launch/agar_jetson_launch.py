@@ -81,6 +81,12 @@ def generate_launch_description():
       respawn=True
     )
 
+    camera_mount_position = Node(
+      package='agar_scripts', 
+      executable='camera_mount_position',
+      respawn=True
+    )
+
     zedcamera_front_launch = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('zed_wrapper'), 'launch'),
@@ -105,6 +111,7 @@ def generate_launch_description():
     
     return LaunchDescription([
         toknav,
+        camera_mount_position,
         description_launch,
         localization_launch,
         waypoint_follower,
@@ -117,6 +124,6 @@ def generate_launch_description():
         position_data_service,
 
         zedcamera_front_launch,
-        # zedcamera_rear_launch,
+        zedcamera_rear_launch,
     ])
     
