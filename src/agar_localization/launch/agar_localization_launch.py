@@ -83,11 +83,11 @@ def generate_launch_description():
       }],
   )
 
-  slam_launch = IncludeLaunchDescription(
-      PythonLaunchDescriptionSource([os.path.join(
-         get_package_share_directory('agar_localization'), 'launch'),
-         '/agar_slam_launch.py'])
-      )
+  # slam_launch = IncludeLaunchDescription(
+  #     PythonLaunchDescriptionSource([os.path.join(
+  #        get_package_share_directory('agar_localization'), 'launch'),
+  #        '/agar_slam_launch.py'])
+  #     )
 
   ld = LaunchDescription()
   
@@ -96,8 +96,10 @@ def generate_launch_description():
   
   ld.add_action(map_to_odom)
 
-  ld.add_action(camera_cloud_to_laser_tf)
-  ld.add_action(camera_cloud_to_laserscan)
+  # ld.add_action(camera_cloud_to_laser_tf)
+  # ld.add_action(camera_cloud_to_laserscan)
+
+  # ld.add_action(slam_launch)
 
   # ld.add_action(odom_to_basefootprint)
 

@@ -120,7 +120,7 @@ def generate_launch_description():
         camera_mount_position,
         description_launch,
         localization_launch,
-        navigation_launch,
+        # navigation_launch,
         waypoint_follower,
         object_detection,
 
