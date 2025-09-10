@@ -22,19 +22,8 @@ def generate_launch_description():
       default_value='True',
       description='Use simulation (Gazebo) clock if true')
 
-    # slam_toolbox = Node(
-    #     name='slamtoolbox',
-    #     package='slam_toolbox', 
-    #     executable='online_async_launch.py',
-    #     parameters=[{
-    #         'use_sim_time': True,
-    #         'slam_params_file': config,
-    #     }],
-    # )
-
     slam_toolbox = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(pkg_slam_toolbox, 'launch', 'online_async_launch.py')),
-        # launch_arguments={'slam_params_file': config}.items(),
         launch_arguments={'use_sime_time': use_sim_time, 'slam_params_file': config}.items(),
     )
     

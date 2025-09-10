@@ -19,6 +19,12 @@ def generate_launch_description():
          get_package_share_directory('agar_localization'), 'launch'),
          '/agar_localization_launch.py'])
       )
+    
+    navigation_launch = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('agar_navigation'), 'launch'),
+         '/agar_navigation_launch.py'])
+      )
 
     waypoint_follower = Node(
       package='agar_scripts', 
@@ -114,6 +120,7 @@ def generate_launch_description():
         camera_mount_position,
         description_launch,
         localization_launch,
+        navigation_launch,
         waypoint_follower,
         object_detection,
 

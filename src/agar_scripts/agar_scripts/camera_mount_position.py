@@ -36,7 +36,7 @@ class CameraMountPosition(Node):
         self.get_logger().info(f'IMU data received: {self.camera_orientation[0]}, {self.camera_orientation[1]}, {self.camera_orientation[2]}, {self.camera_orientation[3]}')
 
     def publish_tf_data(self):
-        self.tf_broadcaster.sendTransform(self.set_transform('top_stand', 'main_camera_link', [0.55, 0.0, 0.25], self.camera_orientation))
+        self.tf_broadcaster.sendTransform(self.set_transform('base_footprint', 'main_camera_link', [0.55, 0.0, 1.60], self.camera_orientation))
         self.tf_broadcaster.sendTransform(self.set_transform('main_camera_link', 'zedx_camera_link', [0.05, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
         self.tf_broadcaster.sendTransform(self.set_transform('main_camera_link', 'zedxm_camera_link', [-0.05, 0.0, 0.0], self.zedxm_orientation))
 

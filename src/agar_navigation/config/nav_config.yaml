@@ -148,24 +148,34 @@ global_costmap:
       obstacle_layer:
         plugin: "nav2_costmap_2d::ObstacleLayer"
         enabled: True
-        observation_sources: lidar_point_cloud #scan
-        lidar_point_cloud:
-          topic: /camera/rgbd/image_raw/points #/velodyne_points
-          data_type: "PointCloud2"
-          max_obstacle_height: 1.5 #3.0
-          min_obstacle_height: 0.15
-          obstacle_max_range: 30.0
-          obstacle_min_range: 0.6
-          raytrace_max_range: 30.0
-          raytrace_min_range: 0.6
+        observation_sources: scan #lidar_point_cloud #scan
+        scan:
+          topic: /zedx/zed_node/scan
+          data_type: "LaserScan"
+          max_obstacle_height: 2.0
           clearing: True
           marking: True
+          raytrace_max_range: 30.0
+          raytrace_min_range: 0.6
+          obstacle_max_range: 30.0
+          obstacle_min_range: 0.6
+        # lidar_point_cloud:
+        #   topic: /camera/rgbd/image_raw/points
+        #   data_type: "PointCloud2"
+        #   max_obstacle_height: 1.5 #3.0
+        #   min_obstacle_height: 0.15
+        #   obstacle_max_range: 30.0
+        #   obstacle_min_range: 0.6
+        #   raytrace_max_range: 30.0
+        #   raytrace_min_range: 0.6
+        #   clearing: True
+        #   marking: True
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 3.0 #3.0
-        inflation_radius: 0.3 # 0.25 #2.5 #1.2 #0.55
-        inflate_around_unknown: False
+        cost_scaling_factor: 5.0 #3.0
+        inflation_radius: 0.7 # 0.3 # 0.25 #2.5 #1.2 #0.55
+        inflate_around_unknown: True
       always_send_full_costmap: True

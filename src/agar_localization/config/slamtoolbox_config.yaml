@@ -13,8 +13,7 @@ slam_toolbox:
     odom_frame: odom
     map_frame: map
     base_frame: base_footprint
-    scan_topic: /lidar_scan
-    #scan_topic: /camera_scan
+    scan_topic: /zedx/zed_node/scan
     use_map_saver: true
     mode: mapping #localization
 
@@ -29,21 +28,21 @@ slam_toolbox:
 
     debug_logging: false
     throttle_scans: 1
-    transform_publish_period: 0.02 #if 0 never publishes odometry
+    transform_publish_period: 0.0 #if 0 never publishes odometry
     map_update_interval: 0.5 #1.0
-    resolution: 0.07 # 0.05
-    min_laser_range: 0.0 #for rastering images
-    max_laser_range: 20.0 #for rastering images
-    minimum_time_interval: 0.5
+    resolution: 0.15 # 0.05
+    min_laser_range: 0.5 #for rastering images
+    max_laser_range: 30.0 #for rastering images
+    minimum_time_interval: 0.2 # 0.5
     transform_timeout: 0.2
     tf_buffer_duration: 30.0
     stack_size_to_use: 40000000 #// program needs a larger stack size to serialize large maps
     enable_interactive_mode: true
 
     # General Parameters
-    use_scan_matching: true
-    use_scan_barycenter: true
-    minimum_travel_distance: 0.2
+    use_scan_matching: false
+    use_scan_barycenter: false
+    minimum_travel_distance: 0.1
     minimum_travel_heading: 0.1
     scan_buffer_size: 10
     scan_buffer_maximum_scan_distance: 10.0
