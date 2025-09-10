@@ -47,7 +47,7 @@ def generate_launch_description():
                   ('/tf_static', 'tf_static')]
 
     param_substitutions = {
-        'use_sim_time': use_sim_time,
+        # 'use_sim_time': use_sim_time,
         'autostart': autostart}
 
     configured_params = ParameterFile(
@@ -68,7 +68,7 @@ def generate_launch_description():
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
         'use_sim_time',
-        default_value='true',
+        default_value='false',
         description='Use simulation (Gazebo) clock if true')
 
     declare_params_file_cmd = DeclareLaunchArgument(

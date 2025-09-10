@@ -93,6 +93,12 @@ def generate_launch_description():
       respawn=True
     )
 
+    collision_checker = Node(
+      package='agar_scripts', 
+      executable='collision_checker',
+      respawn=True
+    )
+
     zedcamera_front_launch = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('zed_wrapper'), 'launch'),
@@ -117,12 +123,13 @@ def generate_launch_description():
     
     return LaunchDescription([
         toknav,
-        # camera_mount_position,
+        camera_mount_position,
         description_launch,
         localization_launch,
-        # navigation_launch,
+        navigation_launch,
         waypoint_follower,
         object_detection,
+        collision_checker,
 
         waypoint_service,
         waypoint_files_service,
@@ -130,7 +137,7 @@ def generate_launch_description():
         set_mission_editor_service,
         position_data_service,
 
-        # zedcamera_front_launch,
-        # zedcamera_rear_launch,
+        zedcamera_front_launch,
+        zedcamera_rear_launch,
     ])
     

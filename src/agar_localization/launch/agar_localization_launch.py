@@ -42,42 +42,42 @@ def generate_launch_description():
       arguments=['0', '0', '0', '0', '0', '0', '1', 'map', 'odom'],
   )
   
-  # camera_cloud_to_laser_tf = Node(
-  #       package="tf2_ros",
-  #       executable="static_transform_publisher",
-  #       name="camera_to_laser",
-  #       output="screen",
-  #       arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'zedx_left_camera_frame', 'camera_laserscan']
-  #   )
+  camera_cloud_to_laser_tf = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="camera_to_laser",
+        output="screen",
+        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'zedx_left_camera_frame', 'camera_laserscan']
+    )
 
-  # camera_cloud_to_laserscan = Node(
-  #     name='pointcloud_to_laserscan',
-  #     package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
-  #     remappings=[('cloud_in', '/zedx/zed_node/point_cloud/cloud_registered'),
-  #                 ('scan', '/zedx/zed_node/scan')],
-  #     parameters=[{
-  #         'target_frame': 'camera_laserscan',
-  #         'transform_tolerance': 0.01,
-  #         'min_height': -0.4,
-  #         'max_height': 0.6,
-  #         'angle_min': -1.5708, 
-  #         'angle_max': 1.5708,
-  #         'angle_increment': 0.0087,
-  #         'time_increment': 0.1,
-  #         'scan_time': 20.0,
-  #         'range_min': 0.45,
-  #         'range_max': 10.0,
-  #         'use_inf': True,
-  #         'use_sime_time': True,
-  #     }],
-  # )
+  camera_cloud_to_laserscan = Node(
+      name='pointcloud_to_laserscan',
+      package='pointcloud_to_laserscan', executable='pointcloud_to_laserscan_node',
+      remappings=[('cloud_in', '/zedx/zed_node/point_cloud/cloud_registered'),
+                  ('scan', '/zedx/zed_node/scan')],
+      parameters=[{
+          'target_frame': 'camera_laserscan',
+          'transform_tolerance': 0.01,
+          'min_height': -0.9,
+          'max_height': 0.3,
+          'angle_min': -0.523, 
+          'angle_max': 0.523,
+          'angle_increment': 0.0087,
+          'time_increment': 0.1,
+          'scan_time': 20.0,
+          'range_min': 0.45,
+          'range_max': 10.0,
+          'use_inf': True,
+          'use_sime_time': False,
+      }],
+  )
 
-  # slam_launch = IncludeLaunchDescription(
-  #     PythonLaunchDescriptionSource([os.path.join(
-  #        get_package_share_directory('agar_localization'), 'launch'),
-  #        '/agar_slam_launch.py'])
-  #     )
-
+  slam_launch = IncludeLaunchDescription(
+      PythonLaunchDescriptionSource([os.path.join(
+         get_package_share_directory('agar_localization'), 'launch'),
+         '/agar_slam_launch.py'])
+      )
+  
   ld = LaunchDescription()
   
   ld.add_action(start_robot_localization_cmd)
@@ -85,8 +85,8 @@ def generate_launch_description():
   
   ld.add_action(map_to_odom)
 
-  # ld.add_action(camera_cloud_to_laser_tf)
-  # ld.add_action(camera_cloud_to_laserscan)
+  ld.add_action(camera_cloud_to_laser_tf)
+  ld.add_action(camera_cloud_to_laserscan)
 
   # ld.add_action(slam_launch)
 
