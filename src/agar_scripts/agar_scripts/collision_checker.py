@@ -6,6 +6,7 @@ from nav_msgs.msg import OccupancyGrid
 from nav2_msgs.srv import GetCostmap
 from geometry_msgs.msg import Point32, Polygon, PolygonStamped
 from agar_msgs.msg import CollisionZones
+from std_msgs.msg import Int16
 
 from nav2_simple_commander.costmap_2d import PyCostmap2D
 from nav2_simple_commander.line_iterator import LineIterator
@@ -34,12 +35,9 @@ class CollisionChecker(Node):
         self.nav                    = BasicNavigator()
         self.costmap                = None
         self.footprint              = None
-        self.costmap_subscriber     = self.create_subscription(
-            OccupancyGrid, 'global_costmap/costmap',
-            self.costmap_subscriber_callback, 10)
-        # self.footprint_subscriber   = self.create_subscription(
-        #     PolygonStamped, 'global_costmap/published_footprint',
-        #     self.footprint_subscriber_callback, 10)
+        self.costmap_subscriber     = self.create_subscription(OccupancyGrid, 'global_costmap/costmap', self.costmap_subscriber_callback, 10)
+        
+        self.brake_robot_pub        = self.create_publisher(Int16, '/brake_status', 10)
     
         self.robot_height           = 2.0
         self.robot_width            = 1.8
@@ -53,11 +51,7 @@ class CollisionChecker(Node):
         self.front_slow_poly_pub    = self.create_publisher(PolygonStamped, 'front_slow_footprint', 10)
         self.rear_stop_poly_pub     = self.create_publisher(PolygonStamped, 'rear_stop_footprint', 10)
         self.rear_slow_poly_pub     = self.create_publisher(PolygonStamped, 'rear_slow_footprint', 10)
-        # self.left_stop_poly_pub     = self.create_publisher(PolygonStamped, 'left_stop_footprint', 10)
-        # self.left_slow_poly_pub     = self.create_publisher(PolygonStamped, 'left_slow_footprint', 10)
-        # self.right_stop_poly_pub    = self.create_publisher(PolygonStamped, 'right_stop_footprint', 10)
-        # self.right_slow_poly_pub    = self.create_publisher(PolygonStamped, 'right_slow_footprint', 10)
-
+        
         self.collision_zones_pub    = self.create_publisher(CollisionZones, 'collision_zones', 10)
 
         self.front_stop_poly        = None
@@ -73,24 +67,6 @@ class CollisionChecker(Node):
     #region Process Data
     def costmap_subscriber_callback(self, msg):
         self.costmap = PyCostmap2D(msg)
-        # self.nav.clearGlobalCostmap()
-
-    # def footprint_subscriber_callback(self, msg):
-    #     polygon = msg.polygon
-    #     self.footprint = polygon
-
-    #     point_A = (polygon.points[0].x, polygon.points[0].y)
-    #     point_B = (polygon.points[1].x, polygon.points[1].y)
-    #     point_C = (polygon.points[2].x, polygon.points[2].y)
-    #     point_D = (polygon.points[3].x, polygon.points[3].y)
-
-    #     (self.front_stop_poly, self.front_slow_poly) = self.generate_zones(point_D, point_A, point_C, point_B, 0.25, 0.75)
-    #     self.front_stop_poly_pub.publish(self.front_stop_poly)
-    #     self.front_slow_poly_pub.publish(self.front_slow_poly)
-
-    #     (self.rear_stop_poly, self.rear_slow_poly) = self.generate_zones(point_A, point_D, point_B, point_C, 0.25, 0.75)
-    #     self.rear_stop_poly_pub.publish(self.rear_stop_poly)
-    #     self.rear_slow_poly_pub.publish(self.rear_slow_poly)
 
     def run(self):
         self.generate_footprint()
@@ -103,10 +79,6 @@ class CollisionChecker(Node):
             val_r_stop = self.footprintCost(self.rear_stop_poly.polygon)
             val_r_slow = self.footprintCost(self.rear_slow_poly.polygon)
             
-            # if val_f_stop != 0.0 or val_f_slow != 0.0 or val_r_stop != 0.0 or val_r_slow != 0.0:
-            #     self.get_logger().info(f'Front stop: {val_f_stop}, slow: {val_f_slow}')
-            #     self.get_logger().info(f'Rear stop: {val_r_stop}, slow: {val_r_slow}')
-
             collision_zones = CollisionZones()
             collision_zones.front_stop = val_f_stop != 0
             collision_zones.front_slow = val_f_slow != 0
@@ -114,9 +86,13 @@ class CollisionChecker(Node):
             collision_zones.rear_slow = val_r_slow != 0
             self.collision_zones_pub.publish(collision_zones)
 
+            if val_f_stop != 0 or val_r_stop != 0:
+                brake_msg = Int16()
+                brake_msg.data = 1
+                self.brake_robot_pub.publish(brake_msg)
+
         except Exception as ex:
-            self.get_logger().error(
-                f'Exception: {ex}')
+            self.get_logger().error(f'Exception: {ex}')
     #endregion
             
     #region Utils
@@ -124,7 +100,6 @@ class CollisionChecker(Node):
         """
         Generate and publish robot footprint with stop and slow zones.
         """
-
         try:
             trans = self.tf_buffer.lookup_transform(self.source_frame, self.target_frame, Time())
                 
@@ -163,8 +138,7 @@ class CollisionChecker(Node):
             self.rear_stop_poly_pub.publish(self.rear_stop_poly)
             self.rear_slow_poly_pub.publish(self.rear_slow_poly)
         except TransformException as ex:
-            self.get_logger().warn(
-                f'Could not transform {self.source_frame} to {self.target_frame}: {ex}')
+            self.get_logger().error(f'Could not transform {self.source_frame} to {self.target_frame}: {ex}')
 
 
     def move_point(self, A, B, d):
@@ -180,19 +154,19 @@ class CollisionChecker(Node):
             tuple of points: x, y (Moved point).
             x (float): point x position.
             y (float): point t position.
+
+        D---------------A
+        |               |
+        |   FOOTPRINT   |
+        |               |
+        C---------------B
         """
         vector_AB = (B[0] - A[0], B[1] - A[1]) 
         length_AB = sqrt(vector_AB[0]**2 + vector_AB[1]**2) 
         unit_vector = (vector_AB[0] / length_AB, vector_AB[1] / length_AB) 
         return (B[0] + d * unit_vector[0], B[1] + d * unit_vector[1])
 
-    """
-            D---------------A
-            |               |
-            |   FOOTPRINT   |
-            |               |
-            C---------------B
-    """
+        
     def generate_zones(self, point_1_back, point_1_front, point_2_back, point_2_front, dis_stop, dis_slow):
         """
         Generate stop and slow robot footprint
@@ -280,12 +254,8 @@ class CollisionChecker(Node):
 
         """
         if self.costmap is None:
-            raise ValueError(
-                'Costmap not specified, use setCostmap to specify the costmap first'
-            )
-        # return self.costmap.worldToMapValidated(wx, wy)
+            self.get_logger().warn('Costmap not specified, use setCostmap to specify the costmap first')
         return self.costmap.worldToMap(wx, wy)
-
 
     def footprintCost(self, footprint: Polygon):
         """
@@ -306,27 +276,21 @@ class CollisionChecker(Node):
         y1 = 0.0
 
         x0, y0 = self.worldToMapValidated(footprint.points[0].x, footprint.points[0].y)
-
-        if x0 is None or y0 is None:
-            return LETHAL_OBSTACLE
+        if x0 is None or y0 is None: return LETHAL_OBSTACLE
 
         xstart = x0
         ystart = y0
 
         for i in range(len(footprint.points) - 1):
-            x1, y1 = self.worldToMapValidated(
-                footprint.points[i + 1].x, footprint.points[i + 1].y
-            )
+            x1, y1 = self.worldToMapValidated(footprint.points[i + 1].x, footprint.points[i + 1].y)
 
-            if x1 is None or y1 is None:
-                return LETHAL_OBSTACLE
+            if x1 is None or y1 is None: return LETHAL_OBSTACLE
 
             footprint_cost = max(float(self.lineCost(x0, x1, y0, y1)), footprint_cost)
             x0 = x1
             y0 = y1
 
-            if footprint_cost == LETHAL_OBSTACLE:
-                return footprint_cost
+            if footprint_cost == LETHAL_OBSTACLE: return footprint_cost
 
         return max(float(self.lineCost(xstart, x1, ystart, y1)), footprint_cost)
     
@@ -353,16 +317,10 @@ class CollisionChecker(Node):
         line_iterator = LineIterator(x0, y0, x1, y1, step_size)
 
         while line_iterator.isValid():
-            point_cost = self.pointCost(
-                int(line_iterator.getX()), int(line_iterator.getY())
-            )
+            point_cost = self.pointCost(int(line_iterator.getX()), int(line_iterator.getY()))
 
-            if point_cost == LETHAL_OBSTACLE:
-                return point_cost
-
-            if line_cost < point_cost:
-                line_cost = point_cost
-
+            if point_cost == LETHAL_OBSTACLE: return point_cost
+            if line_cost < point_cost: line_cost = point_cost
             line_iterator.advance()
 
         return line_cost
@@ -382,9 +340,7 @@ class CollisionChecker(Node):
 
         """
         if self.costmap is None:
-            raise ValueError(
-                'Costmap not specified, use setCostmap to specify the costmap first'
-            )
+            self.get_logger().warn('Costmap not specified, use setCostmap to specify the costmap first')
         return self.costmap.getCostXY(x, y)
     #endregion
 
