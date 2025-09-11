@@ -36,12 +36,6 @@ class BatteryStatus(Node):
         except Exception as ex:
             print(ex)
 
-    # async def update_status(self):
-    #     try:
-    #         status = await self.bt_bms.get_status()
-    #     except Exception as ex:
-    #         print(ex)
-
     async def update_soc(self):
         try:
             self.soc = await self.bt_bms.get_soc()
@@ -55,9 +49,9 @@ class BatteryStatus(Node):
 
         try:
             await self.update_soc()
-            # print(self.soc['total_voltage'])
-            # print(self.soc['current'])
-            # print(self.soc['soc_percent'] / 100.0)
+            self.get_logger().info(self.soc['total_voltage'])
+            self.get_logger().info(self.soc['current'])
+            self.get_logger().info(self.soc['soc_percent'] / 100.0)
             await self.bt_bms.disconnect()
 
             text = String()
