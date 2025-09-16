@@ -10,12 +10,12 @@ from rclpy.callback_groups import ReentrantCallbackGroup
 
 class BatteryStatus(Node):
     def __init__(self):
-        super().__init__('notifications')
+        super().__init__('battery_status_node')
         self.get_logger().info('Initialization completed')
 
         self.callback_group = ReentrantCallbackGroup()
 
-        timer_period        = 30  # seconds
+        timer_period        = 300  # seconds
         self.timer          = self.create_timer(timer_period, self.run)
 
         self.bt_bms = DalyBMSBluetooth()
@@ -40,7 +40,7 @@ class BatteryStatus(Node):
         try:
             self.soc = await self.bt_bms.get_soc()
         except Exception as ex:
-            print(ex)
+            self.get_logger().error(ex)
 
     async def read_soc(self):
         self.get_logger().info("Bluetooth connecting...")
@@ -49,13 +49,11 @@ class BatteryStatus(Node):
 
         try:
             await self.update_soc()
-            self.get_logger().info(self.soc['total_voltage'])
-            self.get_logger().info(self.soc['current'])
-            self.get_logger().info(self.soc['soc_percent'] / 100.0)
+            # self.get_logger().info(f"Voltage: {self.soc['total_voltage']}, current: {self.soc['current']}, percent: {self.soc['soc_percent'] / 100.0}")
             await self.bt_bms.disconnect()
 
             text = String()
-            text.data = 'Battery level: {0}, total voltage: {1}.'.format(round(self.soc['soc_percent'], 2), round(self.soc['total_voltage'], 2))
+            text.data = 'Battery level: {0}%, total voltage: {1}V.'.format(round(self.soc['soc_percent'], 2), round(self.soc['total_voltage'], 2))
             self.notification_pub.publish(text)
         except Exception as ex:
             self.get_logger().error(ex)
@@ -70,7 +68,6 @@ def main(args=None):
     rclpy.init(args=args)
     battery_status = BatteryStatus()
     rclpy.spin(battery_status)
-
     battery_status.destroy_node()
     rclpy.shutdown()
 

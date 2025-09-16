@@ -35,7 +35,7 @@ def generate_launch_description():
     toknav = Node(
       package='agar_scripts', 
       executable='toknav_gps',
-      # output='screen',
+      output='screen',
       respawn=True
     )
 
@@ -77,25 +77,35 @@ def generate_launch_description():
     position_data_service = Node(
       package='agar_scripts', 
       executable='position_data_service',
-      # output='screen',
+      output='screen',
       respawn=True
     )
 
     object_detection = Node(
       package='agar_scripts', 
       executable='object_detection',
+      output='screen',
       respawn=True
     )
 
     camera_mount_position = Node(
       package='agar_scripts', 
       executable='camera_mount_position',
+      output='screen',
       respawn=True
     )
 
     collision_checker = Node(
       package='agar_scripts', 
       executable='collision_checker',
+      output='screen',
+      respawn=True
+    )
+
+    battery_status = Node(
+      package='agar_scripts', 
+      executable='battery_status',
+      output='screen',
       respawn=True
     )
 
@@ -129,7 +139,8 @@ def generate_launch_description():
         navigation_launch,
         waypoint_follower,
         object_detection,
-        collision_checker,
+        # collision_checker,
+        battery_status,
 
         waypoint_service,
         waypoint_files_service,

@@ -130,11 +130,11 @@ class CollisionChecker(Node):
             self.footprint = footprint.polygon
             self.footprint_poly_pub.publish(footprint)
 
-            (self.front_stop_poly, self.front_slow_poly) = self.generate_zones(point_D, point_A, point_C, point_B, 0.45, 0.75)
+            (self.front_stop_poly, self.front_slow_poly) = self.generate_zones(point_D, point_A, point_C, point_B, 0.65, 1.00)
             self.front_stop_poly_pub.publish(self.front_stop_poly)
             self.front_slow_poly_pub.publish(self.front_slow_poly)
 
-            (self.rear_stop_poly, self.rear_slow_poly) = self.generate_zones(point_A, point_D, point_B, point_C, 0.45, 0.75)
+            (self.rear_stop_poly, self.rear_slow_poly) = self.generate_zones(point_A, point_D, point_B, point_C, 0.65, 1.00)
             self.rear_stop_poly_pub.publish(self.rear_stop_poly)
             self.rear_slow_poly_pub.publish(self.rear_slow_poly)
         except TransformException as ex:

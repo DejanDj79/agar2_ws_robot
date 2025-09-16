@@ -94,7 +94,7 @@ class WaypointFollower(Node):
         self.navigation_active_pub          = self.create_publisher(Bool, '/navigation_active', 10)
 
         self.navigation_active_sub          = self.create_subscription(Bool, '/navigation_active', self.navigation_active_callback, 10)
-        self.collision_zones_sub            = self.create_subscription(CollisionZones, '/collision_zones', self.collision_zones_callback, 10)
+        # self.collision_zones_sub            = self.create_subscription(CollisionZones, '/collision_zones', self.collision_zones_callback, 10)
         self.load_waypoints_sub             = self.create_subscription(String, '/load_waypoints', self.load_waypoints_callback, 10, callback_group=self.callback_group)
         self.reset_waypoints_sub            = self.create_subscription(UInt64, '/reset_waypoints', self.reset_waypoints_callback, 10)
 
