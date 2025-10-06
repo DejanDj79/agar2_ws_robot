@@ -23,7 +23,7 @@
             serial_number: 0 # usually overwritten by launch file
             pub_resolution: 'CUSTOM' # The resolution used for image and depth map publishing. 'NATIVE' to use the same `general.grab_resolution` - `CUSTOM` to apply the `general.pub_downscale_factor` downscale factory to reduce bandwidth in transmission
             pub_downscale_factor: 2.0 # rescale factor used to rescale image before publishing when 'pub_resolution' is 'CUSTOM'
-            pub_frame_rate: 30.0 # frequency of publishing of visual images and depth images
+            pub_frame_rate: 10.0 #30.0 # frequency of publishing of visual images and depth images
             enable_image_validity_check: 1 # [SDK5 required] Sets the image validity check. If set to 1, the SDK will check if the frames are valid before processing.
             gpu_id: -1
             optional_opencv_calibration_file: '' # Optional path where the ZED SDK can find a file containing the calibration information of the camera computed by OpenCV. Read the ZED SDK documentation for more information: https://www.stereolabs.com/docs/api/structsl_1_1InitParameters.html#a9eab2753374ef3baec1d31960859ba19
@@ -65,14 +65,14 @@
             depth_mode: 'NEURAL_LIGHT' # Matches the ZED SDK setting: 'NONE', 'PERFORMANCE', 'QUALITY', 'ULTRA', 'NEURAL', 'NEURAL_PLUS' - Note: if 'NONE' all the modules that requires depth extraction are disabled by default (Pos. Tracking, Obj. Detection, Mapping, ...)
             depth_stabilization: 1 # Forces positional tracking to start if major than 0 - Range: [0,100]
             openni_depth_mode: false # 'false': 32bit float [meters], 'true': 16bit unsigned int [millimeters]
-            point_cloud_freq: 30.0 # [DYNAMIC] - frequency of the pointcloud publishing (equal or less to `pub_frame_rate` value)
+            point_cloud_freq: 10.0 #30.0 # [DYNAMIC] - frequency of the pointcloud publishing (equal or less to `pub_frame_rate` value)
             point_cloud_res: 'COMPACT' # The resolution used for point cloud publishing - 'COMPACT'-Standard resolution. Optimizes processing and bandwidth, 'REDUCED'-Half resolution. Low processing and bandwidth requirements
             depth_confidence: 50 # [DYNAMIC]
             depth_texture_conf: 100 # [DYNAMIC]
             remove_saturated_areas: true # [DYNAMIC]
 
         pos_tracking: # Only stereo cameras
-            pos_tracking_enabled: true # True to enable positional tracking from start
+            pos_tracking_enabled: false # True to enable positional tracking from start
             pos_tracking_mode: 'GEN_1' # Matches the ZED SDK setting: 'GEN_1', 'GEN_2'
             imu_fusion: false # enable/disable IMU fusion. When set to false, only the optical odometry will be used.
             publish_tf: false # [usually overwritten by launch file] publish `odom -> camera_link` TF
@@ -109,7 +109,7 @@
             target_yaw_uncertainty: 0.0 #1e-2 # defines the target yaw uncertainty at which the calibration process between GNSS and VIO concludes. The unit of this parameter is in radian. By default, the threshold is set at 0.1 radians.
 
         mapping: # Only stereo cameras
-            mapping_enabled: true # True to enable mapping and fused point cloud pubblication
+            mapping_enabled: false # True to enable mapping and fused point cloud pubblication
             resolution: 0.05 # maps resolution in meters [min: 0.01f - max: 0.2f]
             max_mapping_range: 5.0 # maximum depth range while mapping in meters (-1 for automatic calculation) [2.0, 20.0]
             fused_pointcloud_freq: 1.0 # frequency of the publishing of the fused colored point cloud
@@ -138,7 +138,7 @@
             mc_sport: false # [DYNAMIC] - Enable/disable the detection of sport-related objects for 'MULTI_CLASS_X' models
 
         body_tracking: # Only stereo cameras
-            bt_enabled: true # True to enable Body Tracking
+            bt_enabled: false # True to enable Body Tracking
             model: 'HUMAN_BODY_MEDIUM' # 'HUMAN_BODY_FAST', 'HUMAN_BODY_MEDIUM', 'HUMAN_BODY_ACCURATE'
             body_format: 'BODY_38' # 'BODY_18','BODY_34','BODY_38','BODY_70'
             allow_reduced_precision_inference: false # Allow inference to run at a lower precision to improve runtime and memory usage
@@ -168,7 +168,7 @@
             thread_pointcloud_priority: 60 # ONLY with 'SCHED_FIFO' and 'SCHED_RR' - [1 (LOW) z-> 99 (HIGH)] - NOTE: 'sudo' required
 
         debug:
-            sdk_verbose: 1 # Set the verbose level of the ZED SDK
+            sdk_verbose: 0 # Set the verbose level of the ZED SDK
             debug_common: false
             debug_sim: false
             debug_video_depth: false

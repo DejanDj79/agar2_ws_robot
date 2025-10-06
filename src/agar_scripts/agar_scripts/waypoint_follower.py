@@ -57,7 +57,7 @@ class WaypointFollower(Node):
     def __init__(self):
         super().__init__('waypoint_follower')
 
-        self.simulator_mode = True
+        self.simulator_mode = False
 
         self.callback_group = ReentrantCallbackGroup()
 
@@ -111,7 +111,7 @@ class WaypointFollower(Node):
         self.backup_speed               = -0.3
         self.backup_start_position      = [0, 0]
         self.is_slow                    = False
-        self.default_goal_distance      = 3.2
+        self.default_goal_distance      = 2.6
         self.goal_distance              = self.default_goal_distance
         self.reverse                    = False
         self.robot_direction            = robot_direction.FORWARD
