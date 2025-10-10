@@ -109,6 +109,13 @@ def generate_launch_description():
       respawn=True
     )
 
+    jetson_online = Node(
+      package='agar_scripts', 
+      executable='jetson_status_pub',
+      output='screen',
+      respawn=True
+    )
+
     zedcamera_front_launch = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
          get_package_share_directory('zed_wrapper'), 'launch'),
@@ -141,6 +148,7 @@ def generate_launch_description():
         object_detection,
         # collision_checker,
         battery_status,
+        jetson_online,
 
         waypoint_service,
         waypoint_files_service,
