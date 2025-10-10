@@ -16,7 +16,7 @@
      type: std_msgs/msg/String
      queue_size: 1
  -
-     topic: /image/detected_object
+     topic: /image/detected_object/compressed
      type: sensor_msgs/msg/CompressedImage
      queue_size: 1
  -
@@ -50,6 +50,10 @@
  -
      topic: /image/take_photo
      type: std_msgs/msg/Bool
+     queue_size: 1
+ -
+     topic: /collision_zones
+     type: agar_msgs/msg/CollisionZones
      queue_size: 1
      
  services_1_to_2:
