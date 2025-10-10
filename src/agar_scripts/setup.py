@@ -38,6 +38,7 @@ setup(
             # 'telegram_commands = agar_scripts.telegram_commands:main',
             'camera_mount_position = agar_scripts.camera_mount_position:main',
             'battery_status = agar_scripts.battery_status:main',
+            'jetson_status_pub = agar_scripts.jetson_status_pub:main',
         ],
     },
 )
