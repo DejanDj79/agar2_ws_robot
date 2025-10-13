@@ -584,8 +584,10 @@ class WaypointFollower(Node):
             reverse = False
             self.reverse = False
 
-            if not self.simulator_mode:
-                self.set_robot_speed()
+            # if not self.simulator_mode:
+            #     self.set_robot_speed()
+            self.set_robot_speed()
+            self.set_robot_speed()
 
             if self.waypoint_index < len(self.waypoints) - 1 and self.waypoints[self.waypoint_index + 1].tank:
                 self.goal_distance = 0.7
