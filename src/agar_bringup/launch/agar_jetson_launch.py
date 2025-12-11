@@ -147,7 +147,7 @@ def generate_launch_description():
         waypoint_follower,
         # object_detection,
         # collision_checker,
-        battery_status,
+        # battery_status,
         jetson_online,
 
         waypoint_service,
