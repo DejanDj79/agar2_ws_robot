@@ -67,8 +67,9 @@ class WaypointFollower(Node):
 
         timer_period        = 1 / 20  # seconds
         self.timer          = self.create_timer(timer_period, self.run)
-        # self.timer_stop     = self.create_timer(3.0, self.stop_and_wait)
-        # self.timer_stop.cancel()
+
+        self.timer_stop     = self.create_timer(0.3, self.stop_and_wait)
+        self.timer_stop.cancel()
 
         self.timer_stop_spin = self.create_timer(2.0, self.stop_and_wait_for_spin)
         self.timer_stop_spin.cancel()
@@ -442,7 +443,7 @@ class WaypointFollower(Node):
         self.get_logger().info('Number of waypoints: {0}'.format(len(self.waypoints)))
         self.get_logger().info('********************************************************************')
 
-        if msg.data is True and len(self.waypoints) > 0:
+        if msg.data is True and self.waypoint_index < len(self.waypoints) and len(self.waypoints) > 0:
             self.navigation_active  = True
             self.current_action     = robot_action.FOLLOW_PATH
 
@@ -765,9 +766,7 @@ class WaypointFollower(Node):
 
     def stop_and_wait(self):
         self.get_logger().info(f'Stop and wait finished. Continuing with action {self.wait_action}')
-        # self.get_logger().info(f'Waypoint index {self.waypoint_index}, idx: {self.current_waypoint.idx}')
-        # self.timer_stop.cancel()
-        # self.current_action     = robot_action.FOLLOW_PATH
+        self.timer_stop.cancel()
         self.current_action     = self.wait_action
         self.wait_action        = robot_action.NO_ACTION
 
@@ -775,8 +774,10 @@ class WaypointFollower(Node):
         self.get_logger().info(f'wait action: {self.wait_action}')
         if msg.data and self.navigation_active and self.wait_action != robot_action.NO_ACTION:
             self.get_logger().info('Robot stopped detected. Continuing with next action.')
-            self.current_action     = self.wait_action
-            self.wait_action        = robot_action.NO_ACTION
+            self.timer_stop.reset()
+            
+            # self.current_action     = self.wait_action
+            # self.wait_action        = robot_action.NO_ACTION
             
     def stop_and_wait_for_spin(self):
         self.timer_stop_spin.cancel()
