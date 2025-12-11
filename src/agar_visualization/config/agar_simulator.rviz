@@ -8,7 +8,7 @@ Panels:
         - /RgbdCamera1
         - /Map1
       Splitter Ratio: 0.6015228629112244
-    Tree Height: 754
+    Tree Height: 727
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -103,30 +103,6 @@ Visualization Manager:
           Value: false
         top_stand:
           Value: false
-        zedx_camera_center:
-          Value: false
-        zedx_camera_link:
-          Value: true
-        zedx_left_camera_frame:
-          Value: false
-        zedx_left_camera_optical_frame:
-          Value: false
-        zedx_right_camera_frame:
-          Value: false
-        zedx_right_camera_optical_frame:
-          Value: false
-        zedxm_camera_center:
-          Value: false
-        zedxm_camera_link:
-          Value: true
-        zedxm_left_camera_frame:
-          Value: false
-        zedxm_left_camera_optical_frame:
-          Value: false
-        zedxm_right_camera_frame:
-          Value: false
-        zedxm_right_camera_optical_frame:
-          Value: false
       Marker Scale: 0.5
       Name: TF
       Show Arrows: true
@@ -163,22 +139,7 @@ Visualization Manager:
                   left_stand:
                     {}
                   main_camera_link:
-                    zedx_camera_link:
-                      zedx_camera_center:
-                        zedx_left_camera_frame:
-                          zedx_left_camera_optical_frame:
-                            {}
-                        zedx_right_camera_frame:
-                          zedx_right_camera_optical_frame:
-                            {}
-                    zedxm_camera_link:
-                      zedxm_camera_center:
-                        zedxm_left_camera_frame:
-                          zedxm_left_camera_optical_frame:
-                            {}
-                        zedxm_right_camera_frame:
-                          zedxm_right_camera_optical_frame:
-                            {}
+                    {}
                   rgbd_camera_link:
                     {}
                   right_stand:
@@ -309,56 +270,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        zedx_camera_center:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        zedx_camera_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zedx_left_camera_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zedx_left_camera_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zedx_right_camera_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zedx_right_camera_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zedxm_camera_center:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
-        zedxm_camera_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zedxm_left_camera_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zedxm_left_camera_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zedxm_right_camera_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-        zedxm_right_camera_optical_frame:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
       Mass Properties:
         Inertia: false
         Mass: false
@@ -520,7 +431,7 @@ Visualization Manager:
           Color: 255; 255; 255
           Color Transformer: RGB8
           Decay Time: 0
-          Enabled: true
+          Enabled: false
           Invert Rainbow: false
           Max Color: 255; 255; 255
           Max Intensity: 0
@@ -541,7 +452,7 @@ Visualization Manager:
             Value: /camera/rgbd/image_raw/points
           Use Fixed Frame: true
           Use rainbow: true
-          Value: true
+          Value: false
         - Alpha: 1
           Autocompute Intensity Bounds: true
           Autocompute Value Bounds:
@@ -626,7 +537,7 @@ Visualization Manager:
           Class: rviz_default_plugins/Map
           Color Scheme: costmap
           Draw Behind: false
-          Enabled: true
+          Enabled: false
           Name: CostMap Global
           Topic:
             Depth: 5
@@ -642,7 +553,7 @@ Visualization Manager:
             Reliability Policy: Reliable
             Value: /global_costmap/costmap_updates
           Use Timestamp: false
-          Value: true
+          Value: false
       Enabled: true
       Name: Map
     - Alpha: 1
@@ -916,37 +827,37 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/ThirdPersonFollower
-      Distance: 11.059734344482422
+      Distance: 28.77830696105957
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -0.35156285762786865
+        Y: -0.7905381321907043
+        Z: 4.183917781119817e-07
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3303981125354767
+      Pitch: 0.7053979635238647
       Target Frame: base_footprint
       Value: ThirdPersonFollower (rviz_default_plugins)
-      Yaw: 3.005398750305176
+      Yaw: 4.65540075302124
     Saved: ~
 Window Geometry:
   Depth Image:
     collapsed: false
   Displays:
     collapsed: false
-  Height: 1043
+  Height: 1016
   Hide Left Dock: false
   Hide Right Dock: false
   Navigation 2:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000018c00000375fc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d00000375000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d00650072006101000002ea000000c80000000000000000000000010000011600000375fc0200000007fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d000001e7000000a400fffffffb0000001200520047004200200049006d006100670065010000022a000000b30000002800fffffffb000000160044006500700074006800200049006d00610067006501000002e3000000cf0000002800fffffffb000000160044006500700074006800430061006d00650072006101000002cd000000e50000000000000000fb00000018004e0061007600690067006100740069006f006e0020003200000002630000014f0000013900fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007800000003efc0100000002fb0000000800540069006d0065010000000000000780000002fb00fffffffb0000000800540069006d00650100000000000004500000000000000000000004d20000037500000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000004000000000000018c0000035afc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d0000035a000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000c00430061006d00650072006101000002ea000000c8000000000000000000000001000001160000035afc0200000007fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d000001d8000000a400fffffffb0000001200520047004200200049006d006100670065010000021b000000ad0000002800fffffffb000000160044006500700074006800200049006d00610067006501000002ce000000c90000002800fffffffb000000160044006500700074006800430061006d00650072006101000002cd000000e50000000000000000fb00000018004e0061007600690067006100740069006f006e0020003200000002630000014f0000013900fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000007480000003efc0100000002fb0000000800540069006d0065010000000000000748000002fb00fffffffb0000000800540069006d006501000000000000045000000000000000000000049a0000035a00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   RGB Image:
     collapsed: false
   Selection:
@@ -957,6 +868,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1920
-  X: 0
-  Y: 0
+  Width: 1864
+  X: 56
+  Y: 27

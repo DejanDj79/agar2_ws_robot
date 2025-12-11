@@ -28,7 +28,8 @@ def generate_launch_description():
     world_path = os.path.join(
         get_package_share_directory('agar_gazebo'),
         'worlds',
-        'agar_world_full.sdf'
+        'agar_world.sdf'
+        # 'agar_world_full.sdf'
     )
     
     gazebo_launch = IncludeLaunchDescription(

@@ -67,8 +67,8 @@ class WaypointFollower(Node):
 
         timer_period        = 1 / 20  # seconds
         self.timer          = self.create_timer(timer_period, self.run)
-        self.timer_stop     = self.create_timer(3.0, self.stop_and_wait)
-        self.timer_stop.cancel()
+        # self.timer_stop     = self.create_timer(3.0, self.stop_and_wait)
+        # self.timer_stop.cancel()
 
         self.timer_stop_spin = self.create_timer(2.0, self.stop_and_wait_for_spin)
         self.timer_stop_spin.cancel()
@@ -97,6 +97,8 @@ class WaypointFollower(Node):
         # self.collision_zones_sub            = self.create_subscription(CollisionZones, '/collision_zones', self.collision_zones_callback, 10)
         self.load_waypoints_sub             = self.create_subscription(String, '/load_waypoints', self.load_waypoints_callback, 10, callback_group=self.callback_group)
         self.reset_waypoints_sub            = self.create_subscription(UInt64, '/reset_waypoints', self.reset_waypoints_callback, 10)
+
+        self.robot_stopped_sub            = self.create_subscription(Bool, '/robot_stopped', self.robot_stopped_callback, 10)
 
         self.source_frame = 'odom'
         self.target_frame = 'base_footprint'
@@ -434,6 +436,12 @@ class WaypointFollower(Node):
         #     self.current_action = robot_action.BACKUP
 
     def navigation_active_callback(self, msg):
+
+        self.get_logger().info('********************************************************************')
+        self.get_logger().info('Navigation active callback received: {0}'.format(msg.data))
+        self.get_logger().info('Number of waypoints: {0}'.format(len(self.waypoints)))
+        self.get_logger().info('********************************************************************')
+
         if msg.data is True and len(self.waypoints) > 0:
             self.navigation_active  = True
             self.current_action     = robot_action.FOLLOW_PATH
@@ -445,6 +453,10 @@ class WaypointFollower(Node):
             self.get_logger().info('Start time: {0}'.format(datetime.now()))
             self.get_logger().info('********************************************************************')
         else:
+            self.get_logger().info('********************************************************************')
+            self.get_logger().info('Navigation not started.')
+            self.get_logger().info('********************************************************************')
+
             self.navigation_active  = False
             self.current_action     = robot_action.STOP
             self.brake_robot()
@@ -586,17 +598,19 @@ class WaypointFollower(Node):
 
             # if not self.simulator_mode:
             #     self.set_robot_speed()
-            self.set_robot_speed()
-            self.set_robot_speed()
+            if not self.simulator_mode:
+                self.set_robot_speed()
+                self.set_robot_speed()
 
             if self.waypoint_index < len(self.waypoints) - 1 and self.waypoints[self.waypoint_index + 1].tank:
                 self.goal_distance = 0.7
 
             if self.current_waypoint.tank:
-                msg = Twist()
-                msg.linear.x  = 0.0
-                msg.angular.z = 0.0
-                self.cmd_vel_pub.publish(msg)
+                # msg = Twist()
+                # msg.linear.x  = 0.0
+                # msg.angular.z = 0.0
+                # self.cmd_vel_pub.publish(msg)
+                self.brake_robot()
                 self.current_action = robot_action.STOP
                 self.timer_stop_spin.reset()
                 # self.delay_active = True
@@ -662,20 +676,30 @@ class WaypointFollower(Node):
             if speed_z > 1: speed_z = 1.0
             if angle_deg < 0: speed_z *= -1.0
 
+            # self.get_logger().info(f'Reverse: {self.reverse}')
+
             if self.reverse:
                 speed_x *= -1
-                speed_z *= -1
+                if not self.simulator_mode:
+                    speed_z *= -1
+
+
+            # self.get_logger().info(f'Speed x: {round(speed_x, 2)}, direction: {self.robot_direction}')
 
             if speed_x >= 0 and self.robot_direction == robot_direction.BACKWARD:
+                speed_x = 0.0
+                speed_z = 0.0
                 self.current_action     = robot_action.STOP
                 self.robot_direction    = robot_direction.FORWARD
                 self.wait_action        = robot_action.FOLLOW_PATH
-                self.timer_stop.reset()
+                # self.timer_stop.reset()
             elif speed_x < 0 and self.robot_direction == robot_direction.FORWARD:
+                speed_x = 0.0
+                speed_z = 0.0
                 self.current_action     = robot_action.STOP
                 self.robot_direction    = robot_direction.BACKWARD
                 self.wait_action        = robot_action.FOLLOW_PATH
-                self.timer_stop.reset()
+                # self.timer_stop.reset()
 
             msg = Twist()
             msg.linear.x = speed_x
@@ -742,11 +766,18 @@ class WaypointFollower(Node):
     def stop_and_wait(self):
         self.get_logger().info(f'Stop and wait finished. Continuing with action {self.wait_action}')
         # self.get_logger().info(f'Waypoint index {self.waypoint_index}, idx: {self.current_waypoint.idx}')
-        self.timer_stop.cancel()
+        # self.timer_stop.cancel()
         # self.current_action     = robot_action.FOLLOW_PATH
         self.current_action     = self.wait_action
         self.wait_action        = robot_action.NO_ACTION
 
+    def robot_stopped_callback(self, msg):
+        self.get_logger().info(f'wait action: {self.wait_action}')
+        if msg.data and self.navigation_active and self.wait_action != robot_action.NO_ACTION:
+            self.get_logger().info('Robot stopped detected. Continuing with next action.')
+            self.current_action     = self.wait_action
+            self.wait_action        = robot_action.NO_ACTION
+            
     def stop_and_wait_for_spin(self):
         self.timer_stop_spin.cancel()
         self.current_action = robot_action.SPIN
@@ -786,11 +817,13 @@ class WaypointFollower(Node):
             
             # self.goal_reached()
 
+            self.brake_robot()
             self.current_action     = robot_action.STOP
             self.robot_direction    = robot_direction.BACKWARD
             self.wait_action        = robot_action.BACKUP
-            self.timer_stop.reset()
+            # self.timer_stop.reset()
         elif agar_action == 11: # Forward distance
+            self.brake_robot()
             self.backup_start_position = [self.robot_position.x, self.robot_position.y]
             self.backup_distance = param_1
             self.get_logger().info(f'Forward distance: {round(self.backup_distance, 2)}')
@@ -798,7 +831,7 @@ class WaypointFollower(Node):
             self.current_action     = robot_action.STOP
             self.robot_direction    = robot_direction.FORWARD
             self.wait_action        = robot_action.BACKUP_FORWARD
-            self.timer_stop.reset()
+            # self.timer_stop.reset()
     #endregion
 
     #region Angle and point calculation

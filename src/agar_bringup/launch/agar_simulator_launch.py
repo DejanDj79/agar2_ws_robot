@@ -93,7 +93,7 @@ def generate_launch_description():
         # mapviz_launch,
         # robot_steering_node,
 
-        waypoint_follower,
+        # waypoint_follower,
         # datum_correction,
 
         waypoint_service,

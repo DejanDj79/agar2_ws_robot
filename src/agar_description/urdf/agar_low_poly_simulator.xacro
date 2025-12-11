@@ -28,7 +28,7 @@
     <!-- <xacro:include filename="$(find agar_description)/urdf/lidar.xacro" /> -->
     <xacro:include filename="$(find agar_description)/urdf/camera.xacro" />
 
-    <xacro:include filename="$(find agar_description)/urdf/zed_cameras.urdf.xacro" />
+    <!-- <xacro:include filename="$(find agar_description)/urdf/zed_cameras.urdf.xacro" /> -->
     <xacro:include filename="$(find agar_description)/urdf/agar_control.xacro" />
     
     <!-- AgAR frame -->
