@@ -35,8 +35,9 @@ class ObjectDetection(Node):
 
         self.take_photo_sub         = self.create_subscription(Bool, '/image/take_photo', self.take_photo_callback, 10)
         
-        # self.capture_image_sub      = self.create_subscription(Image, '/zedx/zed_node/rgb/image_rect_color', self.capture_image_callback, 10)
-        self.capture_image_sub      = self.create_subscription(CompressedImage, '/zedx/zed_node/rgb_raw/image_raw_color/compressed', self.capture_image_callback, 1)
+        self.capture_image_sub      = self.create_subscription(CompressedImage, '/zedx/zed_node/rgb/color/rect/image/compressed', self.capture_image_callback, 1)
+        # self.capture_image_sub      = self.create_subscription(CompressedImage, '/zedx/zed_node/rgb_raw/image_raw_color/compressed', self.capture_image_callback, 1)
+
         self.cmd_vel_sub            = self.create_subscription(Twist, '/cmd_vel', self.cmd_vel_callback, 10)
 
         self.detected_object_sub    = self.create_subscription(ObjectsStamped, '/zedx/zed_node/obj_det/objects', self.detected_object_callback, 1)

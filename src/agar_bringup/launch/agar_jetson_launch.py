@@ -135,6 +135,7 @@ def generate_launch_description():
               'camera_model': 'zedxm',
               'camera_name': 'zedxm',
               'serial_number': '55327043',
+              'node_log_type': 'screen',
           }.items()
       )
     
@@ -145,7 +146,7 @@ def generate_launch_description():
         localization_launch,
         navigation_launch,
         waypoint_follower,
-        # object_detection,
+        object_detection,
         # collision_checker,
         # battery_status,
         jetson_online,
@@ -156,7 +157,7 @@ def generate_launch_description():
         set_mission_editor_service,
         position_data_service,
 
-        # zedcamera_front_launch,
+        zedcamera_front_launch,
         # # zedcamera_rear_launch,
     ])
     

@@ -5,12 +5,19 @@
 /**:
     ros__parameters:
         general:
-            serial_number: 0 # usually overwritten by launch file
-            camera_timeout_sec: 5
+            serial_number: 0 # overwritten by launch file
             pub_resolution: "NATIVE" # The resolution used for output. 'NATIVE' to use the same `general.grab_resolution` - `CUSTOM` to apply the `general.pub_downscale_factor` downscale factory to reduce bandwidth in transmission
             pub_downscale_factor: 2.0 # rescale factor used to rescale image before publishing when 'pub_resolution' is 'CUSTOM'
             gpu_id: -1
             optional_opencv_calibration_file: "" # Optional path where the ZED SDK can find a file containing the calibration information of the camera computed by OpenCV. Read the ZED SDK documentation for more information: https://www.stereolabs.com/docs/api/structsl_1_1InitParameters.html#a9eab2753374ef3baec1d31960859ba19
+            publish_status: true # Enable/Disable the publishing of the camera status topic
+
+        svo:
+            use_svo_timestamps: true # Use the SVO timestamps to publish data. If false, data will be published at the system time.
+            publish_svo_clock: true # [overwritten by launch file options] When use_svo_timestamps is true allows to publish the SVO clock to the `/clock` topic. This is useful for synchronous rosbag playback.
+            svo_loop: false # Enable loop mode when using an SVO as input source. NOTE: ignored if SVO timestamping is used
+            svo_realtime: true # if true the SVO will be played trying to respect the original framerate eventually skipping frames, otherwise every frame will be processed respecting the `pub_frame_rate` setting
+            play_from_frame: 0 # Start playing the SVO from a specific frame
 
         video:
             saturation: 4 # [DYNAMIC]
@@ -32,10 +39,18 @@
             auto_digital_gain_range_min: 1 # [DYNAMIC] - Defines the minimum range of digital ISP gain in automatic control
             auto_digital_gain_range_max: 256 # [DYNAMIC] - Defines the maximum range of digital ISP gain in automatic control
             denoising: 50 # [DYNAMIC] - Defines the level of denoising applied on both left and right images. Range [0-100]
+            enable_24bit_output: false # [SDK >= 5.1] Enable BGR 24-bit output for lower bandwidth usage. If false, BGRA 32-bit output is used (old way before SDK v5.1)
+            publish_rgb: true # Advertise the RGB image topics that are published only if a node subscribes to them
+            publish_gray: false # Advertise the gray image topics that are published only if a node subscribes to them
+            publish_raw: false # Advertise the raw image topics that are published only if a node subscribes to them (only if 'publish_rgb' or 'publish_gray' is true)
 
         sensors:
-            publish_imu_tf: true # [usually overwritten by launch file] enable/disable the IMU TF broadcasting
-            sensors_pub_rate: 200. # [DYNAMIC] - frequency of publishing of sensors data. MAX: 400. - MIN: grab rate
+            publish_imu_tf: true # [overwritten by launch file options] enable/disable the IMU TF broadcasting
+            sensors_pub_rate: 100. # [DYNAMIC] - frequency of publishing of sensors data. MAX: 400. - MIN: grab rate
+            publish_imu: true # Advertise the IMU topic that is published only if a node subscribes to it
+            publish_imu_raw: false # Advertise the raw IMU topic that is published only if a node subscribes to it
+            publish_cam_imu_transf: false # Advertise the CAMERA-IMU transformation topic that is published only if a node subscribes to it
+            publish_temp: false # Advertise the temperature topics that are published only if a node subscribes to them
 
         stream_server:
             stream_enabled: false # enable the streaming server when the camera is open
@@ -55,9 +70,13 @@
 
         debug:
             sdk_verbose: 1 # Set the verbose level of the ZED SDK
+            sdk_verbose_log_file: '' # Path to the file where the ZED SDK will log its messages. If empty, no file will be created. The log level can be set using the `sdk_verbose` parameter.
+            use_pub_timestamps: false # Use the current ROS time for the message timestamp instead of the camera timestamp. This is useful to test data communication latency.
             debug_common: false
             debug_video_depth: false
             debug_camera_controls: false
             debug_sensors: false
             debug_streaming: false
             debug_advanced: false
+            debug_nitros: false
+            disable_nitros: false # If available, disable NITROS usage for debugging and testing purposes
