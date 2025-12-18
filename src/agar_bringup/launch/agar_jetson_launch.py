@@ -156,7 +156,7 @@ def generate_launch_description():
         set_mission_editor_service,
         position_data_service,
 
-        zedcamera_front_launch,
-        # zedcamera_rear_launch,
+        # zedcamera_front_launch,
+        # # zedcamera_rear_launch,
     ])
     
