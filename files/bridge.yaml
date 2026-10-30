@@ -12,6 +12,12 @@
      topic: /cmd_vel
      type: geometry_msgs/msg/Twist
      queue_size: 1
+
+ -
+     topic: /cmd_vel_raw
+     type: geometry_msgs/msg/Twist
+     queue_size: 10
+
  -
      topic: /agar_notifications
      type: std_msgs/msg/String

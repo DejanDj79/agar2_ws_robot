@@ -1,0 +1,21 @@
+ros2_medkit_gateway:
+  ros__parameters:
+    server.host: "10.77.0.10"
+    server.port: 8080
+
+    cors.allowed_origins:
+      - "http://localhost:3000"
+      - "http://localhost:5173"
+
+    plugins:
+      - "graph_provider"
+      - "procfs"
+      - "systemd"
+
+    plugins.graph_provider.path: "/opt/ros/humble/lib/ros2_medkit_graph_provider/libros2_medkit_graph_provider_plugin.so"
+
+    plugins.procfs.path: "/opt/ros/humble/lib/ros2_medkit_linux_introspection/libprocfs_introspection.so"
+    plugins.procfs.pid_cache_ttl_seconds: 10
+
+    plugins.systemd.path: "/opt/ros/humble/lib/ros2_medkit_linux_introspection/libsystemd_introspection.so"
+    plugins.systemd.pid_cache_ttl_seconds: 10

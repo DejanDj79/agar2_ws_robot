@@ -1,0 +1,22 @@
+zed_scan_probe:
+  ros__parameters:
+    # Transform the registered ZED point cloud into the robot base frame before
+    # selecting a horizontal obstacle band.
+    target_frame: base_footprint
+    transform_tolerance: 0.05
+    queue_size: 1
+
+    # Keep ground returns and high canopy out of the diagnostic 2D scan.
+    min_height: 0.15
+    max_height: 2.20
+
+    # The ZED is forward-looking. Empty bins outside its actual field of view
+    # remain infinite and are not interpreted as obstacles.
+    angle_min: -1.570796327
+    angle_max: 1.570796327
+    angle_increment: 0.008726646
+    scan_time: 0.10
+    range_min: 0.50
+    range_max: 15.0
+    use_inf: true
+    inf_epsilon: 1.0

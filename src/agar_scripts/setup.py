@@ -21,7 +21,9 @@ setup(
     entry_points={
         'console_scripts': [
             'simulator_odometry = agar_scripts.simulator_odometry:main',
+            'fuzzy_middleware = agar_scripts.fuzzy_middleware:main',
             'waypoint_follower = agar_scripts.waypoint_follower:main',
+            'virtual_fence = agar_scripts.virtual_fence:main',
             'collision_checker = agar_scripts.collision_checker:main',
             'toknav_gps = agar_scripts.toknav:main',
             'datum_correction = agar_scripts.datum_correction:main',
@@ -33,6 +35,9 @@ setup(
             'get_mission_editor_service = agar_scripts.get_mission_editor_service:main',
             'set_mission_editor_service = agar_scripts.set_mission_editor_service:main',
             'position_data_service = agar_scripts.position_data_service:main',
+            'system_health_monitor = agar_scripts.system_health_monitor:main',
+            'system_health_cli = agar_scripts.system_health_cli:main',
+            'system_health_rviz = agar_scripts.system_health_rviz:main',
             # 'notifications = agar_scripts.notifications:main',
             'object_detection = agar_scripts.object_detection:main',
             # 'telegram_commands = agar_scripts.telegram_commands:main',

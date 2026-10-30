@@ -1,0 +1,31 @@
+slam_health_monitor:
+  ros__parameters:
+    diagnostics_topic: /diagnostics
+    scan_topic: /scan
+    map_topic: /map
+    map_frame: map
+    odom_frame: odom
+    base_frame: base_footprint
+    default_scan_frame: velodyne
+
+    startup_grace_sec: 45.0
+    check_period_sec: 1.0
+    tf_sample_period_sec: 0.1
+
+    scan_rate_window_sec: 10.0
+    min_scan_rate_hz: 5.0
+    scan_warn_age_sec: 0.5
+    scan_error_age_sec: 2.0
+
+    tf_warn_age_sec: 0.5
+    tf_error_age_sec: 2.0
+    scan_tf_check_delay_sec: 0.3
+    timing_window_sec: 10.0
+    timing_warn_failure_ratio: 0.1
+    timing_error_failure_ratio: 0.5
+
+    jump_warn_translation_m: 0.2
+    jump_error_translation_m: 0.4
+    jump_warn_yaw_deg: 5.0
+    jump_error_yaw_deg: 12.0
+    jump_hold_sec: 10.0

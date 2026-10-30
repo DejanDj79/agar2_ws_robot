@@ -1,15 +1,24 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
   pkg_localization = FindPackageShare(package='agar_localization').find('agar_localization')
   robot_localization_file_path = os.path.join(pkg_localization, 'config', 'localization_config.yaml') 
-  
+  enable_slam = LaunchConfiguration('enable_slam')
+
+  declare_enable_slam = DeclareLaunchArgument(
+    'enable_slam',
+    default_value='false',
+    description='Enable slam_toolbox and let SLAM own map->odom. If false, publish static map->odom for GPS/localization mode.'
+  )
+
   gnss_fix_to_odometry_node = Node(
         package="robot_localization",
         executable="navsat_transform_node",
@@ -35,6 +44,7 @@ def generate_launch_description():
     )
   
   map_to_odom = Node(
+      condition=UnlessCondition(enable_slam),
       package="tf2_ros",
       executable="static_transform_publisher",
       name="odom_to_map",
@@ -74,11 +84,13 @@ def generate_launch_description():
 
   slam_launch = IncludeLaunchDescription(
       PythonLaunchDescriptionSource([os.path.join(
-         get_package_share_directory('agar_localization'), 'launch'),
-         '/agar_slam_launch.py'])
+         get_package_share_directory('agar_slam'), 'launch'),
+         '/agar_slam_launch.py']),
+      condition=IfCondition(enable_slam),
       )
   
   ld = LaunchDescription()
+  ld.add_action(declare_enable_slam)
   
   ld.add_action(start_robot_localization_cmd)
   ld.add_action(gnss_fix_to_odometry_node)
@@ -88,7 +100,7 @@ def generate_launch_description():
   ld.add_action(camera_cloud_to_laser_tf)
   ld.add_action(camera_cloud_to_laserscan)
 
-  # ld.add_action(slam_launch)
+  ld.add_action(slam_launch)
 
   # ld.add_action(odom_to_basefootprint)
 

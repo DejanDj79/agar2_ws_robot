@@ -1,45 +1,104 @@
+import math
+
 import rclpy
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 
-from tf2_ros import TransformBroadcaster
-from tf_transformations import quaternion_from_euler
+from tf2_ros import StaticTransformBroadcaster
 from geometry_msgs.msg import TransformStamped
 
-from sensor_msgs.msg import Imu
-from math import pi
+
+def quaternion_from_euler(roll, pitch, yaw):
+    half_roll = roll * 0.5
+    half_pitch = pitch * 0.5
+    half_yaw = yaw * 0.5
+    cr = math.cos(half_roll)
+    sr = math.sin(half_roll)
+    cp = math.cos(half_pitch)
+    sp = math.sin(half_pitch)
+    cy = math.cos(half_yaw)
+    sy = math.sin(half_yaw)
+    return [
+        sr * cp * cy - cr * sp * sy,
+        cr * sp * cy + sr * cp * sy,
+        cr * cp * sy - sr * sp * cy,
+        cr * cp * cy + sr * sp * sy,
+    ]
+
 
 class CameraMountPosition(Node):
 
     def __init__(self):
         super().__init__('camera_position')
 
-        timer_period = 1.0 / 20
-        self.timer_camera_tf = self.create_timer(timer_period, self.publish_tf_data)
+        self.declare_parameter('base_frame', 'base_footprint')
+        self.declare_parameter('mount_frame', 'main_camera_link')
+        self.declare_parameter('front_camera_frame', 'zedx_camera_link')
+        self.declare_parameter('rear_camera_frame', 'zedxm_camera_link')
+        self.declare_parameter('mount_x_m', 0.55)
+        self.declare_parameter('mount_y_m', 0.0)
+        self.declare_parameter('mount_z_m', 1.60)
+        self.declare_parameter('mount_roll_rad', 0.0)
+        self.declare_parameter('mount_pitch_rad', 0.0)
+        self.declare_parameter('mount_yaw_rad', 0.0)
+        self.declare_parameter('front_x_m', 0.05)
+        self.declare_parameter('rear_x_m', -0.05)
 
-        self.tf_broadcaster = TransformBroadcaster(self)
+        self.base_frame = self.get_parameter('base_frame').value
+        self.mount_frame = self.get_parameter('mount_frame').value
+        self.front_camera_frame = self.get_parameter(
+            'front_camera_frame'
+        ).value
+        self.rear_camera_frame = self.get_parameter(
+            'rear_camera_frame'
+        ).value
+        self.mount_position = [
+            self.get_parameter('mount_x_m').value,
+            self.get_parameter('mount_y_m').value,
+            self.get_parameter('mount_z_m').value,
+        ]
+        self.mount_orientation = quaternion_from_euler(
+            self.get_parameter('mount_roll_rad').value,
+            self.get_parameter('mount_pitch_rad').value,
+            self.get_parameter('mount_yaw_rad').value,
+        )
+        self.front_x_m = self.get_parameter('front_x_m').value
+        self.rear_x_m = self.get_parameter('rear_x_m').value
 
-        self.camera_orientation = [0.0, 0.0, 0.0, 1.0]
+        self.tf_broadcaster = StaticTransformBroadcaster(self)
+        self.publish_tf_data()
 
-
-        self.zedxm_orientation = quaternion_from_euler(0, 0, pi)
-
-        self.get_logger().info('Initialization completed')
-
-        self.imu_sub  = self.create_subscription(Imu, '/zedx/zed_node/imu/data', self.imu_data_callback, 10) 
-
-    def imu_data_callback(self, msg):
-        self.camera_orientation[0] = msg.orientation.x
-        self.camera_orientation[1] = msg.orientation.y
-        self.camera_orientation[2] = msg.orientation.z
-        self.camera_orientation[3] = msg.orientation.w
-
-        # self.get_logger().info(f'IMU data received: {self.camera_orientation[0]}, {self.camera_orientation[1]}, {self.camera_orientation[2]}, {self.camera_orientation[3]}')
+        self.get_logger().info(
+            'Published fixed camera mount TF: %s -> %s -> %s'
+            % (
+                self.base_frame,
+                self.mount_frame,
+                self.front_camera_frame,
+            )
+        )
 
     def publish_tf_data(self):
-        self.tf_broadcaster.sendTransform(self.set_transform('base_footprint', 'main_camera_link', [0.55, 0.0, 1.60], self.camera_orientation))
-        self.tf_broadcaster.sendTransform(self.set_transform('main_camera_link', 'zedx_camera_link', [0.05, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]))
-        self.tf_broadcaster.sendTransform(self.set_transform('main_camera_link', 'zedxm_camera_link', [-0.05, 0.0, 0.0], self.zedxm_orientation))
-
+        transforms = [
+            self.set_transform(
+                self.base_frame,
+                self.mount_frame,
+                self.mount_position,
+                self.mount_orientation,
+            ),
+            self.set_transform(
+                self.mount_frame,
+                self.front_camera_frame,
+                [self.front_x_m, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+            ),
+            self.set_transform(
+                self.mount_frame,
+                self.rear_camera_frame,
+                [self.rear_x_m, 0.0, 0.0],
+                quaternion_from_euler(0.0, 0.0, 3.141592653589793),
+            ),
+        ]
+        self.tf_broadcaster.sendTransform(transforms)
 
     def set_transform(self, frame_id, child_frame_id, position, orientation):
         t = TransformStamped()
@@ -58,14 +117,19 @@ class CameraMountPosition(Node):
 
         return t
 
-    
+
 def main(args=None):
     rclpy.init(args=args)
     camera_position = CameraMountPosition()
-    rclpy.spin(camera_position)
-    camera_position.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(camera_position)
+    except (KeyboardInterrupt, ExternalShutdownException):
+        pass
+    finally:
+        camera_position.destroy_node()
+        if rclpy.ok():
+            rclpy.shutdown()
 
-    
+
 if __name__ == '__main__':
     main()

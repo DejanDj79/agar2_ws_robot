@@ -1,0 +1,41 @@
+fuzzy_middleware:
+  ros__parameters:
+    input_cmd_topic: /cmd_vel_raw
+    output_cmd_topic: /cmd_vel
+    pto_rpm_topic: /pto/rpm
+    pto_current_topic: /pto/current
+    pto_status_topic: /extra_motor_status
+    factor_topic: /fuzzy_debug/factor
+    notification_topic: /agar_notifications
+
+    enable_fuzzy: true
+
+    rpm_full_speed: 2250.0
+    rpm_stop: 1800.0
+    rpm_shutdown: 800.0
+    rpm_shutdown_timeout_sec: 5.0
+    enable_pto_auto_shutdown: false
+    min_scale_factor: 0.0
+    no_rule_fallback_speed: 100.0
+
+    use_current_derate_curve: true
+    current_derate_amps: [190.0, 220.0, 250.0, 280.0, 300.0]
+    current_derate_factors: [1.0, 0.9, 0.8, 0.5, 0.0]
+    current_hard_stop: 300.0
+    current_hard_stop_samples: 3
+
+    pto_timeout_sec: 3.0
+    pto_startup_grace_sec: 4.0
+    pto_max_valid_current: 1000.0
+    pto_max_valid_rpm: 4000.0
+    pass_through_if_pto_missing: false
+    infer_pto_active_from_telemetry: true
+    pto_status_timeout_sec: 2.0
+    pto_infer_active_min_rpm: 50.0
+    pto_infer_active_min_current: 5.0
+    factor_slew_rate_per_sec: 2.0
+    publish_brake_on_stop: false
+    resume_last_cmd_after_stop: true
+    emergency_stop_hold_sec: 3.0
+    notification_cooldown_sec: 10.0
+    notify_invalid_telemetry: false

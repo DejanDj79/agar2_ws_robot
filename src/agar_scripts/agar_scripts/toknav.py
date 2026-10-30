@@ -10,7 +10,7 @@ import sys
 import re
 import datetime
 import calendar
-from math import atan2, pi, radians, degrees, isnan, sin, cos
+from math import atan2, pi, radians, degrees, isfinite, isnan, sin, cos
 
 from std_msgs.msg import Int16, Bool
 from geometry_msgs.msg import Twist, Quaternion, QuaternionStamped
@@ -53,6 +53,7 @@ class ToknavGpsDriver(Node):
 
         self.prev_status = None
         self.has_rtk_fix = True
+        self.valid_fix = False
 
         self.gps_pub = self.create_publisher(NavSatFix, "/gps/fix", 10)
         self.gps_left_pub = self.create_publisher(NavSatFix, "/gps/fix/left", 10)
@@ -107,6 +108,8 @@ class ToknavGpsDriver(Node):
 
         self.position = [0.0, 0.0, 0.0]
         self.orientation = quaternion_from_euler(0, 0, 0)
+        self.invalid_fix_log_period_sec = 10.0
+        self.last_invalid_fix_log_ts = 0.0
 
 
         # self.heading    = euler_from_quaternion([0.0, 0.0, -0.9986637550641332, -0.051678857584170644])
@@ -332,6 +335,37 @@ class ToknavGpsDriver(Node):
         return radians(self.safe_float(degs))
     #endregion
 
+    def has_valid_gga_position(self, data):
+        if not data:
+            return False
+
+        fix_type = int(data.get('fix_type', 0))
+        latitude = float(data.get('latitude', 0.0))
+        longitude = float(data.get('longitude', 0.0))
+
+        return (
+            fix_type > 0
+            and isfinite(latitude)
+            and isfinite(longitude)
+            and not (abs(latitude) < 1e-9 and abs(longitude) < 1e-9)
+        )
+
+    def publish_no_fix(self, msg, reason):
+        msg.status.status = NavSatStatus.STATUS_NO_FIX
+        msg.status.service = NavSatStatus.SERVICE_GPS
+        msg.latitude = float('nan')
+        msg.longitude = float('nan')
+        msg.altitude = float('nan')
+        msg.position_covariance_type = NavSatFix.COVARIANCE_TYPE_UNKNOWN
+
+        now = time.monotonic()
+        if (now - self.last_invalid_fix_log_ts) >= self.invalid_fix_log_period_sec:
+            self.last_invalid_fix_log_ts = now
+            self.get_logger().warn(reason)
+
+        self.valid_fix = False
+        self.gps_pub.publish(msg)
+
     def connect_to_device(self):
         while(True):
             # print('Connection...')
@@ -413,16 +447,23 @@ class ToknavGpsDriver(Node):
             self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'gps_link', [0.0, 0.0, 0.5], [0.0, 0.0, 0.0, 1.0]))
             self.tf_broadcaster.sendTransform(self.set_transform('base_link', 'imu', [0.0, 0.0, 0.4], [0.0, 0.0, 0.0, 1.0]))
 
-            if self.gga['fix_type'] == 4 and self.ggah['fix_type'] == 4 and self.has_rtk_fix == False:
-                self.has_rtk_fix = True
-            elif self.has_rtk_fix == True:
-                self.has_rtk_fix = False
-
             gps_fix_msg = NavSatFix()
             gps_fix_msg.header.stamp        = self.get_clock().now().to_msg()
             gps_fix_msg.header.frame_id     = "gps_link"
 
             gps_fix_msg.position_covariance_type = NavSatFix.COVARIANCE_TYPE_APPROXIMATED
+
+            if not self.has_valid_gga_position(self.gga) or not self.has_valid_gga_position(self.ggah):
+                self.publish_no_fix(
+                    gps_fix_msg,
+                    "GPS fix ignored: waiting for valid position on both antennas",
+                )
+                return
+
+            if self.gga['fix_type'] == 4 and self.ggah['fix_type'] == 4 and self.has_rtk_fix == False:
+                self.has_rtk_fix = True
+            elif self.has_rtk_fix == True:
+                self.has_rtk_fix = False
 
             if self.use_GNSS_time:
                 gps_fix_msg.header.stamp = rclpy.time.Time(seconds=self.gga['utc_time'][0], nanoseconds=self.gga['utc_time'][1]).to_msg()

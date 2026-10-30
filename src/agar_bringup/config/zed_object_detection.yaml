@@ -1,0 +1,26 @@
+/**:
+  ros__parameters:
+    object_detection:
+      od_enabled: true
+      class:
+        people:
+          enabled: true
+          confidence_threshold: 65.0
+        vehicle:
+          enabled: false
+          confidence_threshold: 60.0
+        bag:
+          enabled: false
+          confidence_threshold: 40.0
+        animal:
+          enabled: false
+          confidence_threshold: 40.0
+        electronics:
+          enabled: false
+          confidence_threshold: 45.0
+        fruit_vegetable:
+          enabled: false
+          confidence_threshold: 50.0
+        sport:
+          enabled: false
+          confidence_threshold: 30.0

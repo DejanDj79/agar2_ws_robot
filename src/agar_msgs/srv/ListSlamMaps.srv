@@ -1,0 +1,7 @@
+---
+bool success
+string message
+string[] map_names
+string[] yaml_paths
+string active_map_path
+string active_map_target

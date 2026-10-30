@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>agar_slam</name>
+  <version>0.0.0</version>
+  <description>AgAR SLAM launch files, configuration, and map tools</description>
+  <maintainer email="nikola.velcev@coming.rs">Nikola Velcev</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <test_depend>ament_copyright</test_depend>
+  <test_depend>ament_flake8</test_depend>
+  <test_depend>ament_pep257</test_depend>
+  <test_depend>python3-pytest</test_depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>diagnostic_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>agar_msgs</exec_depend>
+  <exec_depend>agar_description</exec_depend>
+  <exec_depend>robot_localization</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>pointcloud_to_laserscan</exec_depend>
+  <exec_depend>zed_wrapper</exec_depend>
+  <exec_depend>velodyne</exec_depend>
+  <exec_depend>slam_toolbox</exec_depend>
+  <exec_depend>nav2_amcl</exec_depend>
+  <exec_depend>nav2_lifecycle_manager</exec_depend>
+  <exec_depend>nav2_map_server</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

@@ -1,0 +1,16 @@
+fault_manager:
+  ros__parameters:
+    storage_type: "sqlite"
+    database_path: "/var/lib/ros2_medkit/faults.db"
+
+    # The AgAR bridge performs transition/debounce filtering before reporting.
+    confirmation_threshold: -1
+    healing_enabled: true
+    # The AgAR bridge emits one PASSED event per recovery transition. A fault
+    # starts at counter -1, so threshold 0 heals it on that single PASSED.
+    healing_threshold: 0
+
+    # Start conservatively. Selective black-box topics will be enabled after the
+    # gateway and fault lifecycle are stable on the real robot.
+    snapshots.enabled: false
+    snapshots.rosbag.enabled: false

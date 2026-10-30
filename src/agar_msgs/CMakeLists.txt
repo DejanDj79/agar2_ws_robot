@@ -26,6 +26,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/SetMissionEditor.srv"
   "srv/PositionData.srv"
   "srv/RobotSpeedSave.srv"
+  "srv/SaveSlamMap.srv"
+  "srv/SetActiveSlamMap.srv"
+  "srv/ListSlamMaps.srv"
   DEPENDENCIES geographic_msgs #geometry_msgs # Add packages that above messages depend on, in this case geometry_msgs for Sphere.msg
 )
 

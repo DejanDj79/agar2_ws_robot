@@ -1,0 +1,9 @@
+string map_name
+bool set_active
+bool overwrite
+---
+bool success
+string message
+string yaml_path
+string image_path
+string active_map_path

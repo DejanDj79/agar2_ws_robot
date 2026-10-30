@@ -1,0 +1,34 @@
+agar_medkit_diagnostic_bridge:
+  ros__parameters:
+    diagnostics_topic: "/diagnostics"
+    fault_manager_service: "/fault_manager/report_fault"
+    startup_grace_sec: 20.0
+    failure_threshold: 3
+    recovery_threshold: 3
+    active_repeat_sec: 300.0
+
+    diagnostic_names:
+      - "system_health/summary"
+      - "ekf_filter_node: Filter diagnostic updater"
+      - "ekf_filter_node: odometry/filtered topic status"
+      - "lifecycle_manager_navigation: Nav2 Health"
+      - "zed_node: ZED X"
+      - "slam/engine"
+      - "slam/scan_input"
+      - "slam/tf_chain"
+      - "slam/map_availability"
+      - "slam/localization_jump"
+      - "slam/message_timing"
+
+    fault_codes:
+      - "AGAR_SYSTEM_HEALTH"
+      - "LOCALIZATION_EKF"
+      - "LOCALIZATION_ODOMETRY_RATE"
+      - "NAV2_HEALTH"
+      - "ZED_CAMERA_HEALTH"
+      - "SLAM_ENGINE_HEALTH"
+      - "SLAM_SCAN_INPUT"
+      - "SLAM_TF_CHAIN"
+      - "SLAM_MAP_UNAVAILABLE"
+      - "SLAM_LOCALIZATION_JUMP"
+      - "SLAM_MESSAGE_TIMING"

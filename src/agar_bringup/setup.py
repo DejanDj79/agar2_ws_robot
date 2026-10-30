@@ -26,6 +26,7 @@ setup(
         'console_scripts': [
             'test_node = agar_bringup.test_node:main',
             'agar_rosbag = agar_bringup.rosbag_record:main',
+            'agar_medkit_diagnostic_bridge = agar_bringup.medkit_diagnostic_bridge:main',
         ],
     },
 )

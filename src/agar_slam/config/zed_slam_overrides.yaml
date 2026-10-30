@@ -1,0 +1,5 @@
+/**:
+  ros__parameters:
+    # SLAM Toolbox owns global loop-closure corrections. Its odom input must
+    # remain continuous, so the ZED must not reset odometry on its own.
+    pos_tracking.reset_odom_with_loop_closure: false
